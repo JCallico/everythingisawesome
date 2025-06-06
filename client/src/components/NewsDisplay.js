@@ -156,7 +156,6 @@ const NewsDisplay = ({ stories }) => {
           disabled={isTransitioning}
         >
           <span>◀</span>
-          Previous
         </button>
 
         <button
@@ -171,7 +170,6 @@ const NewsDisplay = ({ stories }) => {
           className="nav-btn next-btn"
           disabled={isTransitioning}
         >
-          Next
           <span>▶</span>
         </button>
       </div>
