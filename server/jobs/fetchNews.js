@@ -7,7 +7,7 @@ const path = require('path');
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 
-const fetchDailyNews = async () => {
+const fetchDailyNews = async (targetDate = null) => {
   try {
     const apiKey = process.env.GROK_API_KEY;
     if (!apiKey) {
@@ -15,8 +15,9 @@ const fetchDailyNews = async () => {
       return false;
     }
 
-    const yesterday = getPreviousDate(new Date());
-    const formattedDate = moment(yesterday).format('MMMM Do, YYYY');
+    // Use provided date or default to yesterday
+    const dateToFetch = targetDate ? formatDateForFilename(targetDate) : getPreviousDate(new Date());
+    const formattedDate = moment(dateToFetch).format('MMMM Do, YYYY');
     
     // Read the example.json as template
     const examplePath = path.join(__dirname, '../../example.json');
@@ -44,7 +45,7 @@ Focus on stories about:
 
 Format the results as JSON with this exact structure:
 {
-  "date": "${yesterday}",
+  "date": "${dateToFetch}",
   "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
   "stories": [
     {
@@ -96,10 +97,10 @@ The awesome_index should range from 50-100, with the most inspiring stories gett
     }
 
     // Save the news data
-    const success = await saveNewsByDate(yesterday, newsData);
+    const success = await saveNewsByDate(dateToFetch, newsData);
     
     if (success) {
-      console.log(`Successfully fetched and saved news for ${yesterday}`);
+      console.log(`Successfully fetched and saved news for ${dateToFetch}`);
       return true;
     } else {
       console.error('Failed to save news data');
