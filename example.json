@@ -1,0 +1,66 @@
+{
+  "date": "2025-06-05",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "stories": [
+    {
+      "title": "Breakthrough in HIV Cure Research",
+      "summary": "A Melbourne research team discovered a method to make HIV visible within white blood cells, a significant step toward a potential cure, offering hope to millions worldwide.",
+      "link": "https://www.theguardian.com/global-development/2025/jun/05/breakthrough-in-search-for-hiv-cure-leaves-researchers-overwhelmed",
+      "awesome_index": 95
+    },
+    {
+      "title": "Global Push for Ocean Protection",
+      "summary": "The EU and 28 nations ratified a treaty to protect 30% of the world’s oceans by 2030, showcasing global commitment to marine ecosystem preservation.",
+      "link": "https://x.com/grok/status/2025-06-05",
+      "awesome_index": 90
+    },
+    {
+      "title": "Scotland’s Move to Criminalize Ecocide",
+      "summary": "Scotland is advancing legislation to make ecocide a crime, inspiring hope for stronger global environmental protections by holding corporations and individuals accountable.",
+      "link": "https://x.com/grok/status/2025-06-05",
+      "awesome_index": 85
+    },
+    {
+      "title": "Australia’s Renewable Energy Milestone",
+      "summary": "Australia’s energy grid reached 43% renewable energy usage, marking progress toward a sustainable future and showcasing human innovation in combating climate change.",
+      "link": "https://x.com/grok/status/2025-06-05",
+      "awesome_index": 80
+    },
+    {
+      "title": "Decline in U.S. Violent Crime",
+      "summary": "Violent crime in the U.S. dropped by over 20%, reflecting improved community safety and effective social programs, fostering hope and security.",
+      "link": "https://x.com/grok/status/2025-06-05",
+      "awesome_index": 75
+    },
+    {
+      "title": "India’s Environmental Campaign Expands",
+      "summary": "PM Narendra Modi planted a sapling on World Environment Day, extending the 'Ek Ped Maa Ke Naam' campaign and launching an Aravalli reforestation initiative, inspiring collective action.",
+      "link": "https://www.thehindu.com/news/national/top-news-of-the-day-june-5-2025/article68418246.ece",
+      "awesome_index": 70
+    },
+    {
+      "title": "AI Integration in Education Inspires Students",
+      "summary": "Galgotias University incorporated AI into its academic programs to inspire and empower students, highlighting the positive potential of technology in education.",
+      "link": "https://www.thehindu.com/education/news-from-the-world-of-education-june-5-2025/article68418258.ece",
+      "awesome_index": 65
+    },
+    {
+      "title": "Student Innovation Shines at Hackathon",
+      "summary": "Students from Amrita Vishwa Vidyapeetham won the Guidewire DEVTrails University Hackathon 2025 with their project KubeBoom, showcasing next-generation creativity.",
+      "link": "https://www.thehindu.com/education/news-from-the-world-of-education-june-5-2025/article68418258.ece",
+      "awesome_index": 60
+    },
+    {
+      "title": "Charming Film Inspires Creativity",
+      "summary": "Superboys of Malegaon, a Certified Fresh dramedy, celebrates amateur filmmakers in India, inspiring audiences with their creativity and determination.",
+      "link": "https://editorial.rottentomatoes.com/article/best-new-movies-2025-ranked/",
+      "awesome_index": 55
+    },
+    {
+      "title": "Buddy Comedy Spreads Joy",
+      "summary": "One of Them Days, featuring Keke Palmer and SZA, revitalizes the buddy-comedy genre with laughter and chemistry, uplifting audiences and celebrating human connections.",
+      "link": "https://editorial.rottentomatoes.com/article/best-new-movies-2025-ranked/",
+      "awesome_index": 50
+    }
+  ]
+}

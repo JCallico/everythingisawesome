@@ -1,0 +1,36 @@
+{
+  "date": "2025-06-04",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "stories": [
+    {
+      "title": "Revolutionary Clean Energy Breakthrough",
+      "summary": "Scientists developed a new solar panel technology that is 50% more efficient, bringing us closer to affordable clean energy for everyone.",
+      "link": "https://example.com/solar-breakthrough",
+      "awesome_index": 98
+    },
+    {
+      "title": "Global Education Initiative Reaches Milestone",
+      "summary": "UNESCO announced that 1 million more children gained access to education this year through innovative remote learning programs.",
+      "link": "https://example.com/education-milestone",
+      "awesome_index": 95
+    },
+    {
+      "title": "Medical Marvel: New Treatment Shows Promise",
+      "summary": "Clinical trials reveal a groundbreaking treatment that could help millions of people with autoimmune diseases live healthier lives.",
+      "link": "https://example.com/medical-breakthrough",
+      "awesome_index": 92
+    },
+    {
+      "title": "Community Heroes Transform Neighborhood",
+      "summary": "Local volunteers in Detroit transformed an abandoned lot into a thriving community garden, providing fresh food and bringing neighbors together.",
+      "link": "https://example.com/community-garden",
+      "awesome_index": 88
+    },
+    {
+      "title": "Tech for Good: AI Helps Conservation",
+      "summary": "Artificial intelligence is now being used to track and protect endangered species, giving conservationists powerful new tools.",
+      "link": "https://example.com/ai-conservation",
+      "awesome_index": 85
+    }
+  ]
+}

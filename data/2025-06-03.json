@@ -1,0 +1,36 @@
+{
+  "date": "2025-06-03",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "stories": [
+    {
+      "title": "Ocean Cleanup Project Removes Record Plastic",
+      "summary": "The Ocean Cleanup project removed 100,000 pounds of plastic from the Great Pacific Garbage Patch, marking their most successful cleanup yet.",
+      "link": "https://example.com/ocean-cleanup",
+      "awesome_index": 96
+    },
+    {
+      "title": "Students Design Solution for Water Crisis",
+      "summary": "High school students in Kenya invented a low-cost water purification system that could help millions access clean drinking water.",
+      "link": "https://example.com/student-innovation",
+      "awesome_index": 93
+    },
+    {
+      "title": "Mental Health Support Expands Globally",
+      "summary": "New mental health support programs launched in 50 countries, providing free counseling and support to those who need it most.",
+      "link": "https://example.com/mental-health",
+      "awesome_index": 90
+    },
+    {
+      "title": "Renewable Energy Milestone Achieved",
+      "summary": "Wind and solar power now generate 40% of the worlds electricity, marking a historic shift toward sustainable energy.",
+      "link": "https://example.com/renewable-milestone",
+      "awesome_index": 87
+    },
+    {
+      "title": "Acts of Kindness Go Viral",
+      "summary": "A simple act of kindness by a grocery store worker sparked a global movement of people helping strangers, restoring faith in humanity.",
+      "link": "https://example.com/kindness-viral",
+      "awesome_index": 84
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "everythingisawesome",
+  "version": "1.0.0",
+  "description": "A website displaying optimistic, feel-good news stories",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/index.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "node server/index.js",
+    "install-all": "npm install && cd client && npm install",
+    "fetch-news": "node server/jobs/fetchNews.js",
+    "create-sample": "node server/jobs/createSampleData.js",
+    "setup": "npm run install-all && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Run \"npm run dev\" to start the application' && echo '3. Visit http://localhost:3000 to see your site'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.2",
+    "fs-extra": "^11.1.1",
+    "moment": "^2.29.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
