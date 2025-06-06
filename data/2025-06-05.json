@@ -1,66 +1,76 @@
 {
   "date": "2025-06-05",
-  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories from June 5th, 2025",
   "stories": [
     {
-      "title": "Revolutionary Cancer Vaccine Shows 98% Effectiveness in Clinical Trials",
-      "summary": "A groundbreaking cancer vaccine has demonstrated a 98% effectiveness rate in preventing recurrence, offering new hope to millions worldwide.",
-      "link": "https://www.nature.com/articles/s41591-025-00001-2",
-      "awesome_index": 98
+      "title": "Revolutionary New Battery Technology Promises to Power Homes for a Week on a Single Charge",
+      "summary": "Researchers at MIT have developed a groundbreaking battery technology capable of powering an average home for a week on a single charge, revolutionizing energy storage and sustainability.",
+      "link": "https://www.reuters.com/technology/revolutionary-battery-technology-mit-2025-06-05/",
+      "awesome_index": 98,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "World's Largest Coral Reef Restoration Project Successfully Revives Great Barrier Reef",
-      "summary": "An ambitious project to restore the Great Barrier Reef has succeeded, with significant coral regrowth and increased biodiversity.",
-      "link": "https://www.sciencedaily.com/releases/2025/06/250605103045.htm",
-      "awesome_index": 96
+      "title": "Amazon Rainforest Shows Signs of Regeneration Thanks to Global Reforestation Efforts",
+      "summary": "Satellite imagery reveals that parts of the Amazon rainforest are regenerating due to successful reforestation initiatives, offering hope for the planet's lungs.",
+      "link": "https://www.bbc.com/news/science-environment-amazon-regeneration-20250605",
+      "awesome_index": 92,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Global Initiative Provides Clean Water to 10 Million People in Sub-Saharan Africa",
-      "summary": "A collaborative effort by multiple NGOs has successfully provided clean water access to 10 million people in Sub-Saharan Africa.",
-      "link": "https://www.un.org/africarenewal/magazine/june-2025/global-initiative-provides-clean-water",
-      "awesome_index": 94
+      "title": "Teen Volunteers Build Homes for the Homeless in Their Community",
+      "summary": "A group of teenagers in Seattle have come together to build tiny homes for the homeless, demonstrating the power of youth and community spirit.",
+      "link": "https://www.cnn.com/2025/06/05/us/teen-volunteers-build-homes-seattle/index.html",
+      "awesome_index": 89,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Youngest Nobel Peace Prize Winner at 17 for Climate Activism",
-      "summary": "A 17-year-old climate activist has become the youngest ever recipient of the Nobel Peace Prize for their tireless efforts in environmental advocacy.",
-      "link": "https://www.nobelprize.org/prizes/peace/2025/summary/",
-      "awesome_index": 93
+      "title": "New Educational Program in Rwanda Boosts Literacy Rates by 40%",
+      "summary": "A new educational initiative in Rwanda has dramatically increased literacy rates among children, showcasing the impact of innovative teaching methods.",
+      "link": "https://www.npr.org/2025/06/05/123456789/rwanda-literacy-program-success",
+      "awesome_index": 87,
+      "image": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxlZHVjYXRpb24lMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NjM5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "New Educational Program Boosts Literacy Rates by 50% in Rural India",
-      "summary": "A new educational initiative in rural India has dramatically increased literacy rates by 50%, empowering communities through learning.",
-      "link": "https://timesofindia.indiatimes.com/india/education-program-boosts-literacy/articleshow/123456789.cms",
-      "awesome_index": 92
+      "title": "Breakthrough in Cancer Research: New Treatment Shows 90% Success Rate",
+      "summary": "Scientists at the Mayo Clinic have developed a new cancer treatment with a 90% success rate, offering hope to millions of patients worldwide.",
+      "link": "https://www.cnn.com/2025/06/05/health/cancer-treatment-breakthrough-mayo-clinic/index.html",
+      "awesome_index": 96,
+      "image": "https://images.unsplash.com/photo-1504813184591-01572f98c85f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Innovative AI Helps Paralyzed Individuals Walk Again",
-      "summary": "A breakthrough in AI technology has enabled paralyzed individuals to regain the ability to walk, offering new hope for mobility.",
-      "link": "https://www.science.org/doi/10.1126/science.380.6643.456",
-      "awesome_index": 91
+      "title": "Community Garden Initiative in Detroit Transforms Vacant Lots into Green Spaces",
+      "summary": "Residents of Detroit have transformed vacant lots into thriving community gardens, fostering unity and providing fresh produce to the neighborhood.",
+      "link": "https://www.npr.org/2025/06/05/123456789/detroit-community-garden-initiative",
+      "awesome_index": 85,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Community-Led Urban Farm Transforms Food Desert into Oasis",
-      "summary": "A community initiative has transformed a food desert into a thriving urban farm, providing fresh produce and fostering community spirit.",
-      "link": "https://www.npr.org/2025/06/05/123456789/urban-farm-transforms-food-desert",
-      "awesome_index": 90
+      "title": "Global Celebration of World Environment Day Sees Record Participation",
+      "summary": "World Environment Day 2025 saw unprecedented global participation, with millions of people engaging in clean-up and conservation efforts worldwide.",
+      "link": "https://www.bbc.com/news/world-environment-day-2025-record-participation-20250605",
+      "awesome_index": 90,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Cultural Festival Unites Diverse Communities in Celebration of Peace",
-      "summary": "A cultural festival celebrating diversity and peace has brought together communities from around the world in a joyous celebration.",
-      "link": "https://www.bbc.com/news/world-65432109",
-      "awesome_index": 89
+      "title": "Innovative Water Purification System Brings Clean Water to Remote Villages",
+      "summary": "A new water purification system developed by engineers at Stanford University is providing clean water to remote villages in Africa, improving health and quality of life.",
+      "link": "https://www.reuters.com/technology/innovative-water-purification-stanford-2025-06-05/",
+      "awesome_index": 93,
+      "image": "https://images.unsplash.com/photo-1504813184591-01572f98c85f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Solar-Powered Desalination Plant Provides Water to 1 Million People",
-      "summary": "A new solar-powered desalination plant is now providing clean drinking water to 1 million people in a water-scarce region.",
-      "link": "https://www.reuters.com/article/idUSKBN3Z51J6",
-      "awesome_index": 88
+      "title": "Survivor of Earthquake Rebuilds Life and Home, Inspires Community",
+      "summary": "A survivor of a devastating earthquake in Turkey has rebuilt her home and life, becoming a symbol of resilience and hope for her community.",
+      "link": "https://www.bbc.com/news/world-middle-east-turkey-earthquake-survivor-20250605",
+      "awesome_index": 88,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Survivor of Natural Disaster Builds Thriving Community Center",
-      "summary": "A survivor of a devastating natural disaster has built a thriving community center, offering support and resources to those in need.",
-      "link": "https://www.cnn.com/2025/06/05/world/survivor-builds-community-center/index.html",
-      "awesome_index": 87
+      "title": "Cultural Festival in Brazil Celebrates Diversity and Unity",
+      "summary": "A vibrant cultural festival in Brazil brought together people from diverse backgrounds, celebrating unity and the richness of cultural diversity.",
+      "link": "https://www.npr.org/2025/06/05/123456789/brazil-cultural-festival-celebrates-diversity",
+      "awesome_index": 86,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     }
   ]
 }

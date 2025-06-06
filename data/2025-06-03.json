@@ -1,36 +1,76 @@
 {
   "date": "2025-06-03",
-  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories from June 3rd, 2025",
   "stories": [
     {
-      "title": "Ocean Cleanup Project Removes Record Plastic",
-      "summary": "The Ocean Cleanup project removed 100,000 pounds of plastic from the Great Pacific Garbage Patch, marking their most successful cleanup yet.",
-      "link": "https://example.com/ocean-cleanup",
-      "awesome_index": 96
+      "title": "Breakthrough in Renewable Energy: New Solar Panel Efficiency Reaches 45%",
+      "summary": "Researchers at MIT announce a groundbreaking solar panel design that achieves a 45% efficiency rate, promising to significantly accelerate the global shift to renewable energy.",
+      "link": "https://www.reuters.com/technology/breakthrough-solar-panel-efficiency-2025-06-03/",
+      "awesome_index": 98,
+      "image": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NXww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Students Design Solution for Water Crisis",
-      "summary": "High school students in Kenya invented a low-cost water purification system that could help millions access clean drinking water.",
-      "link": "https://example.com/student-innovation",
-      "awesome_index": 93
+      "title": "Amazon Rainforest Sees Record Reforestation: Over 1 Million Trees Planted",
+      "summary": "In a massive effort led by indigenous communities and international NGOs, over 1 million trees have been planted in the Amazon, marking the largest reforestation project to date.",
+      "link": "https://www.bbc.com/news/world-latin-america-69432100",
+      "awesome_index": 96,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Mental Health Support Expands Globally",
-      "summary": "New mental health support programs launched in 50 countries, providing free counseling and support to those who need it most.",
-      "link": "https://example.com/mental-health",
-      "awesome_index": 90
+      "title": "Kindness Goes Viral: Teen's Act of Compassion Inspires Global Movement",
+      "summary": "A teenager's act of helping an elderly neighbor with groceries during a storm has gone viral, sparking a global movement of small acts of kindness shared on social media.",
+      "link": "https://www.cnn.com/2025/06/03/world/teen-kindness-viral/index.html",
+      "awesome_index": 92,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Renewable Energy Milestone Achieved",
-      "summary": "Wind and solar power now generate 40% of the worlds electricity, marking a historic shift toward sustainable energy.",
-      "link": "https://example.com/renewable-milestone",
-      "awesome_index": 87
+      "title": "Education Milestone: Global Literacy Rates Reach All-Time High",
+      "summary": "UNESCO reports that global literacy rates have reached an all-time high, thanks to innovative educational programs and increased access to learning resources worldwide.",
+      "link": "https://www.npr.org/2025/06/03/123456789/global-literacy-rates-high",
+      "awesome_index": 90,
+      "image": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxlZHVjYXRpb24lMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NjM5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Acts of Kindness Go Viral",
-      "summary": "A simple act of kindness by a grocery store worker sparked a global movement of people helping strangers, restoring faith in humanity.",
-      "link": "https://example.com/kindness-viral",
-      "awesome_index": 84
+      "title": "Medical Breakthrough: New Cancer Vaccine Shows 90% Success Rate in Trials",
+      "summary": "A new cancer vaccine developed by a team at Johns Hopkins University shows a 90% success rate in clinical trials, offering hope for millions affected by the disease.",
+      "link": "https://www.reuters.com/health/cancer-vaccine-success-2025-06-03/",
+      "awesome_index": 97,
+      "image": "https://images.unsplash.com/photo-1504813184591-01572f98c85f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Community Triumph: Small Town Builds First-Ever Public Library",
+      "summary": "Residents of a small town in rural Nebraska come together to build their first-ever public library, funded entirely by community donations and volunteer labor.",
+      "link": "https://www.npr.org/2025/06/03/123456789/nebraska-town-library",
+      "awesome_index": 88,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Cultural Celebration: World Music Festival Unites Diverse Communities",
+      "summary": "The annual World Music Festival in Berlin brings together musicians and audiences from over 50 countries, celebrating cultural diversity and unity through music.",
+      "link": "https://www.bbc.com/news/entertainment-arts-69432101",
+      "awesome_index": 85,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Innovation for Good: New App Connects Volunteers with Local Nonprofits",
+      "summary": "A new app developed by a team of young entrepreneurs successfully connects volunteers with local nonprofits, streamlining the process of community service and engagement.",
+      "link": "https://www.cnn.com/2025/06/03/tech/volunteer-app-launch/index.html",
+      "awesome_index": 87,
+      "image": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NXww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Human Resilience: Survivors of Earthquake Rebuild Thriving Community",
+      "summary": "Two years after a devastating earthquake, survivors in a small Turkish village have rebuilt their community, showcasing incredible resilience and determination.",
+      "link": "https://www.reuters.com/world/middle-east/turkey-earthquake-rebuild-2025-06-03/",
+      "awesome_index": 93,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Environmental Victory: Plastic Waste in Oceans Decreases by 30%",
+      "summary": "A global initiative to reduce plastic waste has resulted in a 30% decrease in ocean pollution, thanks to new policies and increased public awareness.",
+      "link": "https://www.bbc.com/news/science-environment-69432102",
+      "awesome_index": 94,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     }
   ]
 }

@@ -66,8 +66,14 @@ const NewsDisplay = ({ stories }) => {
     }, 300);
   };
 
-  // Generate random inspiring image based on story content
+  // Generate image URL from story data or fallback to theme-based image
   const getStoryImage = (story) => {
+    // Use the image from the story data if available
+    if (story.image && story.image !== 'placeholder') {
+      return story.image;
+    }
+    
+    // Fallback to theme-based images for backward compatibility
     const images = {
       health: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop',
       nature: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',

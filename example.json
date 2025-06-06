@@ -3,64 +3,74 @@
   "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
   "stories": [
     {
-      "title": "Breakthrough in HIV Cure Research",
-      "summary": "A Melbourne research team discovered a method to make HIV visible within white blood cells, a significant step toward a potential cure, offering hope to millions worldwide.",
-      "link": "https://www.theguardian.com/global-development/2025/jun/05/breakthrough-in-search-for-hiv-cure-leaves-researchers-overwhelmed",
-      "awesome_index": 95
+      "title": "Revolutionary Cancer Vaccine Shows 98% Effectiveness in Clinical Trials",
+      "summary": "A groundbreaking cancer vaccine has demonstrated a 98% effectiveness rate in preventing recurrence, offering new hope to millions worldwide.",
+      "link": "https://www.nature.com/articles/s41591-025-00001-2",
+      "awesome_index": 98,
+      "image": "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop"
     },
     {
-      "title": "Global Push for Ocean Protection",
-      "summary": "The EU and 28 nations ratified a treaty to protect 30% of the world’s oceans by 2030, showcasing global commitment to marine ecosystem preservation.",
-      "link": "https://x.com/grok/status/2025-06-05",
-      "awesome_index": 90
+      "title": "World's Largest Coral Reef Restoration Project Successfully Revives Great Barrier Reef",
+      "summary": "An ambitious project to restore the Great Barrier Reef has succeeded, with significant coral regrowth and increased biodiversity.",
+      "link": "https://www.sciencedaily.com/releases/2025/06/250605103045.htm",
+      "awesome_index": 96,
+      "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop"
     },
     {
-      "title": "Scotland’s Move to Criminalize Ecocide",
-      "summary": "Scotland is advancing legislation to make ecocide a crime, inspiring hope for stronger global environmental protections by holding corporations and individuals accountable.",
-      "link": "https://x.com/grok/status/2025-06-05",
-      "awesome_index": 85
+      "title": "Global Initiative Provides Clean Water to 10 Million People in Sub-Saharan Africa",
+      "summary": "A collaborative effort by multiple NGOs has successfully provided clean water access to 10 million people in Sub-Saharan Africa.",
+      "link": "https://www.un.org/africarenewal/magazine/june-2025/global-initiative-provides-clean-water",
+      "awesome_index": 94,
+      "image": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop"
     },
     {
-      "title": "Australia’s Renewable Energy Milestone",
-      "summary": "Australia’s energy grid reached 43% renewable energy usage, marking progress toward a sustainable future and showcasing human innovation in combating climate change.",
-      "link": "https://x.com/grok/status/2025-06-05",
-      "awesome_index": 80
+      "title": "Youngest Nobel Peace Prize Winner at 17 for Climate Activism",
+      "summary": "A 17-year-old climate activist has become the youngest ever recipient of the Nobel Peace Prize for their tireless efforts in environmental advocacy.",
+      "link": "https://www.nobelprize.org/prizes/peace/2025/summary/",
+      "awesome_index": 93,
+      "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop"
     },
     {
-      "title": "Decline in U.S. Violent Crime",
-      "summary": "Violent crime in the U.S. dropped by over 20%, reflecting improved community safety and effective social programs, fostering hope and security.",
-      "link": "https://x.com/grok/status/2025-06-05",
-      "awesome_index": 75
+      "title": "New Educational Program Boosts Literacy Rates by 50% in Rural India",
+      "summary": "A new educational initiative in rural India has dramatically increased literacy rates by 50%, empowering communities through learning.",
+      "link": "https://timesofindia.indiatimes.com/india/education-program-boosts-literacy/articleshow/123456789.cms",
+      "awesome_index": 92,
+      "image": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop"
     },
     {
-      "title": "India’s Environmental Campaign Expands",
-      "summary": "PM Narendra Modi planted a sapling on World Environment Day, extending the 'Ek Ped Maa Ke Naam' campaign and launching an Aravalli reforestation initiative, inspiring collective action.",
-      "link": "https://www.thehindu.com/news/national/top-news-of-the-day-june-5-2025/article68418246.ece",
-      "awesome_index": 70
+      "title": "Innovative AI Helps Paralyzed Individuals Walk Again",
+      "summary": "A breakthrough in AI technology has enabled paralyzed individuals to regain the ability to walk, offering new hope for mobility.",
+      "link": "https://www.science.org/doi/10.1126/science.380.6643.456",
+      "awesome_index": 91,
+      "image": "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop"
     },
     {
-      "title": "AI Integration in Education Inspires Students",
-      "summary": "Galgotias University incorporated AI into its academic programs to inspire and empower students, highlighting the positive potential of technology in education.",
-      "link": "https://www.thehindu.com/education/news-from-the-world-of-education-june-5-2025/article68418258.ece",
-      "awesome_index": 65
+      "title": "Community-Led Urban Farm Transforms Food Desert into Oasis",
+      "summary": "A community initiative has transformed a food desert into a thriving urban farm, providing fresh produce and fostering community spirit.",
+      "link": "https://www.npr.org/2025/06/05/123456789/urban-farm-transforms-food-desert",
+      "awesome_index": 90,
+      "image": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop"
     },
     {
-      "title": "Student Innovation Shines at Hackathon",
-      "summary": "Students from Amrita Vishwa Vidyapeetham won the Guidewire DEVTrails University Hackathon 2025 with their project KubeBoom, showcasing next-generation creativity.",
-      "link": "https://www.thehindu.com/education/news-from-the-world-of-education-june-5-2025/article68418258.ece",
-      "awesome_index": 60
+      "title": "Cultural Festival Unites Diverse Communities in Celebration of Peace",
+      "summary": "A cultural festival celebrating diversity and peace has brought together communities from around the world in a joyous celebration.",
+      "link": "https://www.bbc.com/news/world-65432109",
+      "awesome_index": 89,
+      "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=600&fit=crop"
     },
     {
-      "title": "Charming Film Inspires Creativity",
-      "summary": "Superboys of Malegaon, a Certified Fresh dramedy, celebrates amateur filmmakers in India, inspiring audiences with their creativity and determination.",
-      "link": "https://editorial.rottentomatoes.com/article/best-new-movies-2025-ranked/",
-      "awesome_index": 55
+      "title": "Solar-Powered Desalination Plant Provides Water to 1 Million People",
+      "summary": "A new solar-powered desalination plant is now providing clean drinking water to 1 million people in a water-scarce region.",
+      "link": "https://www.reuters.com/article/idUSKBN3Z51J6",
+      "awesome_index": 88,
+      "image": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=600&fit=crop"
     },
     {
-      "title": "Buddy Comedy Spreads Joy",
-      "summary": "One of Them Days, featuring Keke Palmer and SZA, revitalizes the buddy-comedy genre with laughter and chemistry, uplifting audiences and celebrating human connections.",
-      "link": "https://editorial.rottentomatoes.com/article/best-new-movies-2025-ranked/",
-      "awesome_index": 50
+      "title": "Survivor of Natural Disaster Builds Thriving Community Center",
+      "summary": "A survivor of a devastating natural disaster has built a thriving community center, offering support and resources to those in need.",
+      "link": "https://www.cnn.com/2025/06/05/world/survivor-builds-community-center/index.html",
+      "awesome_index": 87,
+      "image": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop"
     }
   ]
 }

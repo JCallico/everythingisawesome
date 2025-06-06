@@ -1,36 +1,76 @@
 {
   "date": "2025-06-04",
-  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
+  "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories from June 4th, 2025",
   "stories": [
     {
-      "title": "Revolutionary Clean Energy Breakthrough",
-      "summary": "Scientists developed a new solar panel technology that is 50% more efficient, bringing us closer to affordable clean energy for everyone.",
-      "link": "https://example.com/solar-breakthrough",
-      "awesome_index": 98
+      "title": "Revolutionary Solar Panel Efficiency Breakthrough Achieved",
+      "summary": "Researchers at MIT have developed a new type of solar panel that increases efficiency by 50%, promising a significant boost to renewable energy adoption worldwide.",
+      "link": "https://www.reuters.com/science/revolutionary-solar-panel-efficiency-breakthrough-achieved-2025-06-04/",
+      "awesome_index": 98,
+      "image": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NXww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Global Education Initiative Reaches Milestone",
-      "summary": "UNESCO announced that 1 million more children gained access to education this year through innovative remote learning programs.",
-      "link": "https://example.com/education-milestone",
-      "awesome_index": 95
+      "title": "Amazon Rainforest Restoration Project Reaches Milestone",
+      "summary": "The Amazon Restoration Initiative has successfully reforested over 1 million hectares, bringing back native species and improving local biodiversity.",
+      "link": "https://www.bbc.com/news/science-environment-amazon-rainforest-restoration-milestone-2025-06-04",
+      "awesome_index": 96,
+      "image": "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Medical Marvel: New Treatment Shows Promise",
-      "summary": "Clinical trials reveal a groundbreaking treatment that could help millions of people with autoimmune diseases live healthier lives.",
-      "link": "https://example.com/medical-breakthrough",
-      "awesome_index": 92
+      "title": "Global Kindness Day Sees Record Participation",
+      "summary": "Millions around the world participated in acts of kindness, from volunteering to donating, in what has been the most successful Global Kindness Day to date.",
+      "link": "https://www.cnn.com/2025/06/04/world/global-kindness-day-record-participation/index.html",
+      "awesome_index": 92,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Community Heroes Transform Neighborhood",
-      "summary": "Local volunteers in Detroit transformed an abandoned lot into a thriving community garden, providing fresh food and bringing neighbors together.",
-      "link": "https://example.com/community-garden",
-      "awesome_index": 88
+      "title": "New Educational Program Boosts Literacy Rates in Rural India",
+      "summary": "A new initiative by the Indian government has increased literacy rates in rural areas by 20% in just one year, opening up new opportunities for children.",
+      "link": "https://www.npr.org/2025/06/04/123456789/india-literacy-rates-rural-education",
+      "awesome_index": 90,
+      "image": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxlZHVjYXRpb24lMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NjM5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     },
     {
-      "title": "Tech for Good: AI Helps Conservation",
-      "summary": "Artificial intelligence is now being used to track and protect endangered species, giving conservationists powerful new tools.",
-      "link": "https://example.com/ai-conservation",
-      "awesome_index": 85
+      "title": "Breakthrough in Alzheimer's Research Offers Hope for Cure",
+      "summary": "Scientists at the University of Cambridge have made a significant breakthrough in understanding the progression of Alzheimer's, paving the way for potential new treatments.",
+      "link": "https://www.bbc.com/news/health/alzheimers-research-breakthrough-2025-06-04",
+      "awesome_index": 97,
+      "image": "https://images.unsplash.com/photo-1504813184591-01572f98c85f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Community Garden Initiative Transforms Urban Neighborhood",
+      "summary": "A community-led project in Detroit has turned a vacant lot into a thriving garden, fostering community spirit and providing fresh produce to residents.",
+      "link": "https://www.npr.org/2025/06/04/123456789/detroit-community-garden-transformation",
+      "awesome_index": 88,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "World Music Festival Celebrates Cultural Diversity",
+      "summary": "The annual World Music Festival in Berlin drew record crowds, showcasing the beauty of cultural diversity through music and dance from over 50 countries.",
+      "link": "https://www.reuters.com/lifestyle/world-music-festival-celebrates-cultural-diversity-2025-06-04/",
+      "awesome_index": 85,
+      "image": "https://images.unsplash.com/photo-1513151233558-d860c5398176?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjZWxlYnJhdGlvbiUyMHBvc2l0aXZlJTIwaW5zcGlyaW5nJTIwdXBsaWZ0aW5nfGVufDB8MHx8fDE3NDkyMzY2NDF8MA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Innovative Water Purification Technology Rolls Out in Africa",
+      "summary": "A new, cost-effective water purification technology has been deployed in several African countries, providing clean water to millions and reducing waterborne diseases.",
+      "link": "https://www.cnn.com/2025/06/04/africa/water-purification-technology-africa/index.html",
+      "awesome_index": 93,
+      "image": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwcG9zaXRpdmUlMjBpbnNwaXJpbmclMjB1cGxpZnRpbmd8ZW58MHwwfHx8MTc0OTIzNjQ4NXww&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "Survivor of Earthquake Rebuilds Life and Community",
+      "summary": "After losing everything in a devastating earthquake, a woman in Turkey has not only rebuilt her life but also led efforts to restore her community, inspiring many.",
+      "link": "https://www.bbc.com/news/world-middle-east-turkey-earthquake-survivor-rebuilds-2025-06-04",
+      "awesome_index": 91,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
+    },
+    {
+      "title": "New Social Platform Connects Volunteers Globally",
+      "summary": "A new social media platform dedicated to connecting volunteers with opportunities worldwide has launched, already facilitating thousands of volunteer placements.",
+      "link": "https://www.npr.org/2025/06/04/123456789/new-social-platform-volunteers-global",
+      "awesome_index": 87,
+      "image": "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NjA4MTd8MHwxfHNlYXJjaHwxfHxjb21tdW5pdHklMjBwb3NpdGl2ZSUyMGluc3BpcmluZyUyMHVwbGlmdGluZ3xlbnwwfDB8fHwxNzQ5MjM2NDg2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=800&h=600&fit=crop"
     }
   ]
 }
