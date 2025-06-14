@@ -85,7 +85,6 @@ const HomePage = () => {
     <div className="news-container">
       <div className="news-date">
         <h2>{news.title}</h2>
-        <p>{moment(news.date).format('MMMM Do, YYYY')}</p>
       </div>
 
       <NewsDisplay stories={news.stories} />
