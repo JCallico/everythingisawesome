@@ -11,17 +11,110 @@ const NewsDisplay = ({ stories }) => {
     const summary = story.summary.toLowerCase();
     const text = title + ' ' + summary;
 
-    if (text.includes('medical') || text.includes('health') || text.includes('cancer') || text.includes('treatment')) {
+    // Medical and health-related
+    if (text.includes('medical') || text.includes('health') || text.includes('cancer') || 
+        text.includes('treatment') || text.includes('hospital') || text.includes('doctor') || 
+        text.includes('medicine') || text.includes('vaccine')) {
       return 'theme-health';
-    } else if (text.includes('environment') || text.includes('coral') || text.includes('forest') || text.includes('nature')) {
+    }
+    // Environment and nature
+    else if (text.includes('environment') || text.includes('coral') || text.includes('forest') || 
+             text.includes('nature') || text.includes('climate') || text.includes('wildlife') || 
+             text.includes('ocean') || text.includes('green') || text.includes('sustainability')) {
       return 'theme-nature';
-    } else if (text.includes('ai') || text.includes('technology') || text.includes('innovation') || text.includes('breakthrough')) {
+    }
+    // Technology and innovation
+    else if (text.includes('ai') || text.includes('technology') || text.includes('innovation') || 
+             text.includes('breakthrough') || text.includes('robot') || text.includes('digital') || 
+             text.includes('software') || text.includes('internet') || text.includes('computer')) {
       return 'theme-innovation';
-    } else if (text.includes('community') || text.includes('volunteer') || text.includes('together') || text.includes('support')) {
+    }
+    // Community and social
+    else if (text.includes('community') || text.includes('volunteer') || text.includes('together') || 
+             text.includes('support') || text.includes('charity') || text.includes('help') || 
+             text.includes('donate') || text.includes('social')) {
       return 'theme-community';
-    } else if (text.includes('education') || text.includes('learning') || text.includes('school') || text.includes('literacy')) {
+    }
+    // Education and learning
+    else if (text.includes('education') || text.includes('learning') || text.includes('school') || 
+             text.includes('literacy') || text.includes('student') || text.includes('university') || 
+             text.includes('teaching') || text.includes('academic')) {
       return 'theme-education';
-    } else {
+    }
+    // Sports and fitness
+    else if (text.includes('sport') || text.includes('game') || text.includes('team') || 
+             text.includes('player') || text.includes('championship') || text.includes('olympic') || 
+             text.includes('fitness') || text.includes('athlete') || text.includes('competition')) {
+      return 'theme-sports';
+    }
+    // Science and research
+    else if (text.includes('science') || text.includes('research') || text.includes('study') || 
+             text.includes('discovery') || text.includes('experiment') || text.includes('laboratory') || 
+             text.includes('scientist') || text.includes('physics') || text.includes('chemistry')) {
+      return 'theme-science';
+    }
+    // Arts and culture
+    else if (text.includes('art') || text.includes('music') || text.includes('film') || 
+             text.includes('culture') || text.includes('museum') || text.includes('artist') || 
+             text.includes('creative') || text.includes('design') || text.includes('theater')) {
+      return 'theme-arts';
+    }
+    // Business and finance
+    else if (text.includes('business') || text.includes('company') || text.includes('startup') || 
+             text.includes('finance') || text.includes('investment') || text.includes('market') || 
+             text.includes('economic') || text.includes('profit') || text.includes('trade')) {
+      return 'theme-business';
+    }
+    // Entertainment
+    else if (text.includes('entertainment') || text.includes('celebrity') || text.includes('movie') || 
+             text.includes('show') || text.includes('concert') || text.includes('festival') || 
+             text.includes('performance') || text.includes('comedy')) {
+      return 'theme-entertainment';
+    }
+    // Travel and adventure
+    else if (text.includes('travel') || text.includes('tourism') || text.includes('vacation') || 
+             text.includes('adventure') || text.includes('journey') || text.includes('destination') || 
+             text.includes('explore') || text.includes('trip')) {
+      return 'theme-travel';
+    }
+    // Food and cooking
+    else if (text.includes('food') || text.includes('restaurant') || text.includes('cooking') || 
+             text.includes('recipe') || text.includes('chef') || text.includes('cuisine') || 
+             text.includes('dining') || text.includes('meal')) {
+      return 'theme-food';
+    }
+    // Lifestyle and wellness
+    else if (text.includes('lifestyle') || text.includes('wellness') || text.includes('beauty') || 
+             text.includes('fashion') || text.includes('home') || text.includes('family') || 
+             text.includes('relationship') || text.includes('personal')) {
+      return 'theme-lifestyle';
+    }
+    // Politics and government
+    else if (text.includes('politics') || text.includes('government') || text.includes('election') || 
+             text.includes('policy') || text.includes('law') || text.includes('congress') || 
+             text.includes('president') || text.includes('vote')) {
+      return 'theme-politics';
+    }
+    // Economy and finance news
+    else if (text.includes('economy') || text.includes('inflation') || text.includes('gdp') || 
+             text.includes('unemployment') || text.includes('banking') || text.includes('currency') || 
+             text.includes('stock') || text.includes('financial')) {
+      return 'theme-economy';
+    }
+    // World and international news
+    else if (text.includes('world') || text.includes('international') || text.includes('global') || 
+             text.includes('country') || text.includes('nation') || text.includes('diplomatic') || 
+             text.includes('foreign') || text.includes('border')) {
+      return 'theme-world';
+    }
+    // Inspiring and uplifting stories
+    else if (text.includes('inspiring') || text.includes('amazing') || text.includes('incredible') || 
+             text.includes('wonderful') || text.includes('uplifting') || text.includes('positive') || 
+             text.includes('heartwarming') || text.includes('triumph')) {
+      return 'theme-inspiring';
+    }
+    // Default hope theme for everything else
+    else {
       return 'theme-hope';
     }
   };
