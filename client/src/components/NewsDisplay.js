@@ -159,34 +159,28 @@ const NewsDisplay = ({ stories }) => {
     }, 300);
   };
 
-  // Generate image URL from story data or fallback to theme-based image
+  // Generate image URL from story data or fallback to themed local image
   const getStoryImage = (story) => {
     // Use the image from the story data if available
     if (story.image && story.image !== 'placeholder') {
       return story.image;
     }
     
-    // Fallback to theme-based images for backward compatibility
-    const images = {
-      health: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop',
-      nature: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
-      innovation: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=600&fit=crop',
-      community: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop',
-      education: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop',
-      hope: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-      science: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop',
-      celebration: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=600&fit=crop'
-    };
-
+    // Fallback to themed local images based on story content
     const theme = getThemeFromStory(story);
-    switch (theme) {
-      case 'theme-health': return images.health;
-      case 'theme-nature': return images.nature;
-      case 'theme-innovation': return images.innovation;
-      case 'theme-community': return images.community;
-      case 'theme-education': return images.education;
-      default: return images.hope;
-    }
+    const themeMap = {
+      'theme-health': 'medical',
+      'theme-nature': 'environment',
+      'theme-innovation': 'technology',
+      'theme-community': 'community',
+      'theme-education': 'education',
+      'theme-science': 'science',
+      'theme-sports': 'sports',
+      'theme-arts': 'arts'
+    };
+    
+    const fallbackTheme = themeMap[theme] || 'general';
+    return `/generated-images/fallback-${fallbackTheme}.png`;
   };
 
   if (!stories || stories.length === 0) {

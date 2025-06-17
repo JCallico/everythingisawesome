@@ -7,14 +7,14 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 ## ✨ Features
 
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
-- **AI-Powered Analysis**: Uses Grok-3-latest for sentiment analysis and intelligent summarization  
-- **Smart Ranking System**: Advanced awesome_index algorithm (50-100 scale) combining sentiment scores and positive keywords
+- **AI-Powered Analysis**: Uses Grok-3-latest for sentiment analysis and intelligent summarization
+- **AI-Generated Images**: Custom images generated using Grok's AI image generation for each story
+- **AI-Generated Smart Ranking System**: Advanced awesome_index algorithm (50-100 scale) combining sentiment scores and positive keywords
 - **Diverse Content Coverage**: Technology, science, culture, health, environment, and finance stories
-- **Beautiful Modern UI**: Glassmorphism design with smooth animations and responsive layout
+- **Modern UI**: Glassmorphism design with smooth animations and responsive layout
 - **Smart Navigation**: Browse between different days with intuitive controls
 - **Automated Collection**: Configurable news fetching with robust error handling
 - **Source Flexibility**: Optional filtering by reputable sources (currently disabled for maximum diversity)
-- **Image Enhancement**: Relevant high-quality images from Unsplash for each story
 
 ## 🚀 Quick Start
 
@@ -23,8 +23,7 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 - **Node.js** 18 or higher
 - **npm** or yarn
 - **Grok API key** from [X.AI Console](https://console.x.ai/) (required)
-- **NewsAPI key** from [NewsAPI.org](https://newsapi.org/register) (required)  
-- **Unsplash API key** from [Unsplash Developers](https://unsplash.com/developers) (optional, for images)
+- **NewsAPI key** from [NewsAPI.org](https://newsapi.org/register) (required)
 
 ### Installation
 
@@ -49,12 +48,16 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
    ```env
    GROK_API_KEY=your_grok_api_key_here
    NEWS_API_KEY=your_news_api_key_here
-   UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
    PORT=3001
    NODE_ENV=development
    ```
 
-4. **Start the application**
+4. **Generate themed fallback images** (one-time setup)
+   ```bash
+   npm run generate-themed-fallbacks
+   ```
+
+5. **Start the application**
    ```bash
    npm run dev
    ```
@@ -70,6 +73,7 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 - **Start development servers**: `npm run dev` (runs both client and server)
 - **Fetch real news**: `npm run fetch-news [YYYY-MM-DD]` (optional date parameter)
 - **Create sample data**: `npm run create-sample` (for testing without API keys)
+- **Generate themed fallback images**: `npm run generate-themed-fallbacks` (creates 9 themed fallback images)
 - **Build for production**: `npm run build`
 - **Start production server**: `npm start`
 - **Install all dependencies**: `npm run install-all`
@@ -202,7 +206,6 @@ Ensure your production environment has:
 ```env
 GROK_API_KEY=your_actual_grok_api_key
 NEWS_API_KEY=your_actual_news_api_key  
-UNSPLASH_ACCESS_KEY=your_unsplash_key
 NODE_ENV=production
 PORT=3001
 ```
@@ -302,13 +305,13 @@ The application uses a sophisticated multi-step process to find and rank the mos
 ### Step 5: Content Enhancement & Selection
 - Sorts by awesome_index in descending order
 - Selects top 10 most inspiring stories (or all if fewer than 10 qualify)
-- Fetches relevant images from Unsplash based on story content
+- Generates relevant AI images using Grok's image generation based on story content
 - Preserves authentic source URLs for credibility
 
 ### API Integration Benefits
 - **NewsAPI**: Provides authentic, timestamped articles from diverse global sources
 - **Grok-3-latest**: Latest model for accurate sentiment analysis and creative summarization
-- **Unsplash**: Enhances visual appeal with relevant, high-quality imagery
+- **Grok-2-image**: AI-generated images tailored to each story's content and theme
 - **Combined Power**: Real news authenticity + AI intelligence = optimized positivity
 
 ### Performance Metrics
@@ -388,3 +391,25 @@ Created to combat negative news cycles and remind people that **everything reall
 This project demonstrates the power of combining real journalism with AI analysis to surface the stories that inspire hope, celebrate human achievement, and showcase the progress being made across technology, science, culture, and society.
 
 **Because the world needs more optimism!** 🌈✨
+
+### Themed Fallback Images
+
+The application uses Grok AI to generate unique, contextual images for each news story. When image generation fails, it falls back to themed images that match the story content:
+
+**Available Themes:**
+- **Medical/Health**: Medical research and healthcare imagery
+- **Technology/Innovation**: Futuristic tech and innovation scenes
+- **Education/Learning**: Educational environments and learning
+- **Environment/Nature**: Natural landscapes and conservation
+- **Community/Social**: People coming together and collaboration
+- **Science/Research**: Research facilities and scientific discovery
+- **Sports/Athletics**: Athletic achievements and celebrations
+- **Arts/Culture**: Creative and artistic scenes
+- **General/Default**: Inspiring sunrise and hope imagery
+
+**Generate Themed Fallbacks:**
+```bash
+npm run generate-themed-fallbacks
+```
+
+This command creates 9 themed fallback images (one for each theme) using Grok AI. The system automatically detects the theme of each news story and uses the appropriate fallback image when needed.

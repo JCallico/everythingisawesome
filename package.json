@@ -12,7 +12,8 @@
     "install-all": "npm install && cd client && npm install",
     "fetch-news": "node server/jobs/fetchNews.js",
     "create-sample": "node server/jobs/createSampleData.js",
-    "setup": "npm run install-all && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Add your NEWS_API_KEY to the .env file' && echo '3. Add your UNSPLASH_ACCESS_KEY to the .env file (optional)' && echo '4. Run \"npm run dev\" to start the application' && echo '5. Visit http://localhost:3000 to see your site'"
+    "generate-themed-fallbacks": "node server/jobs/generateThemedFallbacks.js",
+    "setup": "npm run install-all && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Add your NEWS_API_KEY to the .env file' && echo '3. Run \"npm run generate-themed-fallbacks\" to create the themed fallback images' && echo '4. Run \"npm run dev\" to start the application' && echo '5. Visit http://localhost:3000 to see your site'"
   },
   "dependencies": {
     "axios": "^1.6.2",

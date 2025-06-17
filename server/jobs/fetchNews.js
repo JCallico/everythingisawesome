@@ -7,7 +7,6 @@ const path = require('path');
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const NEWSAPI_URL = 'https://newsapi.org/v2/everything';
-const UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos';
 
 // Positive keywords to filter uplifting stories
 const POSITIVE_KEYWORDS = [
@@ -204,69 +203,213 @@ const countPositiveKeywords = (text) => {
     lowercaseText.includes(keyword.toLowerCase())
   ).length;
 };
-const fetchStoryImage = async (story) => {
+// Function to generate image using Grok API
+const generateStoryImage = async (story, storyIndex) => {
   try {
-    const unsplashApiKey = process.env.UNSPLASH_ACCESS_KEY;
-    if (!unsplashApiKey) {
-      console.log('UNSPLASH_ACCESS_KEY not found, using fallback image');
-      return 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop';
+    const grokApiKey = process.env.GROK_API_KEY;
+    if (!grokApiKey) {
+      console.log('GROK_API_KEY not found, using themed fallback image');
+      return getFallbackImage(story);
     }
 
-    // Extract keywords from title and summary for image search
-    const searchText = `${story.title} ${story.summary}`;
-    const keywords = extractImageKeywords(searchText);
+    // Create a detailed prompt for image generation based on the story
+    const imagePrompt = await createImagePrompt(story);
+    console.log(`  Generated prompt: "${imagePrompt}"`);
     
-    const response = await axios.get(UNSPLASH_API_URL, {
-      params: {
-        query: keywords,
-        per_page: 1,
-        w: 800,
-        h: 600,
-        fit: 'crop',
-        orientation: 'landscape'
-      },
-      headers: {
-        'Authorization': `Client-ID ${unsplashApiKey}`
-      }
-    });
+    // Try Grok image generation with grok-2-image
+    try {
+      const response = await axios.post('https://api.x.ai/v1/images/generations', {
+        model: "grok-2-image",
+        prompt: imagePrompt,
+        n: 1,
+        response_format: "b64_json"
+      }, {
+        headers: {
+          'Authorization': `Bearer ${grokApiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-    if (response.data.results && response.data.results.length > 0) {
-      const image = response.data.results[0];
-      return `${image.urls.regular}&w=800&h=600&fit=crop`;
-    } else {
-      // Fallback to a positive, inspiring image
-      return 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop';
+      if (response.data.data && response.data.data.length > 0) {
+        const base64Image = response.data.data[0].b64_json;
+        
+        // Save the base64 image locally
+        const savedImagePath = await saveBase64Image(base64Image, storyIndex);
+        
+        if (savedImagePath) {
+          console.log(`  ✓ Image generated with Grok and saved: ${savedImagePath}`);
+          return savedImagePath;
+        }
+      }
+    } catch (grokError) {
+      console.log('  Grok image generation failed, using themed fallback...');
+      if (grokError.response && grokError.response.data) {
+        console.log('  Grok Error:', grokError.response.data);
+      }
     }
+
+    // Fallback to themed static local image
+    return getFallbackImage(story);
+    
   } catch (error) {
-    console.error('Error fetching image from Unsplash:', error.message);
-    return 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop';
+    console.error('Error in image generation process:', error.message);
+    return getFallbackImage(story);
   }
 };
 
-// Function to extract relevant keywords for image search
-const extractImageKeywords = (text) => {
-  const lowercaseText = text.toLowerCase();
+// Create a detailed image generation prompt based on the story content
+const createImagePrompt = async (story) => {
+  try {
+    const grokApiKey = process.env.GROK_API_KEY;
+    if (!grokApiKey) {
+      // Fallback to a basic prompt if Grok is not available
+      return createBasicImagePrompt(story);
+    }
+
+    const prompt = `Based on this uplifting news story, create a detailed, visual description for an AI image generator. The description should be positive, inspiring, and capture the essence of the story. Focus on creating a professional, high-quality image that represents the story's theme.
+
+Story Title: "${story.title}"
+Story Summary: "${story.summary}"
+
+Create a visual description that includes:
+- The main theme or subject matter
+- Positive, uplifting atmosphere
+- Professional, clean aesthetic
+- Inspiring visual elements
+- No text or words visible in the image
+- Photorealistic or artistic style as appropriate
+
+Respond with only the image generation prompt (max 300 characters).`;
+
+    const response = await axios.post(GROK_API_URL, {
+      model: 'grok-3-latest',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 150
+    }, {
+      headers: {
+        'Authorization': `Bearer ${grokApiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const generatedPrompt = response.data.choices[0].message.content.trim();
+    
+    // Clean up the prompt and ensure it's suitable for image generation
+    const cleanPrompt = generatedPrompt
+      .replace(/['"]/g, '') // Remove quotes
+      .replace(/\n/g, ' ') // Replace newlines with spaces
+      .substring(0, 500); // Reasonable length limit
+    
+    return cleanPrompt || createBasicImagePrompt(story);
+    
+  } catch (error) {
+    console.error('Error creating image prompt with Grok:', error.message);
+    return createBasicImagePrompt(story);
+  }
+};
+
+// Create a basic image prompt without using Grok
+const createBasicImagePrompt = (story) => {
+  const title = story.title.toLowerCase();
+  const summary = story.summary.toLowerCase();
+  const combinedText = `${title} ${summary}`;
   
-  // Define keyword mappings for better image search
-  const keywordMappings = {
-    medical: ['medical', 'health', 'doctor', 'hospital', 'medicine', 'treatment', 'cure', 'vaccine'],
-    nature: ['environment', 'nature', 'forest', 'ocean', 'coral', 'wildlife', 'green', 'sustainability'],
-    technology: ['ai', 'technology', 'innovation', 'digital', 'robot', 'computer', 'breakthrough'],
-    education: ['education', 'school', 'learning', 'student', 'literacy', 'knowledge', 'classroom'],
-    community: ['community', 'volunteer', 'helping', 'charity', 'support', 'together', 'unity'],
-    science: ['science', 'research', 'discovery', 'lab', 'experiment', 'scientist', 'study'],
-    celebration: ['celebration', 'festival', 'culture', 'art', 'music', 'joy', 'happiness']
+  // Detect the main theme and create appropriate prompt
+  const themes = {
+    medical: "A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing",
+    technology: "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
+    education: "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
+    environment: "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future",
+    community: "People coming together in a positive community setting, showing unity, support, and collaborative spirit",
+    science: "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
+    sports: "An inspiring athletic achievement moment with celebration and triumph, showing human potential and success",
+    arts: "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting"
   };
   
-  // Find the most relevant category
-  for (const [category, keywords] of Object.entries(keywordMappings)) {
-    if (keywords.some(keyword => lowercaseText.includes(keyword))) {
-      return `${category} positive inspiring uplifting`;
+  // Find the best matching theme
+  for (const [theme, prompt] of Object.entries(themes)) {
+    const themeKeywords = {
+      medical: ['medical', 'health', 'doctor', 'hospital', 'cure', 'treatment', 'vaccine'],
+      technology: ['technology', 'ai', 'innovation', 'digital', 'tech', 'software', 'device'],
+      education: ['education', 'school', 'student', 'learning', 'university', 'study'],
+      environment: ['environment', 'nature', 'green', 'climate', 'sustainable', 'renewable'],
+      community: ['community', 'volunteer', 'charity', 'helping', 'support', 'together'],
+      science: ['science', 'research', 'discovery', 'scientist', 'study', 'breakthrough'],
+      sports: ['sport', 'athlete', 'game', 'victory', 'championship', 'competition'],
+      arts: ['art', 'music', 'culture', 'creative', 'artist', 'performance']
+    };
+    
+    if (themeKeywords[theme] && themeKeywords[theme].some(keyword => combinedText.includes(keyword))) {
+      return prompt;
     }
   }
   
-  // Default to hope and inspiration
-  return 'hope inspiration positive uplifting success';
+  // Default inspiring prompt
+  return "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere";
+};
+
+// Save base64 image data to file
+const saveBase64Image = async (base64Data, storyIndex) => {
+  try {
+    // Create images directory if it doesn't exist
+    const imagesDir = path.join(__dirname, '../../client/public/generated-images');
+    await fs.ensureDir(imagesDir);
+    
+    // Generate unique filename
+    const timestamp = Date.now();
+    const filename = `story-${storyIndex + 1}-${timestamp}.png`;
+    const filepath = path.join(imagesDir, filename);
+    
+    // Convert base64 to buffer and save
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+    await fs.writeFile(filepath, imageBuffer);
+    
+    // Return the public URL path
+    return `/generated-images/${filename}`;
+    
+  } catch (error) {
+    console.error('Error saving base64 image:', error.message);
+    return null;
+  }
+};
+
+// Function to detect theme from story content
+const detectStoryTheme = (story) => {
+  const title = story.title.toLowerCase();
+  const summary = story.summary.toLowerCase();
+  const combinedText = `${title} ${summary}`;
+  
+  const themeKeywords = {
+    medical: ['medical', 'health', 'doctor', 'hospital', 'cure', 'treatment', 'vaccine'],
+    technology: ['technology', 'ai', 'innovation', 'digital', 'tech', 'software', 'device'],
+    education: ['education', 'school', 'student', 'learning', 'university', 'study'],
+    environment: ['environment', 'nature', 'green', 'climate', 'sustainable', 'renewable'],
+    community: ['community', 'volunteer', 'charity', 'helping', 'support', 'together'],
+    science: ['science', 'research', 'discovery', 'scientist', 'study', 'breakthrough'],
+    sports: ['sport', 'athlete', 'game', 'victory', 'championship', 'competition'],
+    arts: ['art', 'music', 'culture', 'creative', 'artist', 'performance']
+  };
+  
+  // Find the best matching theme
+  for (const [theme, keywords] of Object.entries(themeKeywords)) {
+    if (keywords.some(keyword => combinedText.includes(keyword))) {
+      return theme;
+    }
+  }
+  
+  // Default theme
+  return 'general';
+};
+
+// Fallback to themed static local images
+const getFallbackImage = (story) => {
+  if (!story) {
+    return '/generated-images/fallback-general.png';
+  }
+  
+  const theme = detectStoryTheme(story);
+  return `/generated-images/fallback-${theme}.png`;
 };
 
 const fetchDailyNews = async (targetDate = null) => {
@@ -351,13 +494,13 @@ const fetchDailyNews = async (targetDate = null) => {
     
     console.log(`Selected top ${topArticles.length} articles with awesome_index ranging from ${topArticles[topArticles.length-1].awesome_index} to ${topArticles[0].awesome_index}`);
     
-    // Step 4: Fetch images for each story
-    console.log('Step 4: Fetching relevant images for each story...');
+    // Step 4: Generate custom images for each story using Grok
+    console.log('Step 4: Generating custom AI images for each story using Grok...');
     for (let i = 0; i < topArticles.length; i++) {
       const story = topArticles[i];
-      console.log(`Fetching image for story ${i + 1}: ${story.title.substring(0, 50)}...`);
+      console.log(`Generating image for story ${i + 1}: ${story.title.substring(0, 50)}...`);
       
-      const imageUrl = await fetchStoryImage(story);
+      const imageUrl = await generateStoryImage(story, i);
       topArticles[i].image = imageUrl;
       
       // Remove processing metadata from final output
@@ -366,9 +509,9 @@ const fetchDailyNews = async (targetDate = null) => {
       delete topArticles[i].source;
       delete topArticles[i].publishedAt;
       
-      // Add a small delay between requests to be respectful to the API
+      // Add a delay between requests to respect Grok API rate limits
       if (i < topArticles.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds between image generations
       }
     }
     
