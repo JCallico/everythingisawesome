@@ -353,7 +353,7 @@ const createBasicImagePrompt = (story) => {
 const saveBase64Image = async (base64Data, storyIndex) => {
   try {
     // Create images directory if it doesn't exist
-    const imagesDir = path.join(__dirname, '../../client/public/generated-images');
+    const imagesDir = path.join(__dirname, '../../data/generated-images');
     await fs.ensureDir(imagesDir);
     
     // Generate unique filename

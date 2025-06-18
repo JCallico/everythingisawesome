@@ -76,7 +76,7 @@ const generateFallbackImage = async (theme, themeData) => {
       const base64Image = response.data.data[0].b64_json;
       
       // Create images directory if it doesn't exist
-      const imagesDir = path.join(__dirname, '../../client/public/generated-images');
+      const imagesDir = path.join(__dirname, '../../data/generated-images');
       await fs.ensureDir(imagesDir);
       
       // Save as themed fallback image

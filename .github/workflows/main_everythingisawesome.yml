@@ -35,7 +35,8 @@ jobs:
       - name: Create required directories
         run: |
           mkdir -p data
-          echo "Data directory created"
+          mkdir -p data/generated-images
+          echo "Data and generated-images directories created"
 
       - name: Test application
         run: npm run test --if-present
@@ -74,6 +75,7 @@ jobs:
           app-name: 'everythingisawesome'
           slot-name: 'Production'
           package: .
+          clean: false
 
       - name: 'Configure Node.js Runtime'
         shell: bash

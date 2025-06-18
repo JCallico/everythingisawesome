@@ -2,7 +2,7 @@ node_modules/
 .env
 .DS_Store
 client/build/
-client/public/generated-images/story*.png
+data/generated-images/story*.png
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
