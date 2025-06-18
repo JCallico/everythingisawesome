@@ -71,6 +71,7 @@ jobs:
           package: .
 
       - name: 'Configure Azure Web App Settings'
+        shell: bash
         run: |
           az webapp config appsettings set \
             --name everythingisawesome \
