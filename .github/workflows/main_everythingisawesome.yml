@@ -73,8 +73,14 @@ jobs:
       - name: 'Configure Azure Web App Settings'
         shell: bash
         run: |
+          # Get the resource group name for the web app
+          RESOURCE_GROUP=$(az webapp show --name everythingisawesome --query resourceGroup -o tsv)
+          echo "Found resource group: $RESOURCE_GROUP"
+          
+          # Set application settings
           az webapp config appsettings set \
             --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
             --settings \
               NODE_ENV=production \
               GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
