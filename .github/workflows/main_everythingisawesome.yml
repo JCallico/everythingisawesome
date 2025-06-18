@@ -93,7 +93,7 @@ jobs:
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
-              WEBSITE_NODE_DEFAULT_VERSION=22.x \
+              WEBSITE_NODE_DEFAULT_VERSION=~22 \
               WEBSITE_RUN_FROM_PACKAGE=0 \
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               IISNODE_yml="iisnode.yml" \
