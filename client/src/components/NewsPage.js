@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { fetchNewsByDate, fetchAvailableDates } from '../services/api';
@@ -11,12 +11,7 @@ const NewsPage = () => {
   const [error, setError] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
 
-  useEffect(() => {
-    loadNews();
-    loadAvailableDates();
-  }, [date]);
-
-  const loadNews = async () => {
+  const loadNews = useCallback(async () => {
     try {
       setLoading(true);
       const data = await fetchNewsByDate(date);
@@ -28,16 +23,21 @@ const NewsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [date]);
 
-  const loadAvailableDates = async () => {
+  const loadAvailableDates = useCallback(async () => {
     try {
       const dates = await fetchAvailableDates();
       setAvailableDates(dates);
     } catch (err) {
       console.error('Error loading available dates:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadNews();
+    loadAvailableDates();
+  }, [loadNews, loadAvailableDates]);
 
   const getNavigationInfo = () => {
     if (!availableDates.length) return { prevDate: null, nextDate: null };

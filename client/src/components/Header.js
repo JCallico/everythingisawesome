@@ -8,7 +8,6 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
       const mainContent = document.querySelector('.main-content');
       
       if (mainContent) {
