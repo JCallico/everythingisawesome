@@ -32,12 +32,6 @@ jobs:
       - name: Build client application
         run: cd client && npm run build
 
-      - name: Create required directories
-        run: |
-          mkdir -p data
-          mkdir -p data/generated-images
-          echo "Data and generated-images directories created"
-
       - name: Test application
         run: npm run test --if-present
       
