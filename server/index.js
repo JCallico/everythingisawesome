@@ -1,39 +1,98 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const cron = require('node-cron');
-require('dotenv').config();
+const fs = require('fs');
 
-const newsRoutes = require('./routes/news');
-const { fetchDailyNews } = require('./jobs/fetchNews');
+// Try to load cron, but don't fail if it's missing
+let cron;
+try {
+  cron = require('node-cron');
+} catch (error) {
+  console.log('node-cron not available:', error.message);
+}
+
+// Load environment variables
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+console.log('Starting server...');
+console.log('Node version:', process.version);
+console.log('PORT:', PORT);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../client/build')));
 
-// Routes
-app.use('/api/news', newsRoutes);
+// Ensure data directory exists
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  console.log('Created data directory');
+}
+
+// Serve static files from React build
+const staticPath = path.join(__dirname, '../client/build');
+if (fs.existsSync(staticPath)) {
+  app.use(express.static(staticPath));
+  console.log('Static files configured:', staticPath);
+} else {
+  console.error('Static files directory not found:', staticPath);
+}
+
+// Try to load news routes
+try {
+  const newsRoutes = require('./routes/news');
+  app.use('/api/news', newsRoutes);
+  console.log('News routes loaded successfully');
+} catch (error) {
+  console.error('Error loading news routes:', error.message);
+  // Provide fallback API
+  app.get('/api/news/*', (req, res) => {
+    res.status(500).json({ 
+      error: 'News API temporarily unavailable',
+      message: error.message 
+    });
+  });
+}
 
 // Serve React app for any non-API routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  const indexPath = path.join(__dirname, '../client/build', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send(`
+      <h1>Application Loading...</h1>
+      <p>The React application files are not yet available.</p>
+      <p>Please wait for the build process to complete.</p>
+    `);
+  }
 });
 
-// Schedule daily news fetch at 6:00 AM every day
-cron.schedule('0 6 * * *', () => {
-  console.log('Running scheduled news fetch...');
-  fetchDailyNews();
-}, {
-  timezone: "America/New_York"
-});
+// Schedule daily news fetch at 6:00 AM every day (if cron is available)
+if (cron) {
+  try {
+    const { fetchDailyNews } = require('./jobs/fetchNews');
+    cron.schedule('0 6 * * *', () => {
+      console.log('Running scheduled news fetch...');
+      fetchDailyNews();
+    }, {
+      timezone: "America/New_York"
+    });
+    console.log('Daily news fetch scheduled for 6:00 AM');
+  } catch (error) {
+    console.log('News fetching not available:', error.message);
+  }
+} else {
+  console.log('Cron scheduling not available');
+}
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Daily news fetch scheduled for 6:00 AM');
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log('✅ Application started successfully');
 });
 
 module.exports = app;

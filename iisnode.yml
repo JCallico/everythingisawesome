@@ -5,8 +5,8 @@ interceptor: iisnode/interceptor.js
 enableXFF: true
 loggingEnabled: true
 logDirectory: iisnode
-devErrorsEnabled: false
-debuggingEnabled: false
+devErrorsEnabled: true
+debuggingEnabled: true
 maxLogFileSizeInKB: 128
 maxTotalLogFileSizeInKB: 1024
 maxLogFiles: 20
@@ -15,5 +15,6 @@ watchedFiles: *.js
 uncFileChangesPollingInterval: 5000
 gracefulShutdownTimeout: 60000
 maxConcurrentRequestsPerProcess: 1024
-maxNamedPipeConnectionRetry: 3
-namedPipeConnectionRetryDelay: 2000
+maxNamedPipeConnectionRetry: 100
+namedPipeConnectionRetryDelay: 250
+nodeProcessCountPerApplication: 1
