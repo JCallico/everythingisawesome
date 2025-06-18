@@ -2,13 +2,13 @@
   "name": "everythingisawesome",
   "version": "1.0.0",
   "description": "A website displaying optimistic, feel-good news stories",
-  "main": "server/index.js",
+  "main": "app.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
     "client": "cd client && npm start",
     "build": "cd client && npm run build",
-    "start": "node server/index.js",
+    "start": "node app.js",
     "install-all": "npm install && cd client && npm install",
     "fetch-news": "node server/jobs/fetchNews.js",
     "create-sample": "node server/jobs/createSampleData.js",
@@ -31,6 +31,8 @@
     "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": ">=18.0.0"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["azure", "webapp", "nodejs", "express", "react"]
 }

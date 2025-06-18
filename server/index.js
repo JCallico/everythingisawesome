@@ -90,6 +90,46 @@ if (cron) {
   console.log('Cron scheduling not available');
 }
 
+// Diagnostic endpoints for Azure deployment troubleshooting
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    pid: process.pid,
+    uptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      PWD: process.env.PWD || process.cwd(),
+      HOME: process.env.HOME,
+      WEBSITE_SITE_NAME: process.env.WEBSITE_SITE_NAME,
+      WEBSITE_NODE_DEFAULT_VERSION: process.env.WEBSITE_NODE_DEFAULT_VERSION,
+      IISNODE_VERSION: process.env.IISNODE_VERSION
+    }
+  });
+});
+
+app.get('/api/debug', (req, res) => {
+  res.json({
+    headers: req.headers,
+    url: req.url,
+    method: req.method,
+    query: req.query,
+    params: req.params,
+    serverInfo: {
+      cwd: process.cwd(),
+      execPath: process.execPath,
+      execArgv: process.execArgv,
+      argv: process.argv,
+      versions: process.versions
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log('✅ Application started successfully');

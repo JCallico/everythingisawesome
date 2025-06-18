@@ -75,6 +75,32 @@ jobs:
           slot-name: 'Production'
           package: .
 
+      - name: 'Configure Node.js Runtime'
+        shell: bash
+        run: |
+          # Find the resource group
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
+          echo "Configuring Node.js runtime for resource group: $RESOURCE_GROUP"
+          
+          # Configure for Windows Node.js with explicit startup file
+          az webapp config set \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
+            --startup-file "app.js"
+            
+          # Set Node.js specific configurations
+          az webapp config appsettings set \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              WEBSITE_NODE_DEFAULT_VERSION=22.x \
+              WEBSITE_RUN_FROM_PACKAGE=0 \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              IISNODE_yml="iisnode.yml" \
+              WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
+            
+          echo "Node.js runtime configured"
+
       - name: 'Configure Azure Web App Settings'
         shell: bash
         run: |
@@ -98,7 +124,33 @@ jobs:
             --settings \
               NODE_ENV=production \
               GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
-              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
-              WEBSITE_NODE_DEFAULT_VERSION=22.x \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
-              WEBSITE_RUN_FROM_PACKAGE=0
+              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}"
+              
+          # Force restart to apply all changes
+          az webapp restart \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP"
+            
+          echo "App settings configured and app restarted"
+
+      - name: 'Verify Application Type in Azure'
+        shell: bash
+        run: |
+          # Find the resource group
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
+          
+          # Check current app settings
+          echo "Current app settings:"
+          az webapp config appsettings list \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE']" \
+            -o table
+            
+          # Check startup command
+          echo "Current startup command:"
+          az webapp config show \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "appCommandLine" \
+            -o tsv
