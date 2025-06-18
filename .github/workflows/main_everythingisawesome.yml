@@ -69,3 +69,15 @@ jobs:
           app-name: 'everythingisawesome'
           slot-name: 'Production'
           package: .
+
+      - name: 'Configure Azure Web App Settings'
+        run: |
+          az webapp config appsettings set \
+            --name everythingisawesome \
+            --settings \
+              NODE_ENV=production \
+              GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
+              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
+              WEBSITE_NODE_DEFAULT_VERSION=22.x \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              WEBSITE_RUN_FROM_PACKAGE=0
