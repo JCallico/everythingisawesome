@@ -78,8 +78,17 @@ jobs:
       - name: 'Configure Azure Web App Settings'
         shell: bash
         run: |
-          # Get the resource group name for the web app
-          RESOURCE_GROUP=$(az webapp show --name everythingisawesome --query resourceGroup -o tsv)
+          # Find the resource group by listing all web apps and filtering by name
+          echo "Finding resource group for web app 'everythingisawesome'..."
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
+          
+          if [ -z "$RESOURCE_GROUP" ]; then
+            echo "Error: Could not find resource group for web app 'everythingisawesome'"
+            echo "Available web apps:"
+            az webapp list --query "[].{name:name, resourceGroup:resourceGroup}" -o table
+            exit 1
+          fi
+          
           echo "Found resource group: $RESOURCE_GROUP"
           
           # Set application settings
