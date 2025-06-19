@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './components/HomePage';
 import NewsPage from './components/NewsPage';
+import Disclaimer from './components/Disclaimer';
+import Footer from './components/Footer';
 import './App.css';
 
 function App() {
@@ -38,7 +40,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/date/:date" element={<NewsPage />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
           </Routes>
+          <Footer />
         </main>
       </div>
     </Router>
