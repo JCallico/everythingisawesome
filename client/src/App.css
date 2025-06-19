@@ -970,6 +970,18 @@ body.theme-default {
   .news-date h2 {
     font-size: 1.75rem;
   }
+  
+  .awesome-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    top: 0.75rem;
+    right: 1rem;
+  }
+  
+  .awesome-score {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1035,6 +1047,18 @@ body.theme-default {
   
   .news-date h2 {
     font-size: 1.5rem;
+  }
+  
+  .awesome-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+    border-radius: 15px;
+    top: 0.5rem;
+    right: 0.75rem;
+  }
+  
+  .awesome-score {
+    font-size: 1rem;
   }
 }
 
