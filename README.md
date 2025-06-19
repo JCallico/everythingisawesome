@@ -2,6 +2,60 @@
 
 A beautiful website displaying optimistic, feel-good news stories that restore hope in humanity. This project fetches real news articles, analyzes them with AI for sentiment and positivity, then presents the most uplifting stories with an engaging user interface.
 
+**🚀 Live Demo**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingis## 💻 Tech Stack
+
+### Frontend
+- **React 19** - Modern UI framework with hooks
+- **React Router DOM 7** - Client-side routing for SPA navigation
+- **Axios** - HTTP client for API communication
+- **CSS3** - Glassmorphism design with animations
+- **Responsive Design** - Mobile-first approach
+
+### Backend
+- **Node.js 22** - JavaScript runtime
+- **Express.js** - Web application framework
+- **fs-extra** - Enhanced file system operations
+- **node-cron** - Scheduled task management
+- **cors** - Cross-origin resource sharing
+- **dotenv** - Environment variable management
+
+### AI & APIs
+- **Grok-3-latest** - X.AI's latest model for sentiment analysis and summarization
+- **Grok Image Generation** - AI-powered custom image creation
+- **NewsAPI** - Real-time news data from 100+ sources
+- **Advanced Prompting** - Sophisticated AI prompt engineering
+
+### Cloud & DevOps
+- **Azure Web App** - Production hosting (Windows App Service Plan)
+- **GitHub Actions** - CI/CD pipeline automation
+- **IISNode** - Node.js integration for Windows App Service
+- **Azure CLI** - Infrastructure management and deployment
+
+### Data & Storage
+- **JSON File System** - Lightweight data persistence
+- **Static File Serving** - Express.js static middleware
+- **Image Storage** - Organized file system structure
+- **Data Persistence** - Deployment-safe data retention
+
+### Development Tools
+- **concurrently** - Run multiple npm scripts simultaneously
+- **nodemon** - Development server auto-restart
+- **Git** - Version control with GitHub integration
+- **VS Code** - Recommended development environment
+
+## 📊 Current Status
+
+**Live Application**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+
+**Data Coverage**: June 1-17, 2025 (17 days)  
+**Image Collection**: 180+ AI-generated story images + 9 themed fallbacks  
+**Algorithm Version**: Multi-step AI analysis with Grok-3-latest  
+**Source Diversity**: 100+ news sources (filter disabled for maximum variety)  
+**Processing Capacity**: Up to 100 articles per day (limited to 50 for cost management)  
+**Success Rate**: ~10% articles pass all quality filters  
+**Average Awesome Index**: 85-90 for top stories  
+**Deployment**: Automated CI/CD with data persistence  e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+
 ![Website Preview](https://via.placeholder.com/800x400/667eea/white?text=Everything+Is+Awesome+News)
 
 ## ✨ Features
@@ -9,11 +63,13 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
 - **AI-Powered Analysis**: Uses Grok-3-latest for sentiment analysis and intelligent summarization
 - **AI-Generated Images**: Custom images generated using Grok's AI image generation for each story
-- **AI-Generated Smart Ranking System**: Advanced awesome_index algorithm (50-100 scale) combining sentiment scores and positive keywords
+- **Smart Ranking System**: Advanced awesome_index algorithm (50-100 scale) combining sentiment scores and positive keywords
 - **Diverse Content Coverage**: Technology, science, culture, health, environment, and finance stories
 - **Modern UI**: Glassmorphism design with smooth animations and responsive layout
 - **Smart Navigation**: Browse between different days with intuitive controls
 - **Automated Collection**: Configurable news fetching with robust error handling
+- **Azure Cloud Deployment**: Production-ready deployment on Azure Web App with CI/CD
+- **Persistent Data Storage**: Generated images and news data persist between deployments
 - **Source Flexibility**: Optional filtering by reputable sources (currently disabled for maximum diversity)
 
 ## 🚀 Quick Start
@@ -91,7 +147,7 @@ npm run fetch-news
 ```
 
 **Current Data Coverage:**
-The project currently has news data for June 1-13, 2025 (13 days of content).
+The project currently has news data for June 1-17, 2025 (17 days of content) with over 180 AI-generated story images.
 
 ## 📁 Project Structure
 
@@ -100,25 +156,35 @@ everythingisawesome/
 ├── client/                 # React frontend (port 3000)
 │   ├── src/
 │   │   ├── components/     # React components
-│   │   │   ├── Header.js   # Site header
-│   │   │   ├── HomePage.js # Latest news page
-│   │   │   ├── NewsPage.js # Specific date page
-│   │   │   └── NewsDisplay.js # News cards
+│   │   │   ├── Header.js   # Site header with navigation
+│   │   │   ├── HomePage.js # Latest news homepage
+│   │   │   ├── NewsPage.js # Date-specific news page
+│   │   │   └── NewsDisplay.js # News story cards
 │   │   ├── services/       # API service layer
-│   │   └── App.css         # Beautiful styling
+│   │   │   └── api.js      # Centralized API calls
+│   │   └── App.css         # Beautiful glassmorphism styling
+│   ├── build/              # Production build (auto-generated)
 │   └── package.json
 ├── server/                 # Node.js backend (port 3001)
 │   ├── routes/
-│   │   └── news.js         # API endpoints
+│   │   └── news.js         # News API endpoints
 │   ├── jobs/
-│   │   ├── fetchNews.js    # Daily news fetcher
-│   │   └── createSampleData.js # Sample data generator
+│   │   ├── fetchNews.js    # AI-powered news fetcher
+│   │   ├── createSampleData.js # Sample data generator
+│   │   └── generateThemedFallbacks.js # Fallback image generator
 │   ├── utils/
-│   │   └── newsUtils.js    # File operations
-│   └── index.js            # Express server
-├── data/                   # News database
-│   └── YYYY-MM-DD.json     # Daily news files
-├── package.json            # Main dependencies
+│   │   └── newsUtils.js    # File and data operations
+│   └── index.js            # Express server with static file serving
+├── data/                   # Persistent data storage
+│   ├── generated-images/   # AI-generated story images
+│   │   ├── story-*.png     # Individual story images
+│   │   └── fallback-*.png  # Themed fallback images
+│   └── YYYY-MM-DD.json     # Daily news data files
+├── app.js                  # Azure Web App entry point
+├── web.config              # IIS/Azure configuration
+├── .github/workflows/      # GitHub Actions CI/CD
+│   └── main_everythingisawesome.yml # Deployment pipeline
+├── package.json            # Main dependencies and scripts
 ├── .env.example            # Environment template
 └── README.md
 ```
@@ -128,18 +194,24 @@ everythingisawesome/
 - `GET /api/news/latest` - Get the most recent news
 - `GET /api/news/date/:date` - Get news for a specific date (YYYY-MM-DD)
 - `GET /api/news/dates` - Get all available dates (sorted newest first)
+- `GET /api/health` - Application health check and diagnostics
+- `GET /api/debug` - Detailed server information for troubleshooting
+- `GET /generated-images/*` - Serve AI-generated story images
 
 Example API response:
 ```json
 {
-  "date": "2025-06-05",
+  "date": "2025-06-17",
   "title": "Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories",
   "stories": [
     {
       "title": "Breakthrough in HIV Cure Research",
       "summary": "A Melbourne research team discovered a method...",
       "link": "https://example.com/article",
-      "awesome_index": 95
+      "awesome_index": 95,
+      "imageUrl": "/generated-images/story-1-1750240900848.png",
+      "source": "bbc-news",
+      "theme": "medical"
     }
   ]
 }
@@ -190,31 +262,49 @@ cron.schedule('0 6 * * *', () => {
 
 ## 🚀 Deployment
 
-### Development
+### Azure Cloud Deployment (Production)
+
+**Live Application**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+
+The application is deployed on **Azure Web App** with automated CI/CD via GitHub Actions:
+
+#### Deployment Features:
+- ✅ **Automated deployments** on every push to `main` branch
+- ✅ **Data persistence** - news data and generated images survive deployments
+- ✅ **Environment variable management** via Azure App Service settings
+- ✅ **Node.js 22** runtime on Windows App Service Plan
+- ✅ **Static file serving** for React build and generated images
+- ✅ **Health monitoring** with diagnostic endpoints
+
+#### Required Azure App Service Settings:
+```env
+NODE_ENV=production
+GROK_API_KEY=your_actual_grok_api_key
+NEWS_API_KEY=your_actual_news_api_key
+WEBSITE_NODE_DEFAULT_VERSION=~22
+```
+
+#### GitHub Secrets Required:
+- `GROK_API_KEY` - Your X.AI Grok API key
+- `NEWS_API_KEY` - Your NewsAPI.org key
+- Azure deployment credentials (auto-configured)
+
+### Local Development
 ```bash
 npm run dev  # Starts both React frontend (3000) and Express backend (3001)
 ```
 
-### Production Build
+### Local Production Build
 ```bash
 npm run build  # Builds optimized React app
-npm start      # Serves built app via Express server
+npm start      # Serves built app via Express server (port 3001)
 ```
 
-### Environment Variables
-Ensure your production environment has:
-```env
-GROK_API_KEY=your_actual_grok_api_key
-NEWS_API_KEY=your_actual_news_api_key  
-NODE_ENV=production
-PORT=3001
-```
-
-### Domain Considerations
-- The application works with any domain
-- Configure your DNS and hosting to point to your server
-- Both frontend and backend are served from the same Express server
-- No CORS issues since everything runs on one port in production
+### Key Architecture Notes:
+- **Single-server deployment**: Both frontend and backend served from Node.js Express server
+- **No CORS issues**: React build served as static files from the same origin
+- **Persistent storage**: `/data` folder preserved between deployments (`clean: false`)
+- **Image serving**: Generated images served directly from `/data/generated-images/`
 
 ## 🔧 Customization
 
@@ -413,3 +503,33 @@ npm run generate-themed-fallbacks
 ```
 
 This command creates 9 themed fallback images (one for each theme) using Grok AI. The system automatically detects the theme of each news story and uses the appropriate fallback image when needed.
+
+## 🎨 AI Image Generation
+
+The application features advanced AI-powered image generation for visual storytelling:
+
+### Image Generation Process:
+- **Story-Specific Images**: Each news story gets a unique AI-generated image based on its content
+- **Grok AI Integration**: Uses X.AI's Grok image generation API for high-quality visuals
+- **Intelligent Prompting**: Analyzes story content to create relevant, inspiring image prompts
+- **Fallback System**: 9 themed fallback images (technology, medical, environment, etc.) for reliability
+- **Persistent Storage**: Images saved to `/data/generated-images/` and preserved between deployments
+
+### Image Features:
+- **Unique Naming**: `story-{index}-{timestamp}.png` format prevents conflicts
+- **Optimized Delivery**: Served directly via Express static file serving at `/generated-images/*`
+- **Theme-Based Fallbacks**: Pre-generated themed images ensure every story has a visual
+- **Production Ready**: Works seamlessly in both development and Azure cloud deployment
+
+### Current Image Collection:
+- **180+ Generated Images**: Over 180 unique AI-generated story images
+- **9 Themed Fallbacks**: Arts, Community, Education, Environment, General, Medical, Science, Sports, Technology
+- **Automatic Cleanup**: `.gitignore` configured to exclude images from repository while preserving structure
+
+### Technical Implementation:
+```javascript
+// Example image generation call
+const imagePrompt = `Create an inspiring, optimistic image related to: ${storyTitle}`;
+const response = await grokAPI.generateImage(imagePrompt);
+const imagePath = `/generated-images/story-${index}-${timestamp}.png`;
+```
