@@ -26,13 +26,6 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 app.use(cors());
 app.use(express.json());
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-  console.log('Created data directory');
-}
-
 // Serve static files from React build
 const staticPath = path.join(__dirname, '../client/build');
 if (fs.existsSync(staticPath)) {
@@ -42,10 +35,12 @@ if (fs.existsSync(staticPath)) {
   console.error('Static files directory not found:', staticPath);
 }
 
-// Serve generated images from data folder (for images created by fetchNews job)
-const generatedImagesPath = path.join(__dirname, '../data/generated-images');
-app.use('/generated-images', express.static(generatedImagesPath));
-console.log('Generated images route configured:', generatedImagesPath);
+// Ensure data directory exists
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  console.log('Created data directory');
+}
 
 // Ensure generated-images directory exists
 const generatedImagesDir = path.join(__dirname, '../data/generated-images');
@@ -53,6 +48,11 @@ if (!fs.existsSync(generatedImagesDir)) {
   fs.mkdirSync(generatedImagesDir, { recursive: true });
   console.log('Created generated-images directory');
 }
+
+// Serve generated images from data folder (for images created by fetchNews job)
+const generatedImagesPath = path.join(__dirname, '../data/generated-images');
+app.use('/generated-images', express.static(generatedImagesPath));
+console.log('Generated images route configured:', generatedImagesPath);
 
 // Try to load news routes
 try {
