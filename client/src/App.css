@@ -961,6 +961,15 @@ body.theme-default {
     width: 10px;
     height: 10px;
   }
+  
+  .news-container {
+    margin: 1rem 0.75rem;
+    padding: 0 1rem;
+  }
+  
+  .news-date h2 {
+    font-size: 1.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1017,6 +1026,15 @@ body.theme-default {
     height: 40px;
     font-size: 0.9rem;
     border-radius: 6px;
+  }
+  
+  .news-container {
+    margin: 0.75rem 0.5rem;
+    padding: 0 0.75rem;
+  }
+  
+  .news-date h2 {
+    font-size: 1.5rem;
   }
 }
 
