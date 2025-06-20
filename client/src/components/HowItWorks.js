@@ -2,11 +2,11 @@ import React from 'react';
 
 const HowItWorks = () => {
   return (
-    <div className="disclaimer-container">
-      <div className="disclaimer-content">
+    <div className="content-page-container">
+      <div className="content-page-content">
         <h1>How "Everything Is Awesome News" Works</h1>
         
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Mission & Philosophy</h2>
           <p>
             "Everything Is Awesome" is designed to combat news fatigue and negativity bias by surfacing 
@@ -16,7 +16,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>The 5-Step Curation Process</h2>
           
           <h3>Step 1: News Article Fetching</h3>
@@ -74,7 +74,7 @@ const HowItWorks = () => {
           </ul>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Algorithm Improvements & Anti-Commercial Measures</h2>
           
           <h3>Commercial Content Detection</h3>
@@ -101,7 +101,7 @@ const HowItWorks = () => {
           </ul>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Performance Metrics & Quality Assurance</h2>
           
           <h3>Current Performance (June 2025)</h3>
@@ -127,7 +127,7 @@ const HowItWorks = () => {
           </ul>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Technical Architecture</h2>
           
           <h3>Data Sources</h3>
@@ -146,7 +146,7 @@ const HowItWorks = () => {
           </ul>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Assumptions & Limitations</h2>
           
           <h3>Editorial Assumptions</h3>
@@ -176,7 +176,7 @@ const HowItWorks = () => {
           </ul>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Continuous Improvement</h2>
           <p>
             The algorithm is continuously refined based on performance analysis and quality assessment. 
@@ -186,7 +186,7 @@ const HowItWorks = () => {
           </p>
         </div>
 
-        <div className="disclaimer-footer">
+        <div className="content-page-footer">
           <p>
             <strong>This algorithmic approach ensures that "Everything Is Awesome" delivers genuinely 
             inspiring content while filtering out commercial noise and negative events.</strong>

@@ -2,11 +2,11 @@ import React from 'react';
 
 const Disclaimer = () => {
   return (
-    <div className="disclaimer-container">
-      <div className="disclaimer-content">
+    <div className="content-page-container">
+      <div className="content-page-content">
         <h1>Legal Disclaimer & Terms of Use</h1>
         
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>About This Application</h2>
           <p>
             "Everything Is Awesome" is an experimental news aggregation and analysis platform that combines 
@@ -16,7 +16,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Data Sources & Processing</h2>
           <h3>News Content</h3>
           <p>
@@ -42,7 +42,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Limitations & Disclaimers</h2>
           <h3>Accuracy</h3>
           <p>
@@ -65,7 +65,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Intellectual Property</h2>
           <p>
             Original news content remains the property of respective publishers. AI-generated summaries, 
@@ -74,7 +74,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Third-Party Services</h2>
           <p>
             This application relies on third-party services including NewsAPI and Grok AI. We are not 
@@ -83,7 +83,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Privacy & Data</h2>
           <p>
             We do not collect personal information from users. News content is processed automatically 
@@ -91,7 +91,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Liability Limitation</h2>
           <p>
             To the fullest extent permitted by law, the creators and operators of this application 
@@ -100,7 +100,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Changes to Terms</h2>
           <p>
             These terms may be updated periodically. Continued use of the application constitutes 
@@ -108,7 +108,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-section">
+        <div className="content-page-section">
           <h2>Contact</h2>
           <p>
             This is an experimental project. For questions about this disclaimer or the application's 
@@ -117,7 +117,7 @@ const Disclaimer = () => {
           </p>
         </div>
 
-        <div className="disclaimer-footer">
+        <div className="content-page-footer">
           <p>
             <strong>By using this application, you acknowledge that you have read, understood, and 
             agree to be bound by this disclaimer.</strong>

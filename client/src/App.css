@@ -818,8 +818,8 @@ body.theme-default {
   50% { opacity: 1; }
 }
 
-/* Disclaimer Page Styles */
-.disclaimer-container {
+/* Content Page Styles (for Disclaimer, How It Works, and other info pages) */
+.content-page-container {
   width: calc(100% - 2rem);
   max-width: 1150px;
   margin: 0 auto;
@@ -832,12 +832,12 @@ body.theme-default {
   margin-bottom: 2rem;
 }
 
-.disclaimer-content {
+.content-page-content {
   color: #333;
   line-height: 1.6;
 }
 
-.disclaimer-content h1 {
+.content-page-content h1 {
   color: #2c3e50;
   font-size: 2.5rem;
   font-weight: 700;
@@ -849,17 +849,17 @@ body.theme-default {
   background-clip: text;
 }
 
-.disclaimer-section {
+.content-page-section {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.disclaimer-section:last-of-type {
+.content-page-section:last-of-type {
   border-bottom: none;
 }
 
-.disclaimer-section h2 {
+.content-page-section h2 {
   color: #34495e;
   font-size: 1.5rem;
   font-weight: 600;
@@ -869,36 +869,46 @@ body.theme-default {
   display: inline-block;
 }
 
-.disclaimer-section h3 {
+.content-page-section h3 {
   color: #2c3e50;
   font-size: 1.2rem;
   font-weight: 600;
   margin: 1.5rem 0 0.75rem 0;
 }
 
-.disclaimer-section p {
+.content-page-section p {
   margin-bottom: 1rem;
   text-align: justify;
 }
 
-.disclaimer-section a {
+.content-page-section a {
   color: #3498db;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
-.disclaimer-section a:hover {
+.content-page-section a:hover {
   color: #2980b9;
   text-decoration: underline;
 }
 
-.disclaimer-section strong {
+.content-page-section strong {
   color: #2c3e50;
   font-weight: 600;
 }
 
-.disclaimer-footer {
+.content-page-section ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem; /* Align with paragraph text */
+}
+
+.content-page-section li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.content-page-footer {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 1.5rem;
@@ -907,12 +917,37 @@ body.theme-default {
   text-align: center;
 }
 
-.disclaimer-footer p {
+.content-page-footer p {
   margin-bottom: 0.5rem;
 }
 
-.disclaimer-footer strong {
+.content-page-footer strong {
   font-weight: 700;
+}
+
+/* Additional utility classes for content pages */
+.content-page-highlight {
+  background: linear-gradient(135deg, #667eea 20%, #764ba2 80%);
+  color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1.5rem 0;
+}
+
+.content-page-callout {
+  background: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid #3498db;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 0 10px 10px 0;
+}
+
+.content-page-warning {
+  background: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid #e74c3c;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 0 10px 10px 0;
 }
 
 .last-updated {
@@ -1067,7 +1102,7 @@ body.theme-default {
     font-size: 0.75rem !important;
   }
 
-  .disclaimer-container {
+  .content-page-container {
     width: calc(100% - 1.5rem);
     margin: 0 0.75rem;
     padding: 1.5rem;
@@ -1076,20 +1111,28 @@ body.theme-default {
     border-radius: 15px;
   }
   
-  .disclaimer-content h1 {
+  .content-page-content h1 {
     font-size: 2rem;
   }
   
-  .disclaimer-section h2 {
+  .content-page-section h2 {
     font-size: 1.3rem;
   }
   
-  .disclaimer-section h3 {
+  .content-page-section h3 {
     font-size: 1.1rem;
   }
   
-  .disclaimer-section p {
+  .content-page-section p {
     text-align: left;
+  }
+  
+  .content-page-section ul {
+    padding-left: 1.25rem;
+  }
+  
+  .content-page-section li {
+    margin-bottom: 0.4rem;
   }
 }
 
@@ -1214,7 +1257,7 @@ body.theme-default {
     min-height: 180px;
   }
     
-  .disclaimer-container {
+  .content-page-container {
     width: calc(100% - 1rem);
     margin: 0 0.5rem;
     padding: 1rem;
@@ -1222,16 +1265,25 @@ body.theme-default {
     margin-bottom: 0.5rem;
   }
   
-  .disclaimer-content h1 {
+  .content-page-content h1 {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;
   }
   
-  .disclaimer-section {
+  .content-page-section {
     margin-bottom: 1.5rem;
   }
   
-  .disclaimer-footer {
+  .content-page-section ul {
+    padding-left: 1rem;
+  }
+  
+  .content-page-section li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+  }
+  
+  .content-page-footer {
     padding: 1rem;
   }  
 }
