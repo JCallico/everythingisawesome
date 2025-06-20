@@ -52,19 +52,19 @@ body.theme-health {
 }
 
 body.theme-education {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #b8c8ff 0%, #c4a8e3 100%);
 }
 
 body.theme-sports {
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ff4757 100%);
+  background: linear-gradient(135deg, #ff9970 0%, #ffb85e 50%, #ff7a89 100%);
 }
 
 body.theme-science {
-  background: linear-gradient(135deg, #4834d4 0%, #686de0 50%, #30336b 100%);
+  background: linear-gradient(135deg, #7d6eec 0%, #9ca3f5 50%, #8a8fc7 100%);
 }
 
 body.theme-arts {
-  background: linear-gradient(135deg, #ff6348 0%, #ff9ff3 50%, #f368e0 100%);
+  background: linear-gradient(135deg, #ff9a85 0%, #ffb8f6 50%, #f8a3f0 100%);
 }
 
 body.theme-business {
@@ -96,7 +96,7 @@ body.theme-economy {
 }
 
 body.theme-world {
-  background: linear-gradient(135deg, #00a8ff 0%, #0097e6 50%, #273c75 100%);
+  background: linear-gradient(135deg, #66c9ff 0%, #5db8ff 50%, #7ea4d3 100%);
 }
 
 body.theme-inspiring {
