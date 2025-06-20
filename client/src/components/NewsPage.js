@@ -114,7 +114,7 @@ const NewsPage = () => {
 
       {availableDates.length > 1 && (
         <div className="date-selector">
-          {availableDates.slice(0, 7).map(dateOption => (
+          {availableDates.slice(0, 9).map(dateOption => (
             <Link
               key={dateOption}
               to={dateOption === date ? `/date/${dateOption}` : (availableDates[0] === dateOption ? '/' : `/date/${dateOption}`)}
