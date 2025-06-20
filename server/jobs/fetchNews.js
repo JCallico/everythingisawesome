@@ -346,13 +346,23 @@ const createBasicImagePrompt = (story) => {
   // Detect the main theme and create appropriate prompt using unified theme system
   const themes = {
     'health': "A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing",
-    'innovation': "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
-    'education': "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
     'nature': "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future",
+    'innovation': "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
     'community': "People coming together in a positive community setting, showing unity, support, and collaborative spirit",
-    'science': "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
+    'education': "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
     'sports': "An inspiring athletic achievement moment with celebration and triumph, showing human potential and success",
-    'arts': "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting"
+    'science': "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
+    'arts': "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting",
+    'business': "A modern, dynamic business environment with entrepreneurs and innovators creating positive change, showing growth and success",
+    'entertainment': "A joyful entertainment scene with performers and audiences celebrating creativity and shared experiences",
+    'travel': "An inspiring travel destination showcasing adventure, discovery, and cultural connection, conveying wonder and exploration",
+    'food': "A warm, inviting culinary scene with chefs and food enthusiasts celebrating culture and community through cuisine",
+    'lifestyle': "A balanced, harmonious lifestyle scene showing wellness, personal growth, and positive living choices",
+    'politics': "A hopeful civic scene showing democratic participation, positive governance, and community engagement for the greater good",
+    'economy': "An optimistic economic scene showing innovation, fair trade, and sustainable prosperity for all",
+    'world': "A peaceful, connected global scene showing international cooperation and positive diplomatic relationships",
+    'inspiring': "An uplifting scene of human achievement and triumph, showing the best of humanity and inspiring hope for the future",
+    'hope': "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere"
   };
   
   // Find the best matching theme using the unified detection function
