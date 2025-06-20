@@ -463,9 +463,9 @@ const fetchDailyNews = async (targetDate = null) => {
     console.log('Step 2: Processing articles with Grok API...');
     const processedArticles = [];
     
-    for (let i = 0; i < Math.min(articles.length, 50); i++) { // Limit to 50 articles to manage API costs
+    for (let i = 0; i < Math.min(articles.length, 100); i++) { // Process up to 100 articles for better selection pool
       const article = articles[i];
-      console.log(`Processing article ${i + 1}/${Math.min(articles.length, 50)}: ${article.title.substring(0, 50)}...`);
+      console.log(`Processing article ${i + 1}/${Math.min(articles.length, 100)}: ${article.title.substring(0, 50)}...`);
       
       // Combine title and content for analysis
       const articleText = `${article.title} ${article.content || article.description || ''}`;
