@@ -97,19 +97,32 @@ const analyzeSentimentWithGrok = async (articleText, retries = 3) => {
     const prompt = `Analyze this news article and provide a positivity score from 0-100 based on genuine human interest and inspiring content.
 
 SCORING GUIDELINES:
-- 80-100: Genuine human interest stories, scientific breakthroughs, community help, inspiring achievements, charity work, heroic acts, medical advances, environmental success
-- 40-79: General positive news without major impact
+- 80-100: Genuine positive outcomes - scientific breakthroughs, successful rescues, medical cures, achievements, environmental victories, community successes, heroic acts, charitable accomplishments
+- 40-79: General positive news without major impact  
 - 20-39: Neutral or mixed content
-- 0-19: Product sales, shopping deals, discounts, commercial promotions, advertisements, negative news
+- 0-19: Negative events, crimes, disasters, failures, product sales, commercial content
 
-IMPORTANT: Give very low scores (0-20) to articles about:
-- Product sales, deals, discounts, price drops
-- Shopping guides, buying recommendations  
+CRITICAL: Focus on the MAIN EVENT, not just positive entities mentioned:
+- If the primary news is negative (scams, crimes, disasters, deaths, failures) → Score 0-19 even if good organizations are mentioned
+- If the primary news is positive (successes, breakthroughs, rescues, achievements) → Score based on impact
+
+NEGATIVE INDICATORS (Score 0-19):
+- Crimes, scams, fraud, theft, corruption
+- Disasters, accidents, emergencies, crises
+- Deaths, injuries, illnesses, setbacks
+- Product sales, deals, discounts, shopping content
 - Commercial promotions, advertisements
-- "Best deals", "limited time offers", "save money" content
-- Product reviews focused on purchasing
+- Failures, controversies, conflicts
 
-EXCEPTION: Charity auctions, fundraising for good causes, or donations should score highly even if they mention prices.
+POSITIVE INDICATORS (Score 80-100):
+- Scientific discoveries, medical breakthroughs
+- Successful rescues, heroic acts, lives saved
+- Community achievements, charitable successes
+- Environmental victories, conservation wins
+- Educational breakthroughs, accessibility improvements
+- Inspirational human stories with positive outcomes
+
+EXCEPTION: Charity fundraising events and donation drives should score highly even if they mention prices.
 
 Article text: "${articleText.substring(0, 1000)}"
 
