@@ -688,6 +688,14 @@ body.theme-default {
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
   font-size: 0.9rem;
+  /* iOS-specific fixes */
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -719,6 +727,14 @@ body.theme-default {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* iOS-specific fixes */
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 .pause-btn:hover {
@@ -1327,35 +1343,41 @@ body.theme-default {
   }  
 }
 
-/* Hamburger Menu Styles - Minimal and Isolated */
+/* Hamburger Menu Styles - Glassmorphism Design */
 .simple-nav-toggle {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
   cursor: pointer;
-  font-size: 1.2rem;
-  color: #2c3e50;
-  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  color: #ff6b6b;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1003;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8), -1px -1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .simple-nav-toggle:hover {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 .simple-nav-dropdown {
   position: absolute;
   top: 4rem;
   right: 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 0.75rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 1004;
   min-width: 180px;
@@ -1366,22 +1388,27 @@ body.theme-default {
 .simple-nav-link {
   display: block;
   padding: 0.75rem 1rem;
-  color: #2c3e50;
+  color: #ff6b6b;
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8), -1px -1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid transparent;
 }
 
 .simple-nav-link:hover {
-  background: rgba(52, 152, 219, 0.1);
-  color: #2980b9;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .simple-nav-link.active {
-  background: rgba(52, 152, 219, 0.15);
-  color: #2980b9;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   font-weight: 600;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive hamburger adjustments */
@@ -1389,8 +1416,9 @@ body.theme-default {
   .simple-nav-toggle {
     top: 0.5rem;
     right: 0.5rem;
-    padding: 0.4rem 0.6rem;
+    padding: 0.5rem 0.65rem;
     font-size: 1rem;
+    border-radius: 10px;
   }
   
   .simple-nav-dropdown {
@@ -1399,5 +1427,12 @@ body.theme-default {
     min-width: 160px;
     max-height: 250px;
     overflow-y: auto;
+    border-radius: 14px;
+    padding: 0.6rem;
+  }
+  
+  .simple-nav-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
   }
 }
