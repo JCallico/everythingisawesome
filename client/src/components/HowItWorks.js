@@ -4,7 +4,7 @@ const HowItWorks = () => {
   return (
     <div className="disclaimer-container">
       <div className="disclaimer-content">
-        <h1>How It Works: The Science Behind Awesome News</h1>
+        <h1>How "Everything Is Awesome News" Works</h1>
         
         <div className="disclaimer-section">
           <h2>Mission & Philosophy</h2>
