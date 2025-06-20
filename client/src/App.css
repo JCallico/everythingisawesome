@@ -17,176 +17,6 @@ html {
   --vh: 1vh; /* Fallback for browsers that don't support custom properties */
 }
 
-@media (max-width: 768px) {
-  :root {
-    --header-height: 140px;
-    --container-padding: 0.75rem;
-    --story-border-radius: 15px;
-    --nav-gap: 1rem;
-  }
-  
-  .header-shrunk {
-    height: 50px;
-    padding: 0.25rem 1rem;
-  }
-  
-  .header-shrunk .header-logo {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .news-date h2 {
-    font-size: 1.75rem;
-  }
-  
-  .header-logo {
-    width: 320px;
-    height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --header-height: 120px;
-    --container-padding: 0.5rem;
-    --story-border-radius: 12px;
-    --nav-gap: 0.75rem;
-  }
-  
-  .header-shrunk {
-    height: 45px;
-    padding: 0.25rem 0.5rem;
-  }
-  
-  .header-shrunk .header-logo {
-    width: 25px;
-    height: 25px;
-  }
-  
-  .news-date {
-    margin: 0 auto;
-    padding: 1.5rem;
-    position: relative;
-    max-width: 1200px;
-  }
-  
-  .news-date h2 {
-    font-size: 1.5rem;
-  }
-  
-  .header-logo {
-    width: 280px;
-    height: 140px;
-  }
-}
-
-/* Mobile optimizations for news container children */
-@media (max-width: 480px) {
-  .news-container {
-    padding: 0 0.25rem;
-    margin: 1rem 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .news-date h2 {
-    font-size: 1.4rem;
-  }
-  
-  .stories-grid {
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .story-card {
-    padding: 1rem;
-    border-radius: 12px;
-    margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .story-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .story-title {
-    font-size: 1.1rem;
-    line-height: 1.3;
-    width: 100%;
-  }
-  
-  .awesome-badge {
-    align-self: flex-end;
-    padding: 4px 10px;
-    font-size: 0.8rem;
-    min-width: 50px;
-  }
-  
-  .story-summary {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
-    width: 100%;
-  }
-  
-  .story-link {
-    font-size: 0.9rem;
-    width: 100%;
-    display: block;
-  }
-  
-  .story-progress {
-    gap: 0.5rem;
-    padding: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .progress-dot {
-    width: 6px;
-    height: 6px;
-  }
-}
-
-/* Additional optimizations for very small screens */
-@media (max-width: 360px) {
-  .news-container {
-    padding: 0 0.1rem;
-    margin: 0.75rem 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .news-date h2 {
-    font-size: 1.25rem;
-  }
-  
-  .story-card {
-    padding: 0.75rem;
-    border-radius: 10px;
-  }
-  
-  .story-title {
-    font-size: 1rem;
-  }
-  
-  .story-summary {
-    font-size: 0.85rem;
-  }
-  
-  .awesome-badge {
-    padding: 3px 8px;
-    font-size: 0.75rem;
-    min-width: 45px;
-  }
-}
-
 body {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -375,7 +205,7 @@ body.theme-default {
 }
 
 .header-logo {
-  width: 300px;
+   width: 300px;
   height: 150px;
   border-radius: 60%;
   object-fit: cover;
@@ -622,6 +452,7 @@ body.theme-default {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
+  margin-top: 1rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
   flex-shrink: 0;
@@ -1276,4 +1107,176 @@ body.theme-default {
     width: calc(100% - 1rem);
     margin: 0 0.5rem;
   }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 140px;
+    --container-padding: 0.75rem;
+    --story-border-radius: 15px;
+    --nav-gap: 1rem;
+  }
+  
+  .header-shrunk {
+    height: 50px;
+    padding: 0.25rem 1rem;
+  }
+  
+  .header-shrunk .header-logo {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .news-date h2 {
+    font-size: 1.75rem;
+  }
+  
+  .header-logo {
+    width: 270px;
+    height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 120px;
+    --container-padding: 0.5rem;
+    --story-border-radius: 12px;
+    --nav-gap: 0.75rem;
+  }
+  
+  .header-shrunk {
+    height: 45px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .header-shrunk .header-logo {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .news-date {
+    margin: 0 auto;
+    padding: 1.5rem;
+    position: relative;
+    max-width: 1200px;
+  }
+  
+  .news-date h2 {
+    font-size: 1.5rem;
+  }
+  
+  .header-logo {
+    width: 200px;
+    height: 100px;
+  }
+
+  .news-container {
+    padding: 0 0.25rem;
+    margin: 1rem 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .news-date h2 {
+    font-size: 1.4rem;
+  }
+  
+  .stories-grid {
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .story-card {
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .story-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .story-title {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    width: 100%;
+  }
+  
+  .awesome-badge {
+    align-self: flex-end;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    min-width: 50px;
+  }
+  
+  .story-summary {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    width: 100%;
+  }
+  
+  .story-link {
+    font-size: 0.9rem;
+    width: 100%;
+    display: block;
+  }
+  
+  .story-progress {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Additional optimizations for very small screens */
+@media (max-width: 360px) {
+  .news-container {
+    padding: 0 0.1rem;
+    margin: 0.75rem 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .news-date h2 {
+    font-size: 1.25rem;
+  }
+  
+  .story-card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+  
+  .story-title {
+    font-size: 1rem;
+  }
+  
+  .story-summary {
+    font-size: 0.85rem;
+  }
+  
+  .awesome-badge {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    min-width: 45px;
+  }
+
+  .header-logo {
+    width: 150px;
+    height: 750px;
+  }  
 }
