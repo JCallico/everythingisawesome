@@ -105,7 +105,7 @@ const HomePage = () => {
 
       {availableDates.length > 1 && (
         <div className="date-selector">
-          {availableDates.slice(0, 7).map(date => (
+          {availableDates.slice(0, 9).map(date => (
             <Link
               key={date}
               to={date === news.date ? '/' : `/date/${date}`}
