@@ -5,25 +5,41 @@ import { fetchNewsByDate, fetchAvailableDates } from '../services/api';
 import NewsDisplay from './NewsDisplay';
 
 const NewsPage = () => {
-  const { date } = useParams();
+  const { date, storyIndex } = useParams();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
 
+  // Parse story index from URL parameter (convert from 1-based to 0-based)
+  const currentStoryIndex = storyIndex ? parseInt(storyIndex, 10) - 1 : 0;
+  
+  // Check if story index is valid (will be validated after news loads)
+  const isValidStoryIndex = (stories, index) => {
+    return stories && Array.isArray(stories) && index >= 0 && index < stories.length;
+  };
+
   const loadNews = useCallback(async () => {
     try {
       setLoading(true);
       const data = await fetchNewsByDate(date);
-      setNews(data);
-      setError(null);
+      
+      // Check if the story index is valid
+      if (storyIndex && !isValidStoryIndex(data.stories, currentStoryIndex)) {
+        setError('Failed to load news for this date. Please try another date.');
+        setNews(null);
+      } else {
+        setNews(data);
+        setError(null);
+      }
     } catch (err) {
       setError('Failed to load news for this date. Please try another date.');
+      setNews(null);
       console.error('Error loading news:', err);
     } finally {
       setLoading(false);
     }
-  }, [date]);
+  }, [date, storyIndex, currentStoryIndex]);
 
   const loadAvailableDates = useCallback(async () => {
     try {
@@ -92,7 +108,11 @@ const NewsPage = () => {
         <h2>{news.title}</h2>
       </div>
 
-      <NewsDisplay stories={news.stories} />
+      <NewsDisplay 
+        stories={news.stories} 
+        initialStoryIndex={currentStoryIndex}
+        date={date}
+      />
 
       <div className="navigation">
         <Link to="/" className="nav-button">
@@ -100,13 +120,13 @@ const NewsPage = () => {
         </Link>
         
         {prevDate && (
-          <Link to={`/date/${prevDate}`} className="nav-button">
+          <Link to={`/${prevDate}`} className="nav-button">
             ← Previous Day ({moment(prevDate).format('MMM Do')})
           </Link>
         )}
         
         {nextDate && (
-          <Link to={`/date/${nextDate}`} className="nav-button">
+          <Link to={`/${nextDate}`} className="nav-button">
             Next Day ({moment(nextDate).format('MMM Do')}) →
           </Link>
         )}
@@ -117,7 +137,7 @@ const NewsPage = () => {
           {availableDates.slice(0, 9).map(dateOption => (
             <Link
               key={dateOption}
-              to={dateOption === date ? `/date/${dateOption}` : (availableDates[0] === dateOption ? '/' : `/date/${dateOption}`)}
+              to={dateOption === date ? `/${dateOption}` : (availableDates[0] === dateOption ? '/' : `/${dateOption}`)}
               className={`date-option ${dateOption === date ? 'active' : ''}`}
             >
               {moment(dateOption).format('MMM Do')}

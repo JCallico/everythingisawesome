@@ -87,17 +87,21 @@ const HomePage = () => {
         <h2>{news.title}</h2>
       </div>
 
-      <NewsDisplay stories={news.stories} />
+      <NewsDisplay 
+        stories={news.stories} 
+        initialStoryIndex={0}
+        date={news.date}
+      />
 
       <div className="navigation">
         {prevDate && (
-          <Link to={`/date/${prevDate}`} className="nav-button">
+          <Link to={`/${prevDate}`} className="nav-button">
             ← Previous Day ({moment(prevDate).format('MMM Do')})
           </Link>
         )}
         
         {nextDate && (
-          <Link to={`/date/${nextDate}`} className="nav-button">
+          <Link to={`/${nextDate}`} className="nav-button">
             Next Day ({moment(nextDate).format('MMM Do')}) →
           </Link>
         )}
@@ -108,7 +112,7 @@ const HomePage = () => {
           {availableDates.slice(0, 9).map(date => (
             <Link
               key={date}
-              to={date === news.date ? '/' : `/date/${date}`}
+              to={date === news.date ? '/' : `/${date}`}
               className={`date-option ${date === news.date ? 'active' : ''}`}
             >
               {moment(date).format('MMM Do')}

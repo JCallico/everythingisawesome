@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { resolveImageUrl } from '../services/api';
 
-const NewsDisplay = ({ stories }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
+  const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -120,6 +122,25 @@ const NewsDisplay = ({ stories }) => {
     }
   };
 
+  // Sync current index with URL parameter
+  useEffect(() => {
+    if (stories && stories.length > 0) {
+      const validIndex = Math.max(0, Math.min(initialStoryIndex, stories.length - 1));
+      setCurrentIndex(validIndex);
+    }
+  }, [initialStoryIndex, stories]);
+
+  // Function to update URL when story changes (convert from 0-based to 1-based)
+  const updateURL = (newIndex) => {
+    if (newIndex === 0) {
+      // For first story, use the cleaner URL without story index
+      navigate(`/${date}`, { replace: true });
+    } else {
+      // Convert 0-based index to 1-based for URL
+      navigate(`/${date}/${newIndex + 1}`, { replace: true });
+    }
+  };
+
   // Auto transition effect
   useEffect(() => {
     if (!stories || stories.length === 0 || isPaused) return;
@@ -127,13 +148,15 @@ const NewsDisplay = ({ stories }) => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % stories.length);
+        const newIndex = (currentIndex + 1) % stories.length;
+        setCurrentIndex(newIndex);
+        updateURL(newIndex);
         setIsTransitioning(false);
       }, 300);
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [stories, isPaused]);
+  }, [stories, isPaused, currentIndex]);
 
   // Update body theme when story changes
   useEffect(() => {
@@ -147,7 +170,9 @@ const NewsDisplay = ({ stories }) => {
   const goToPrevious = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + stories.length) % stories.length);
+      const newIndex = (currentIndex - 1 + stories.length) % stories.length;
+      setCurrentIndex(newIndex);
+      updateURL(newIndex);
       setIsTransitioning(false);
     }, 300);
   };
@@ -155,7 +180,18 @@ const NewsDisplay = ({ stories }) => {
   const goToNext = () => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % stories.length);
+      const newIndex = (currentIndex + 1) % stories.length;
+      setCurrentIndex(newIndex);
+      updateURL(newIndex);
+      setIsTransitioning(false);
+    }, 300);
+  };
+
+  const goToStory = (index) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      updateURL(index);
       setIsTransitioning(false);
     }, 300);
   };
@@ -203,7 +239,7 @@ const NewsDisplay = ({ stories }) => {
           <div
             key={index}
             className={`progress-dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => goToStory(index)}
           />
         ))}
       </div>

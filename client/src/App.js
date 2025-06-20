@@ -17,8 +17,13 @@ function ThemeHandler() {
     const getPageTitle = (pathname) => {
       if (pathname === '/') {
         return 'Everything Is Awesome - Positive News That Matters';
-      } else if (pathname.startsWith('/date/')) {
-        const date = pathname.split('/date/')[1];
+      } else if (pathname.match(/^\/\d{4}-\d{2}-\d{2}/)) {
+        const pathParts = pathname.split('/').filter(part => part !== '');
+        const date = pathParts[0];
+        const storyIndex = pathParts[1];
+        if (storyIndex) {
+          return `Everything Is Awesome - ${date} - Story ${storyIndex}`;
+        }
         return `Everything Is Awesome - ${date}`;
       } else if (pathname === '/disclaimer') {
         return 'Legal Disclaimer & Terms of Use - Everything Is Awesome';
@@ -32,7 +37,7 @@ function ThemeHandler() {
     document.title = getPageTitle(location.pathname);
     
     // For home and news pages, set a fallback theme if none is set
-    if (location.pathname === '/' || location.pathname.startsWith('/date/')) {
+    if (location.pathname === '/' || location.pathname.match(/^\/\d{4}-\d{2}-\d{2}/)) {
       // Only set fallback if no theme is currently applied
       if (!document.body.className.startsWith('theme-')) {
         document.body.className = 'theme-hope'; // Fallback theme
@@ -88,7 +93,8 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/date/:date" element={<NewsPage />} />
+            <Route path="/:date" element={<NewsPage />} />
+            <Route path="/:date/:storyIndex" element={<NewsPage />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
           </Routes>
