@@ -6,42 +6,10 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Theme dictionary with keywords for each theme
-  const themeKeywords = {
-    'theme-health': ['medical', 'health', 'cancer', 'treatment', 'hospital', 'doctor', 'medicine', 'vaccine'],
-    'theme-nature': ['environment', 'coral', 'forest', 'nature', 'climate', 'wildlife', 'ocean', 'green', 'sustainability'],
-    'theme-innovation': ['ai', 'technology', 'innovation', 'breakthrough', 'robot', 'digital', 'software', 'internet', 'computer'],
-    'theme-community': ['community', 'volunteer', 'together', 'support', 'charity', 'help', 'donate', 'social'],
-    'theme-education': ['education', 'learning', 'school', 'literacy', 'student', 'university', 'teaching', 'academic'],
-    'theme-sports': ['sport', 'game', 'team', 'player', 'championship', 'olympic', 'fitness', 'athlete', 'competition'],
-    'theme-science': ['science', 'research', 'study', 'discovery', 'experiment', 'laboratory', 'scientist', 'physics', 'chemistry'],
-    'theme-arts': ['art', 'music', 'film', 'culture', 'museum', 'artist', 'creative', 'design', 'theater'],
-    'theme-business': ['business', 'company', 'startup', 'finance', 'investment', 'market', 'economic', 'profit', 'trade'],
-    'theme-entertainment': ['entertainment', 'celebrity', 'movie', 'show', 'concert', 'festival', 'performance', 'comedy'],
-    'theme-travel': ['travel', 'tourism', 'vacation', 'adventure', 'journey', 'destination', 'explore', 'trip'],
-    'theme-food': ['food', 'restaurant', 'cooking', 'recipe', 'chef', 'cuisine', 'dining', 'meal'],
-    'theme-lifestyle': ['lifestyle', 'wellness', 'beauty', 'fashion', 'home', 'family', 'relationship', 'personal'],
-    'theme-politics': ['politics', 'government', 'election', 'policy', 'law', 'congress', 'president', 'vote'],
-    'theme-economy': ['economy', 'inflation', 'gdp', 'unemployment', 'banking', 'currency', 'stock', 'financial'],
-    'theme-world': ['world', 'international', 'global', 'country', 'nation', 'diplomatic', 'foreign', 'border'],
-    'theme-inspiring': ['inspiring', 'amazing', 'incredible', 'wonderful', 'uplifting', 'positive', 'heartwarming', 'triumph']
-  };
-
-  // Color themes based on story content
+  // Get theme from story data (pre-calculated during news fetching)
   const getThemeFromStory = (story) => {
-    const title = story.title.toLowerCase();
-    const summary = story.summary.toLowerCase();
-    const text = title + ' ' + summary;
-
-    // Search through theme keywords to find the best match
-    for (const [theme, keywords] of Object.entries(themeKeywords)) {
-      if (keywords.some(keyword => text.includes(keyword))) {
-        return theme;
-      }
-    }
-
-    // Default hope theme for everything else
-    return 'theme-hope';
+    // Simply return the theme from the story data (all stories now have themes)
+    return story.theme || 'hope'; // Fallback to 'hope' if somehow missing
   };
 
   // Sync current index with URL parameter
@@ -100,7 +68,8 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   useEffect(() => {
     if (stories && stories[currentIndex]) {
       const theme = getThemeFromStory(stories[currentIndex]);
-      document.body.className = theme;
+      // Add 'theme-' prefix for CSS classes
+      document.body.className = `theme-${theme}`;
     }
   }, [currentIndex, stories]);
 
@@ -141,21 +110,9 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
       return resolveImageUrl(story.image);
     }
     
-    // Fallback to themed local images based on story content
-    const theme = getThemeFromStory(story);
-    const themeMap = {
-      'theme-health': 'medical',
-      'theme-nature': 'environment',
-      'theme-innovation': 'technology',
-      'theme-community': 'community',
-      'theme-education': 'education',
-      'theme-science': 'science',
-      'theme-sports': 'sports',
-      'theme-arts': 'arts'
-    };
-    
-    const fallbackTheme = themeMap[theme] || 'general';
-    return resolveImageUrl(`/generated-images/fallback-${fallbackTheme}.png`);
+    // Fallback to themed local images based on story theme (pre-calculated)
+    const theme = story.theme || 'hope';
+    return resolveImageUrl(`/generated-images/fallback-${theme}.png`);
   };
 
   if (!stories || stories.length === 0) {

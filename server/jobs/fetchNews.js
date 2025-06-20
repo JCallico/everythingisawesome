@@ -343,38 +343,23 @@ const createBasicImagePrompt = (story) => {
   const summary = story.summary.toLowerCase();
   const combinedText = `${title} ${summary}`;
   
-  // Detect the main theme and create appropriate prompt
+  // Detect the main theme and create appropriate prompt using unified theme system
   const themes = {
-    medical: "A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing",
-    technology: "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
-    education: "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
-    environment: "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future",
-    community: "People coming together in a positive community setting, showing unity, support, and collaborative spirit",
-    science: "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
-    sports: "An inspiring athletic achievement moment with celebration and triumph, showing human potential and success",
-    arts: "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting"
+    'health': "A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing",
+    'innovation': "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
+    'education': "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
+    'nature': "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future",
+    'community': "People coming together in a positive community setting, showing unity, support, and collaborative spirit",
+    'science': "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
+    'sports': "An inspiring athletic achievement moment with celebration and triumph, showing human potential and success",
+    'arts': "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting"
   };
   
-  // Find the best matching theme
-  for (const [theme, prompt] of Object.entries(themes)) {
-    const themeKeywords = {
-      medical: ['medical', 'health', 'doctor', 'hospital', 'cure', 'treatment', 'vaccine'],
-      technology: ['technology', 'ai', 'innovation', 'digital', 'tech', 'software', 'device'],
-      education: ['education', 'school', 'student', 'learning', 'university', 'study'],
-      environment: ['environment', 'nature', 'green', 'climate', 'sustainable', 'renewable'],
-      community: ['community', 'volunteer', 'charity', 'helping', 'support', 'together'],
-      science: ['science', 'research', 'discovery', 'scientist', 'study', 'breakthrough'],
-      sports: ['sport', 'athlete', 'game', 'victory', 'championship', 'competition'],
-      arts: ['art', 'music', 'culture', 'creative', 'artist', 'performance']
-    };
-    
-    if (themeKeywords[theme] && themeKeywords[theme].some(keyword => combinedText.includes(keyword))) {
-      return prompt;
-    }
-  }
+  // Find the best matching theme using the unified detection function
+  const detectedTheme = detectStoryTheme(story);
   
-  // Default inspiring prompt
-  return "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere";
+  // Return the prompt for the detected theme or a default
+  return themes[detectedTheme] || "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere";
 };
 
 // Save base64 image data to file
@@ -402,38 +387,48 @@ const saveBase64Image = async (base64Data, storyIndex) => {
   }
 };
 
-// Function to detect theme from story content
+// Unified theme dictionary with keywords for each theme (matches NewsDisplay component)
+const THEME_KEYWORDS = {
+  'health': ['medical', 'health', 'cancer', 'treatment', 'hospital', 'doctor', 'medicine', 'vaccine'],
+  'nature': ['environment', 'coral', 'forest', 'nature', 'climate', 'wildlife', 'ocean', 'green', 'sustainability'],
+  'innovation': ['ai', 'technology', 'innovation', 'breakthrough', 'robot', 'digital', 'software', 'internet', 'computer'],
+  'community': ['community', 'volunteer', 'together', 'support', 'charity', 'help', 'donate', 'social'],
+  'education': ['education', 'learning', 'school', 'literacy', 'student', 'university', 'teaching', 'academic'],
+  'sports': ['sport', 'game', 'team', 'player', 'championship', 'olympic', 'fitness', 'athlete', 'competition'],
+  'science': ['science', 'research', 'study', 'discovery', 'experiment', 'laboratory', 'scientist', 'physics', 'chemistry'],
+  'arts': ['art', 'music', 'film', 'culture', 'museum', 'artist', 'creative', 'design', 'theater'],
+  'business': ['business', 'company', 'startup', 'finance', 'investment', 'market', 'economic', 'profit', 'trade'],
+  'entertainment': ['entertainment', 'celebrity', 'movie', 'show', 'concert', 'festival', 'performance', 'comedy'],
+  'travel': ['travel', 'tourism', 'vacation', 'adventure', 'journey', 'destination', 'explore', 'trip'],
+  'food': ['food', 'restaurant', 'cooking', 'recipe', 'chef', 'cuisine', 'dining', 'meal'],
+  'lifestyle': ['lifestyle', 'wellness', 'beauty', 'fashion', 'home', 'family', 'relationship', 'personal'],
+  'politics': ['politics', 'government', 'election', 'policy', 'law', 'congress', 'president', 'vote'],
+  'economy': ['economy', 'inflation', 'gdp', 'unemployment', 'banking', 'currency', 'stock', 'financial'],
+  'world': ['world', 'international', 'global', 'country', 'nation', 'diplomatic', 'foreign', 'border'],
+  'inspiring': ['inspiring', 'amazing', 'incredible', 'wonderful', 'uplifting', 'positive', 'heartwarming', 'triumph']
+};
+
+// Function to detect theme from story content using unified theme system
 const detectStoryTheme = (story) => {
   const title = story.title.toLowerCase();
   const summary = story.summary.toLowerCase();
   const combinedText = `${title} ${summary}`;
   
-  const themeKeywords = {
-    medical: ['medical', 'health', 'doctor', 'hospital', 'cure', 'treatment', 'vaccine'],
-    technology: ['technology', 'ai', 'innovation', 'digital', 'tech', 'software', 'device'],
-    education: ['education', 'school', 'student', 'learning', 'university', 'study'],
-    environment: ['environment', 'nature', 'green', 'climate', 'sustainable', 'renewable'],
-    community: ['community', 'volunteer', 'charity', 'helping', 'support', 'together'],
-    science: ['science', 'research', 'discovery', 'scientist', 'study', 'breakthrough'],
-    sports: ['sport', 'athlete', 'game', 'victory', 'championship', 'competition'],
-    arts: ['art', 'music', 'culture', 'creative', 'artist', 'performance']
-  };
-  
-  // Find the best matching theme
-  for (const [theme, keywords] of Object.entries(themeKeywords)) {
+  // Search through theme keywords to find the best match
+  for (const [theme, keywords] of Object.entries(THEME_KEYWORDS)) {
     if (keywords.some(keyword => combinedText.includes(keyword))) {
       return theme;
     }
   }
   
   // Default theme
-  return 'general';
+  return 'hope';
 };
 
 // Fallback to themed static local images
 const getFallbackImage = (story) => {
   if (!story) {
-    return '/generated-images/fallback-general.png';
+    return '/generated-images/fallback-hope.png';
   }
   
   const theme = detectStoryTheme(story);
@@ -488,15 +483,21 @@ const fetchDailyNews = async (targetDate = null) => {
       
       // Generate summary
       const summary = await generateSummaryWithGrok(articleText);
-      
-      // Calculate awesome index
+       // Calculate awesome index
       const awesomeIndex = calculateAwesomeIndex(sentimentScore, keywordCount);
       
+      // Detect theme for the story
+      const theme = detectStoryTheme({
+        title: article.title,
+        summary: summary
+      });
+
       processedArticles.push({
         title: article.title,
         summary: summary,
         link: article.url,
         awesome_index: awesomeIndex,
+        theme: theme,
         image: 'placeholder',
         source: article.source?.name || 'News Source',
         publishedAt: article.publishedAt,
