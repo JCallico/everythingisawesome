@@ -4,6 +4,7 @@ import Header from './components/Header';
 import HomePage from './components/HomePage';
 import NewsPage from './components/NewsPage';
 import Disclaimer from './components/Disclaimer';
+import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -41,6 +42,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/date/:date" element={<NewsPage />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
           </Routes>
           <Footer />
         </main>
