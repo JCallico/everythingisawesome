@@ -524,9 +524,9 @@ body.theme-default {
 /* Story image */
 .story-image-container {
   position: relative;
-  height: 40%;
+  height: 45%;
   min-height: 200px;
-  max-height: 300px;
+  max-height: 450px; /* Increased from 300px to allow more image visibility on desktop */
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1041,6 +1041,11 @@ body.theme-default {
     width: calc(100% - 1.5rem);
     margin: 0 0.75rem;
   }
+  
+  .story-image-container {
+    height: 40%;
+    max-height: 350px;
+  }
 
   .news-container {
     padding: 0 1rem;
@@ -1201,6 +1206,12 @@ body.theme-default {
   .news-display-container {
     width: calc(100% - 1rem);
     margin: 0 0.5rem;
+  }
+  
+  .story-image-container {
+    height: 35%;
+    max-height: 250px;
+    min-height: 180px;
   }
     
   .disclaimer-container {
