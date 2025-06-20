@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { resolveImageUrl } from '../services/api';
 
 const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
-  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -130,15 +128,20 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
     }
   }, [initialStoryIndex, stories]);
 
-  // Function to update URL when story changes (convert from 0-based to 1-based)
-  const updateURL = (newIndex) => {
-    if (newIndex === 0) {
-      // For first story, use the cleaner URL without story index
-      navigate(`/${date}`, { replace: true });
-    } else {
-      // Convert 0-based index to 1-based for URL
-      navigate(`/${date}/${newIndex + 1}`, { replace: true });
-    }
+  // Function to change story while preserving scroll position
+  const changeStoryWithScrollPreservation = (newIndex) => {
+    // Store current scroll position
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    
+    // Update the story state immediately
+    setCurrentIndex(newIndex);
+    
+    // Update URL using history.replaceState to avoid triggering router navigation
+    const newUrl = newIndex === 0 ? `/${date}` : `/${date}/${newIndex + 1}`;
+    window.history.replaceState(null, '', newUrl);
+    
+    // Maintain scroll position since we're not using React Router navigation
+    window.scrollTo(0, scrollY);
   };
 
   // Auto transition effect
@@ -149,8 +152,19 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
       setIsTransitioning(true);
       setTimeout(() => {
         const newIndex = (currentIndex + 1) % stories.length;
-        setCurrentIndex(newIndex);
-        updateURL(newIndex);
+        
+        // For auto-transitions, only preserve scroll if user has scrolled significantly
+        const shouldPreserveScroll = window.scrollY > 200;
+        
+        if (shouldPreserveScroll) {
+          changeStoryWithScrollPreservation(newIndex);
+        } else {
+          // For auto-transitions near the top, allow natural scroll to top
+          setCurrentIndex(newIndex);
+          const newUrl = newIndex === 0 ? `/${date}` : `/${date}/${newIndex + 1}`;
+          window.history.replaceState(null, '', newUrl);
+        }
+        
         setIsTransitioning(false);
       }, 300);
     }, 30000); // 30 seconds
@@ -168,32 +182,32 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
 
   // Navigation functions
   const goToPrevious = () => {
+    if (isTransitioning) return; // Prevent multiple rapid clicks
     setIsTransitioning(true);
-    setTimeout(() => {
-      const newIndex = (currentIndex - 1 + stories.length) % stories.length;
-      setCurrentIndex(newIndex);
-      updateURL(newIndex);
-      setIsTransitioning(false);
-    }, 300);
+    
+    const newIndex = (currentIndex - 1 + stories.length) % stories.length;
+    changeStoryWithScrollPreservation(newIndex);
+    
+    setTimeout(() => setIsTransitioning(false), 300);
   };
 
   const goToNext = () => {
+    if (isTransitioning) return; // Prevent multiple rapid clicks
     setIsTransitioning(true);
-    setTimeout(() => {
-      const newIndex = (currentIndex + 1) % stories.length;
-      setCurrentIndex(newIndex);
-      updateURL(newIndex);
-      setIsTransitioning(false);
-    }, 300);
+    
+    const newIndex = (currentIndex + 1) % stories.length;
+    changeStoryWithScrollPreservation(newIndex);
+    
+    setTimeout(() => setIsTransitioning(false), 300);
   };
 
   const goToStory = (index) => {
+    if (isTransitioning || index === currentIndex) return; // Prevent unnecessary changes
     setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex(index);
-      updateURL(index);
-      setIsTransitioning(false);
-    }, 300);
+    
+    changeStoryWithScrollPreservation(index);
+    
+    setTimeout(() => setIsTransitioning(false), 300);
   };
 
   // Generate image URL from story data or fallback to themed local image
