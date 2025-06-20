@@ -166,7 +166,7 @@ body.theme-default {
   left: 0;
   right: 0;
   z-index: 1000;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1325,4 +1325,79 @@ body.theme-default {
     width: 150px;
     height: 750px;
   }  
+}
+
+/* Hamburger Menu Styles - Minimal and Isolated */
+.simple-nav-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  z-index: 1003;
+}
+
+.simple-nav-toggle:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.simple-nav-dropdown {
+  position: absolute;
+  top: 4rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 1004;
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.simple-nav-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #2c3e50;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.simple-nav-link:hover {
+  background: rgba(52, 152, 219, 0.1);
+  color: #2980b9;
+}
+
+.simple-nav-link.active {
+  background: rgba(52, 152, 219, 0.15);
+  color: #2980b9;
+  font-weight: 600;
+}
+
+/* Responsive hamburger adjustments */
+@media (max-width: 480px) {
+  .simple-nav-toggle {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+  }
+  
+  .simple-nav-dropdown {
+    top: 3rem;
+    right: 0.5rem;
+    min-width: 160px;
+    max-height: 250px;
+    overflow-y: auto;
+  }
 }
