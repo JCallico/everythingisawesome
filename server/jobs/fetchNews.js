@@ -94,7 +94,22 @@ const analyzeSentimentWithGrok = async (articleText, retries = 3) => {
       throw new Error('GROK_API_KEY not found');
     }
 
-    const prompt = `Analyze the sentiment of this news article and provide a positivity score from 0-100, where 100 is extremely positive and uplifting, and 0 is very negative.
+    const prompt = `Analyze this news article and provide a positivity score from 0-100 based on genuine human interest and inspiring content.
+
+SCORING GUIDELINES:
+- 80-100: Genuine human interest stories, scientific breakthroughs, community help, inspiring achievements, charity work, heroic acts, medical advances, environmental success
+- 40-79: General positive news without major impact
+- 20-39: Neutral or mixed content
+- 0-19: Product sales, shopping deals, discounts, commercial promotions, advertisements, negative news
+
+IMPORTANT: Give very low scores (0-20) to articles about:
+- Product sales, deals, discounts, price drops
+- Shopping guides, buying recommendations  
+- Commercial promotions, advertisements
+- "Best deals", "limited time offers", "save money" content
+- Product reviews focused on purchasing
+
+EXCEPTION: Charity auctions, fundraising for good causes, or donations should score highly even if they mention prices.
 
 Article text: "${articleText.substring(0, 1000)}"
 
