@@ -8,11 +8,29 @@ import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 import './App.css';
 
-// Component to handle theme setting based on route
+// Component to handle theme setting and page title based on route
 function ThemeHandler() {
   const location = useLocation();
   
   useEffect(() => {
+    // Update page title based on current route
+    const getPageTitle = (pathname) => {
+      if (pathname === '/') {
+        return 'Everything Is Awesome - Positive News That Matters';
+      } else if (pathname.startsWith('/date/')) {
+        const date = pathname.split('/date/')[1];
+        return `Everything Is Awesome - ${date}`;
+      } else if (pathname === '/disclaimer') {
+        return 'Legal Disclaimer & Terms of Use - Everything Is Awesome';
+      } else if (pathname === '/how-it-works') {
+        return 'How It Works - Everything Is Awesome';
+      } else {
+        return 'Everything Is Awesome';
+      }
+    };
+    
+    document.title = getPageTitle(location.pathname);
+    
     // For home and news pages, set a fallback theme if none is set
     if (location.pathname === '/' || location.pathname.startsWith('/date/')) {
       // Only set fallback if no theme is currently applied
