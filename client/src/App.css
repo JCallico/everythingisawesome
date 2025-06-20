@@ -559,7 +559,6 @@ body.theme-default {
   flex-direction: column;
   position: relative;
   overflow-y: auto;
-  min-height: 300px;
 }
 
 .awesome-badge {
