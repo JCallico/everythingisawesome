@@ -7,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 // Import screens
 import HomeScreenSimple from './src/screens/HomeScreenSimple';
 import NewsScreenSimple from './src/screens/NewsScreenSimple';
-import StoryScreen from './src/screens/StoryScreen';
 
 const Stack = createStackNavigator();
 
@@ -44,14 +43,6 @@ export default function App() {
               title: route.params?.date || 'News',
               headerShown: false 
             })}
-          />
-          <Stack.Screen 
-            name="Story" 
-            component={StoryScreen}
-            options={{ 
-              title: 'Story',
-              headerShown: false 
-            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

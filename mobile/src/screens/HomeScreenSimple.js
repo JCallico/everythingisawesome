@@ -290,15 +290,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const navigateToStory = (story, index) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    navigation.navigate('Story', {
-      story: story,
-      date: news.date,
-      index: index
-    });
-  };
-
   // Swipe gesture handling - exactly like web navigation
   const panResponder = useRef(
     PanResponder.create({
@@ -419,25 +410,8 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
           <View style={styles.headerInfo}>
-            <Text style={styles.headerDate}>{news.title}</Text>
-            <Text style={styles.headerCounter}>
-              {currentIndex + 1} of {news.stories.length}
-            </Text>
-            {availableDates.length > 1 && (
-              <TouchableOpacity 
-                onPress={() => setShowDateSelector(true)}
-                style={styles.dateSelectButton}
-              >
-                <Text style={styles.dateSelectButtonText}>📅 Browse Dates</Text>
-              </TouchableOpacity>
-            )}
+            <Text style={styles.headerTitle}>{news.title}</Text>
           </View>
-          <TouchableOpacity 
-            onPress={isPaused ? resumeAutoRotation : pauseAutoRotation}
-            style={styles.pauseBtn}
-          >
-            <Text style={styles.pauseBtnText}>{isPaused ? '▶️' : '⏸️'}</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Story Content */}
@@ -499,23 +473,12 @@ const HomeScreen = ({ navigation }) => {
             {/* Story Content */}
             <BlurView intensity={20} style={styles.contentCard}>
               <View style={styles.cardContent}>
-                <TouchableOpacity 
-                  onPress={() => navigateToStory(currentStory, currentIndex)}
-                  style={styles.storyContentArea}
-                  activeOpacity={0.7}
-                >
+                <View style={styles.storyContentArea}>
                   <Text style={styles.storyTitle}>{currentStory.title}</Text>
                   <Text style={styles.storySummary}>{currentStory.summary}</Text>
-                </TouchableOpacity>
+                </View>
 
                 <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => navigateToStory(currentStory, currentIndex)}
-                  >
-                    <Text style={styles.actionButtonText}>👁️ Details</Text>
-                  </TouchableOpacity>
-
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => openStoryLink(currentStory.link)}
@@ -530,6 +493,16 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={styles.actionButtonText}>📤 Share</Text>
                   </TouchableOpacity>
                 </View>
+
+                {/* Browse Dates Button */}
+                {availableDates.length > 1 && (
+                  <TouchableOpacity 
+                    onPress={() => setShowDateSelector(true)}
+                    style={styles.browseDatesButton}
+                  >
+                    <Text style={styles.browseDatesButtonText}>📅 Browse Dates</Text>
+                  </TouchableOpacity>
+                )}
 
                 {/* Theme Badge */}
                 <View style={styles.themeBadge}>
@@ -710,25 +683,15 @@ const styles = StyleSheet.create({
   headerInfo: {
     flex: 2,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  headerDate: {
+  headerTitle: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  headerCounter: {
-    color: '#fff',
-    fontSize: 12,
-    opacity: 0.8,
-    textAlign: 'center',
-  },
-  pauseBtn: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  pauseBtnText: {
-    fontSize: 20,
+    lineHeight: 22,
+    paddingHorizontal: 10,
   },
   scrollView: {
     flex: 1,
@@ -918,19 +881,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  dateSelectButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 4,
+  browseDatesButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginTop: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    alignSelf: 'center',
   },
-  dateSelectButtonText: {
+  browseDatesButtonText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
   },
   dateModal: {
     position: 'absolute',
