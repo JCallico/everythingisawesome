@@ -412,8 +412,11 @@ const HomeScreen = ({ navigation }) => {
         {/* Header - exactly like web */}
         <View style={styles.header}>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.title}>Everything Is</Text>
-            <Text style={styles.titleAwesome}>Awesome</Text>
+            <Image 
+              source={require('../../assets/everythingisawesome.jpg')} 
+              style={styles.headerLogo}
+              resizeMode="cover"
+            />
           </View>
           <View style={styles.headerInfo}>
             <Text style={styles.headerDate}>{news.title}</Text>
@@ -689,16 +692,20 @@ const styles = StyleSheet.create({
   },
   headerTitleContainer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: '#fff',
-  },
-  titleAwesome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFD700',
+  headerLogo: {
+    width: 120,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 5,
   },
   headerInfo: {
     flex: 2,
@@ -752,8 +759,8 @@ const styles = StyleSheet.create({
   },
   awesomeIndexContainer: {
     position: 'absolute',
-    top: 80,
-    left: 20,
+    top: 50,
+    right: 30,
     zIndex: 10,
   },
   awesomeIndexBadge: {
