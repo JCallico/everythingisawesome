@@ -37,27 +37,27 @@ const getImageBaseUrl = () => {
   return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net';
 };
 
-// Theme colors mapping - exactly like web version
+// Theme colors mapping - exactly matching web version
 const THEME_COLORS = {
-  hope: ['#FFD700', '#FFA500', '#FF6347'],
-  health: ['#32CD32', '#20B2AA', '#4169E1'],
-  innovation: ['#9B59B6', '#8E44AD'],
-  education: ['#FF6347', '#FFD700', '#32CD32'],
-  community: ['#E74C3C', '#C0392B'],
-  science: ['#4A90E2', '#357ABD'],
-  arts: ['#9B59B6', '#8E44AD'],
-  entertainment: ['#FFD700', '#FFA500'],
-  business: ['#34495E', '#2C3E50'],
-  sports: ['#E67E22', '#D35400'],
-  travel: ['#11998e', '#38ef7d'],
-  food: ['#FFA500', '#FFD700'],
-  lifestyle: ['#667eea', '#764ba2'],
-  nature: ['#11998e', '#38ef7d'],
-  politics: ['#4A90E2', '#357ABD'],
-  economy: ['#FFD700', '#FFA500'],
-  world: ['#20B2AA', '#4169E1'],
-  inspiring: ['#FFD700', '#FF69B4'],
-  default: ['#667eea', '#764ba2'],
+  hope: ['#ff9a9e', '#fecfef', '#fecfef'],
+  health: ['#fdbb2d', '#22c1c3'],
+  innovation: ['#a8edea', '#fed6e3'],
+  education: ['#b8c8ff', '#c4a8e3'],
+  community: ['#89f7fe', '#66a6ff'],
+  science: ['#7d6eec', '#9ca3f5', '#8a8fc7'],
+  arts: ['#ff9a85', '#ffb8f6', '#f8a3f0'],
+  entertainment: ['#ff3838', '#ff6b81', '#ff9ff3'],
+  business: ['#3c40c6', '#575fcf', '#2c2c54'],
+  sports: ['#ff9970', '#ffb85e', '#ff7a89'],
+  travel: ['#00d2d3', '#54a0ff', '#5f27cd'],
+  food: ['#ff9f43', '#feca57', '#ff6348'],
+  lifestyle: ['#ff6b81', '#ff9ff3', '#a55eea'],
+  nature: ['#d299c2', '#fef9d7'],
+  politics: ['#2c2c54', '#40407a', '#706fd3'],
+  economy: ['#218c74', '#33d9b2', '#2ed573'],
+  world: ['#66c9ff', '#5db8ff', '#7ea4d3'],
+  inspiring: ['#ff9a56', '#fad0c4', '#ffd1ff'],
+  default: ['#ffecd2', '#fcb69f'],
 };
 
 const fetchLatestNews = async () => {
@@ -470,11 +470,14 @@ const HomeScreen = ({ navigation }) => {
 
             {/* Awesome Index Badge - exactly like web */}
             <View style={styles.awesomeIndexContainer}>
-              <BlurView intensity={20} style={styles.awesomeIndexBadge}>
-                <Text style={styles.awesomeIndexText}>
-                  ⭐ {currentStory.awesome_index}/100 Awesome
+              <View style={styles.awesomeIndexBadge}>
+                <Text style={styles.awesomeScore}>
+                  {currentStory.awesome_index}
                 </Text>
-              </BlurView>
+                <Text style={styles.awesomeLabel}>
+                  Awesome
+                </Text>
+              </View>
             </View>
 
             {/* Story Image */}
@@ -750,21 +753,53 @@ const styles = StyleSheet.create({
   awesomeIndexContainer: {
     position: 'absolute',
     top: 80,
-    right: 20,
+    left: 20,
     zIndex: 10,
   },
   awesomeIndexBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#FFD700',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    backgroundColor: '#ff6b6b',
+    borderWidth: 0,
+    shadowColor: 'rgba(255, 107, 107, 0.3)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 12,
+    elevation: 8,
+    minWidth: 80,
   },
   awesomeIndexText: {
-    color: '#FFD700',
+    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  awesomeScore: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '800',
+    textAlign: 'center',
+    lineHeight: 26,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  awesomeLabel: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    opacity: 0.95,
+    textTransform: 'capitalize',
+    letterSpacing: 0.5,
+    lineHeight: 14,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   imageContainer: {
     height: height * 0.4,
