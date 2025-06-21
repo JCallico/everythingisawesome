@@ -5,8 +5,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 // Import screens
-import HomeScreenSimple from './src/screens/HomeScreenSimple';
-import NewsScreenSimple from './src/screens/NewsScreenSimple';
+import HomeScreen from './src/screens/HomeScreen';
+import NewsScreen from './src/screens/NewsScreen';
 
 const Stack = createStackNavigator();
 
@@ -30,7 +30,7 @@ export default function App() {
         >
           <Stack.Screen 
             name="Home" 
-            component={HomeScreenSimple}
+            component={HomeScreen}
             options={{ 
               title: 'Everything Is Awesome',
               headerShown: false 
@@ -38,7 +38,7 @@ export default function App() {
           />
           <Stack.Screen 
             name="News" 
-            component={NewsScreenSimple}
+            component={NewsScreen}
             options={({ route }) => ({ 
               title: route.params?.date || 'News',
               headerShown: false 
