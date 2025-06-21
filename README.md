@@ -1,8 +1,41 @@
 # Everything Is Awesome 🌟
 
-A beautiful website displaying optimistic, feel-good news stories that restore hope in humanity. This project fetches real news articles, analyzes them with AI for sentiment and positivity, then presents the most uplifting stories with an engaging user interface.
+A beautiful cross-platform application displaying optimistic, feel-good news stories that restore hope in humanity. This project fetches real news articles, analyzes them with AI for sentiment and positivity, then presents the most uplifting stories with an engaging user interface.
 
-**🚀 Live Demo**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingis## 💻 Tech Stack
+**🚀 Live Demo**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+
+## 📱 Cross-Platform Architecture
+
+This monorepo contains three main components:
+
+### 🌐 Web Application (`/client`)
+- **React 19** web application
+- Responsive design with glassmorphism UI
+- Deployed to Azure Web Apps
+
+### 📱 Mobile Application (`/mobile`)
+- **React Native** with Expo
+- Native iOS and Android support  
+- **Swipe Gestures** - Navigate between stories with intuitive swipe controls
+- **Haptic Feedback** - Enhanced mobile experience with touch feedback
+- **Native Sharing** - Built-in share functionality for stories
+- **Auto-rotation** - Stories automatically transition every 30 seconds
+- **Touch Navigation** - Tap on story content to view detailed view
+- **Responsive Design** - Optimized for mobile screens and interactions
+- **Cross-platform** - Single codebase for iOS, Android, and web
+- Shared business logic with web
+
+### 🚀 Backend API (`/server`)
+- **Node.js & Express** REST API
+- AI-powered news analysis
+- Shared by both web and mobile clients
+
+### 🔄 Shared Libraries (`/shared`)
+- Common utilities and types
+- API service layer
+- Business logic components
+
+## 💻 Tech Stack
 
 ### Frontend
 - **React 19** - Modern UI framework with hooks
@@ -60,6 +93,7 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 
 ## ✨ Features
 
+### 🌐 Web Application
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
 - **AI-Powered Analysis**: Uses Grok-3-latest for sentiment analysis and intelligent summarization
 - **AI-Generated Images**: Custom images generated using Grok's AI image generation for each story
@@ -72,55 +106,153 @@ A beautiful website displaying optimistic, feel-good news stories that restore h
 - **Persistent Data Storage**: Generated images and news data persist between deployments
 - **Source Flexibility**: Optional filtering by reputable sources (currently disabled for maximum diversity)
 
+### 📱 Mobile Application
+- **Cross-Platform**: Single React Native codebase runs on iOS, Android, and web
+- **Swipe Navigation**: Intuitive left/right swipe gestures to navigate between stories
+- **Haptic Feedback**: Enhanced mobile experience with tactile responses
+- **Native Sharing**: Built-in platform sharing for stories via SMS, email, social media
+- **Auto-Rotation**: Stories automatically transition every 30 seconds (pausable)
+- **Touch Interactions**: Tap story content or use dedicated "View Details" button
+- **Story Details Screen**: Full-screen story view with comprehensive information
+- **Theme-Based Gradients**: Dynamic color schemes based on story categories
+- **Mobile-Optimized UI**: Designed specifically for touch interfaces
+- **Offline-Ready**: Cached data for improved performance
+- **Real-time API**: Seamless integration with the same backend as web
+
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 18+ and npm 8+
+- For mobile development: Expo CLI
+- Git for version control
 
-- **Node.js** 18 or higher
-- **npm** or yarn
-- **Grok API key** from [X.AI Console](https://console.x.ai/) (required)
-- **NewsAPI key** from [NewsAPI.org](https://newsapi.org/register) (required)
+### Installation & Setup
 
-### Installation
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd everythingisawesome
 
-1. **Navigate to the project directory**
-   ```bash
-   cd /Users/jcallico/Source/Code/everythingisawesome
-   ```
+# Install all dependencies (web, mobile, and server)
+npm run install-all
 
-2. **Install all dependencies**
-   ```bash
-   npm run setup
-   ```
+# Set up environment variables
+# Copy .env.example to .env and add your API keys:
+# - GROK_API_KEY=your_grok_api_key
+# - NEWS_API_KEY=your_news_api_key
+```
 
-3. **Configure environment**
-   
-   Copy the example environment file and add your API keys:
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Then edit `.env` and add your API keys:
-   ```env
-   GROK_API_KEY=your_grok_api_key_here
-   NEWS_API_KEY=your_news_api_key_here
-   PORT=3001
-   NODE_ENV=development
-   ```
+### Development Commands
 
-4. **Generate themed fallback images** (one-time setup)
-   ```bash
-   npm run generate-themed-fallbacks
-   ```
+```bash
+# Start web + server (recommended for web development)
+npm run dev
 
-5. **Start the application**
-   ```bash
-   npm run dev
-   ```
+# Start mobile + server (for mobile development)
+npm run dev:mobile
 
-5. **Open your browser**
-   
-   Visit [http://localhost:3000](http://localhost:3000) to see your awesome news site! 🎉
+# Start everything (web + mobile + server)
+npm run dev:all
+
+# Individual components
+npm run server     # Backend API only
+npm run client     # Web app only
+npm run mobile     # Mobile app only
+```
+
+### Building for Production
+
+```bash
+# Build web application
+npm run build
+
+# Build mobile application
+npm run build:mobile
+```
+
+## 📁 Project Structure
+
+```
+everythingisawesome/
+├── client/                 # React Web Application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── services/      # API services
+│   │   └── App.js
+│   └── package.json
+│
+├── mobile/                 # React Native Mobile App
+│   ├── src/
+│   │   ├── screens/       # Mobile screens
+│   │   ├── components/    # Mobile components
+│   │   ├── services/      # Mobile API services
+│   │   └── styles/        # Mobile stylesheets
+│   ├── App.js
+│   └── package.json
+│
+├── server/                 # Backend API & Jobs
+│   ├── index.js           # Express server
+│   ├── jobs/              # Scheduled tasks
+│   ├── routes/            # API routes
+│   ├── scripts/           # Utility scripts
+│   └── utils/             # Server utilities
+│
+├── shared/                 # Shared Libraries
+│   ├── api.js             # Platform-agnostic API layer
+│   ├── utils.js           # Common utilities
+│   └── types.js           # Type definitions
+│
+├── data/                   # News data storage
+│   ├── *.json             # Daily news files
+│   └── generated-images/  # AI-generated images
+│
+└── package.json           # Root package manager
+```
+
+## 🔄 Development Workflow
+
+### For Web Development
+```bash
+npm run dev              # Starts server + web client
+# Open http://localhost:3000
+```
+
+### For Mobile Development
+```bash
+npm run dev:mobile       # Starts server + mobile app
+# Use Expo app on your phone or simulator
+```
+
+### For Full-Stack Development
+```bash
+npm run dev:all          # Starts everything
+# Web: http://localhost:3000
+# Mobile: Use Expo app
+# API: http://localhost:3001
+```
+
+## 📱 Mobile Development
+
+The mobile app is built with **Expo** and **React Native**, providing:
+
+- **Cross-platform**: Single codebase for iOS and Android
+- **Shared Logic**: Reuses business logic from web app
+- **Native Feel**: Platform-specific UI components
+- **Easy Testing**: Use Expo app for instant preview
+
+### Mobile-Specific Features
+- Gesture-based navigation
+- Native animations
+- Pull-to-refresh
+- Haptic feedback
+- Push notifications (coming soon)
+
+### Testing Mobile App
+
+1. Install Expo app on your phone
+2. Run `npm run dev:mobile`
+3. Scan QR code with Expo app
+4. App updates automatically as you develop
 
 ## 🎮 Usage
 

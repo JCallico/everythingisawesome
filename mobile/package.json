@@ -1,0 +1,39 @@
+{
+  "name": "everythingisawesome-mobile",
+  "version": "1.0.0",
+  "description": "Everything Is Awesome - Mobile App for positive news stories",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:android": "expo build:android",
+    "build:ios": "expo build:ios",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~5.0.4",
+    "@expo/vector-icons": "^14.1.0",
+    "@react-navigation/bottom-tabs": "^7.3.17",
+    "@react-navigation/native": "^7.1.13",
+    "@react-navigation/stack": "^7.3.6",
+    "axios": "^1.10.0",
+    "expo": "~53.0.12",
+    "expo-blur": "^14.1.5",
+    "expo-haptics": "^14.1.4",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-status-bar": "~2.2.3",
+    "moment": "^2.30.1",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.4",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "^4.11.1",
+    "react-native-web": "^0.20.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
+}
