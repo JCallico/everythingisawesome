@@ -448,7 +448,21 @@ const HomeScreen = ({ navigation }) => {
                     index === currentIndex && styles.progressDotActive
                   ]}
                   onPress={() => changeStory(index)}
-                />
+                >
+                  {index === currentIndex ? (
+                    <LinearGradient
+                      colors={['#ff6b6b', '#4ecdc4']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[
+                        styles.progressDotInner,
+                        styles.progressDotActiveInner
+                      ]}
+                    />
+                  ) : (
+                    <View style={styles.progressDotInner} />
+                  )}
+                </TouchableOpacity>
               ))}
             </View>
 
@@ -714,21 +728,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 12,
+    flexWrap: 'wrap',
   },
   progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
     marginHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  progressDotInner: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 4,
   },
   progressDotActive: {
-    backgroundColor: '#FFD700',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    transform: [{ scale: 1.4 }],
+  },
+  progressDotActiveInner: {
+    borderColor: 'rgba(255, 255, 255, 1)',
+    shadowColor: '#ff6b6b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25,
+    elevation: 8,
   },
   awesomeIndexContainer: {
     position: 'absolute',
