@@ -1,36 +1,25 @@
 import axios from 'axios';
 import { resolveImageUrl } from '@everythingisawesome/shared-api';
 
-// Determine the correct API base URL based on environment
+// Mobile-specific API configuration
 const getApiBaseUrl = () => {
-  // If REACT_APP_API_URL is set, use it
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
-  }
-  
-  // In development, explicitly use localhost:3001
-  if (process.env.NODE_ENV === 'development') {
+  // Check for React Native development environment
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return 'http://localhost:3001/api';
   }
   
-  // In production, use relative URLs
-  return '/api';
+  // For mobile production, use the full Azure website URL
+  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api';
 };
 
-// Determine the correct base URL for images
 const getImageBaseUrl = () => {
-  // If REACT_APP_API_URL is set, use it (removing /api from the end)
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL.replace('/api', '');
-  }
-  
-  // In development, explicitly use localhost:3001
-  if (process.env.NODE_ENV === 'development') {
+  // Check for React Native development environment
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
     return 'http://localhost:3001';
   }
   
-  // In production, use relative URLs (no base URL needed)
-  return '';
+  // For mobile production, use the full Azure website URL
+  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -70,10 +59,7 @@ export const fetchAvailableDates = async () => {
   }
 };
 
-// Re-export the shared utility function
-export { resolveImageUrl };
-
-// Export the environment-specific functions
-export { getApiBaseUrl, getImageBaseUrl };
+// Re-export the shared functions
+export { getApiBaseUrl, getImageBaseUrl, resolveImageUrl };
 
 export default api;

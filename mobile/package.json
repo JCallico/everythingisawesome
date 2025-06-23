@@ -13,6 +13,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@everythingisawesome/shared-api": "file:../packages/shared-api",
     "@expo/metro-runtime": "~5.0.4",
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/bottom-tabs": "^7.3.17",

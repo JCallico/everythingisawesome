@@ -17,26 +17,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import axios from 'axios';
 import * as Haptics from 'expo-haptics';
 import DateSelector from '../components/DateSelector';
+import { 
+  fetchLatestNews, 
+  fetchAvailableDates, 
+  fetchNewsByDate, 
+  getImageBaseUrl,
+  resolveImageUrl 
+} from '../services/api';
 
 const { width, height } = Dimensions.get('window');
-
-// API configuration
-const getApiBaseUrl = () => {
-  if (__DEV__) {
-    return 'http://localhost:3001/api';
-  }
-  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api';
-};
-
-const getImageBaseUrl = () => {
-  if (__DEV__) {
-    return 'http://localhost:3001';
-  }
-  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net';
-};
 
 // Theme colors mapping - exactly matching web version
 const THEME_COLORS = {
@@ -59,42 +50,6 @@ const THEME_COLORS = {
   world: ['#66c9ff', '#5db8ff', '#7ea4d3'],
   inspiring: ['#ff9a56', '#fad0c4', '#ffd1ff'],
   default: ['#ffecd2', '#fcb69f'],
-};
-
-const fetchLatestNews = async () => {
-  try {
-    const response = await axios.get(`${getApiBaseUrl()}/news/latest`, {
-      timeout: 10000,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching latest news:', error);
-    throw new Error('Failed to fetch latest news');
-  }
-};
-
-const fetchAvailableDates = async () => {
-  try {
-    const response = await axios.get(`${getApiBaseUrl()}/news/dates`, {
-      timeout: 10000,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching available dates:', error);
-    throw new Error('Failed to fetch available dates');
-  }
-};
-
-const fetchNewsForDate = async (date) => {
-  try {
-    const response = await axios.get(`${getApiBaseUrl()}/news/date/${date}`, {
-      timeout: 10000,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching news for date:', error);
-    throw new Error('Failed to fetch news for date');
-  }
 };
 
 const HomeScreen = ({ navigation }) => {
@@ -178,7 +133,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       setLoading(true);
       setCurrentIndex(0); // Reset to first story
-      const data = await fetchNewsForDate(date);
+      const data = await fetchNewsByDate(date);
       setNews(data);
       setError(null);
     } catch (err) {

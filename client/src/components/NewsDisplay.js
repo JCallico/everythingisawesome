@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { resolveImageUrl } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { resolveImageUrl, getImageBaseUrl } from '../services/api';
 
 const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
@@ -21,7 +21,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   }, [initialStoryIndex, stories]);
 
   // Function to change story while preserving scroll position
-  const changeStoryWithScrollPreservation = (newIndex) => {
+  const changeStoryWithScrollPreservation = useCallback((newIndex) => {
     // Store current scroll position
     const scrollY = window.scrollY || window.pageYOffset || 0;
     
@@ -34,7 +34,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
     
     // Maintain scroll position since we're not using React Router navigation
     window.scrollTo(0, scrollY);
-  };
+  }, [date]);
 
   // Auto transition effect
   useEffect(() => {
@@ -62,7 +62,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [stories, isPaused, currentIndex]);
+  }, [stories, isPaused, currentIndex, changeStoryWithScrollPreservation, date]);
 
   // Update body theme when story changes
   useEffect(() => {
@@ -107,12 +107,12 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const getStoryImage = (story) => {
     // Use the image from the story data if available
     if (story.image && story.image !== 'placeholder') {
-      return resolveImageUrl(story.image);
+      return resolveImageUrl(story.image, getImageBaseUrl());
     }
     
     // Fallback to themed local images based on story theme (pre-calculated)
     const theme = story.theme || 'hope';
-    return resolveImageUrl(`/generated-images/fallback-${theme}.png`);
+    return resolveImageUrl(`/generated-images/fallback-${theme}.png`, getImageBaseUrl());
   };
 
   if (!stories || stories.length === 0) {
