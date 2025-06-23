@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import axios from 'axios';
 import * as Haptics from 'expo-haptics';
+import DateSelector from '../components/DateSelector';
 
 const { width, height } = Dimensions.get('window');
 
@@ -86,7 +87,7 @@ const fetchAvailableDates = async () => {
 
 const fetchNewsForDate = async (date) => {
   try {
-    const response = await axios.get(`${getApiBaseUrl()}/news/${date}`, {
+    const response = await axios.get(`${getApiBaseUrl()}/news/date/${date}`, {
       timeout: 10000,
     });
     return response.data;
@@ -324,8 +325,14 @@ const HomeScreen = ({ navigation }) => {
     return THEME_COLORS[theme] || THEME_COLORS.default;
   };
 
+  // Utility function to parse date string without timezone issues
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
   const formatShortDate = (dateString) => {
-    const date = new Date(dateString);
+    const date = parseDate(dateString);
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
       day: 'numeric' 
