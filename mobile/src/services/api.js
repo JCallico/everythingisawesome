@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { resolveImageUrl } from '@everythingisawesome/shared-api';
+import { createImageService, createApiService } from '@everythingisawesome/shared-api';
 
 // Mobile-specific API configuration
 const getApiBaseUrl = () => {
@@ -29,37 +29,19 @@ const api = axios.create({
   timeout: 10000,
 });
 
-export const fetchLatestNews = async () => {
-  try {
-    const response = await api.get('/news/latest');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching latest news:', error);
-    throw new Error('Failed to fetch latest news');
-  }
-};
+// Create API service functions using the shared factory
+const apiService = createApiService(api);
 
-export const fetchNewsByDate = async (date) => {
-  try {
-    const response = await api.get(`/news/date/${date}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching news for date ${date}:`, error);
-    throw new Error(`Failed to fetch news for ${date}`);
-  }
-};
+// Create image service functions using the shared factory
+const imageService = createImageService(getImageBaseUrl());
 
-export const fetchAvailableDates = async () => {
-  try {
-    const response = await api.get('/news/dates');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching available dates:', error);
-    throw new Error('Failed to fetch available dates');
-  }
-};
+// Export the API functions directly from the shared service
+export const { fetchLatestNews, fetchNewsByDate, fetchAvailableDates } = apiService;
+
+// Export the image functions directly from the shared service
+export const { resolveImageUrl } = imageService;
 
 // Re-export the shared functions
-export { getApiBaseUrl, getImageBaseUrl, resolveImageUrl };
+export { getApiBaseUrl, getImageBaseUrl };
 
 export default api;

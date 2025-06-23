@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { resolveImageUrl, getImageBaseUrl } from '../services/api';
+import { resolveImageUrl } from '../services/api';
 
 const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
@@ -107,12 +107,12 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const getStoryImage = (story) => {
     // Use the image from the story data if available
     if (story.image && story.image !== 'placeholder') {
-      return resolveImageUrl(story.image, getImageBaseUrl());
+      return resolveImageUrl(story.image);
     }
     
     // Fallback to themed local images based on story theme (pre-calculated)
     const theme = story.theme || 'hope';
-    return resolveImageUrl(`/generated-images/fallback-${theme}.png`, getImageBaseUrl());
+    return resolveImageUrl(`/generated-images/fallback-${theme}.png`);
   };
 
   if (!stories || stories.length === 0) {

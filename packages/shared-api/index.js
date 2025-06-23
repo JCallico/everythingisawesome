@@ -5,21 +5,63 @@
  */
 
 /**
- * Utility function to resolve image URLs correctly
- * @param {string} imagePath - The relative or absolute image path
- * @param {string} baseUrl - The base URL to prepend to relative paths
- * @returns {string} The resolved image URL
+ * Factory function to create image utility functions with a configured base URL
+ * @param {string} baseUrl - The base URL for resolving relative image paths
+ * @returns {object} Image utility functions
  */
-export const resolveImageUrl = (imagePath, baseUrl = '') => {
-  // If the path is already absolute (starts with http), return as is
-  if (imagePath && imagePath.startsWith('http')) {
-    return imagePath;
-  }
-  
-  // For relative paths, prepend the base URL
-  if (imagePath && imagePath.startsWith('/')) {
-    return `${baseUrl}${imagePath}`;
-  }
-  
-  return imagePath;
+export const createImageService = (baseUrl = '') => {
+  return {
+    resolveImageUrl: (imagePath) => {
+      // If the path is already absolute (starts with http), return as is
+      if (imagePath && imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      
+      // For relative paths, prepend the base URL
+      if (imagePath && imagePath.startsWith('/')) {
+        return `${baseUrl}${imagePath}`;
+      }
+      
+      return imagePath;
+    }
+  };
+};
+
+/**
+ * Factory function to create API service functions with a configured axios instance
+ * @param {object} apiInstance - Configured axios instance
+ * @returns {object} API service functions
+ */
+export const createApiService = (apiInstance) => {
+  return {
+    fetchLatestNews: async () => {
+      try {
+        const response = await apiInstance.get('/news/latest');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching latest news:', error);
+        throw new Error('Failed to fetch latest news');
+      }
+    },
+
+    fetchNewsByDate: async (date) => {
+      try {
+        const response = await apiInstance.get(`/news/date/${date}`);
+        return response.data;
+      } catch (error) {
+        console.error(`Error fetching news for date ${date}:`, error);
+        throw new Error(`Failed to fetch news for ${date}`);
+      }
+    },
+
+    fetchAvailableDates: async () => {
+      try {
+        const response = await apiInstance.get('/news/dates');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching available dates:', error);
+        throw new Error('Failed to fetch available dates');
+      }
+    }
+  };
 };
