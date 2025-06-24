@@ -421,18 +421,6 @@ const HomeScreen = ({ navigation }) => {
               ))}
             </View>
 
-            {/* Awesome Index Badge - exactly like web */}
-            <View style={styles.awesomeIndexContainer}>
-              <View style={styles.awesomeIndexBadge}>
-                <Text style={styles.awesomeScore}>
-                  {currentStory.awesome_index}
-                </Text>
-                <Text style={styles.awesomeLabel}>
-                  Awesome
-                </Text>
-              </View>
-            </View>
-
             {/* Story Image */}
             <View style={styles.imageContainer}>
               <Image
@@ -444,6 +432,18 @@ const HomeScreen = ({ navigation }) => {
                 colors={['transparent', 'rgba(0,0,0,0.7)']}
                 style={styles.imageGradient}
               />
+              
+              {/* Awesome Index Badge - positioned relative to image */}
+              <View style={styles.awesomeIndexContainer}>
+                <View style={styles.awesomeIndexBadge}>
+                  <Text style={styles.awesomeScore}>
+                    {currentStory.awesome_index}
+                  </Text>
+                  <Text style={styles.awesomeLabel}>
+                    Awesome
+                  </Text>
+                </View>
+              </View>
             </View>
 
             {/* Story Content */}
@@ -636,35 +636,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    gap: 12,
-    flexWrap: 'wrap',
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    gap: 8,
+    flexWrap: 'nowrap',
   },
   progressDot: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'transparent',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    flex: 0,
+    minWidth: 32,
   },
   progressDotInner: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.9)',
     shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowRadius: 8,
     elevation: 4,
   },
   progressDotActive: {
-    transform: [{ scale: 1.4 }],
+    transform: [{ scale: 1.2 }],
   },
   progressDotActiveInner: {
     borderColor: 'rgba(255, 255, 255, 1)',
@@ -674,10 +677,29 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
     elevation: 8,
   },
+  imageContainer: {
+    height: height * 0.4,
+    marginHorizontal: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  storyImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '50%',
+  },
   awesomeIndexContainer: {
     position: 'absolute',
-    top: 50,
-    right: 30,
+    top: 15,
+    right: 15,
     zIndex: 10,
   },
   awesomeIndexBadge: {
@@ -692,15 +714,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
     minWidth: 80,
-  },
-  awesomeIndexText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   awesomeScore: {
     color: '#fff',
@@ -724,24 +737,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
-  },
-  imageContainer: {
-    height: height * 0.4,
-    marginHorizontal: 20,
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
-  storyImage: {
-    width: '100%',
-    height: '100%',
-  },
-  imageGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '50%',
   },
   contentCard: {
     marginHorizontal: 20,
