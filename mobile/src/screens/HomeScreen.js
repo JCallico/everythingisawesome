@@ -522,6 +522,7 @@ const HomeScreen = ({ navigation }) => {
           availableDates={availableDates}
           currentDate={news?.date}
           onDateSelect={handleDateSelect}
+          themeColors={themeColors}
         />
       </SafeAreaView>
     </LinearGradient>

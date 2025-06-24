@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 
@@ -20,7 +21,8 @@ const DateSelector = ({
   onClose, 
   availableDates = [], 
   currentDate = null, 
-  onDateSelect 
+  onDateSelect,
+  themeColors = ['#667eea', '#764ba2'] // Default gradient if no theme provided
 }) => {
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [isReady, setIsReady] = useState(false);
@@ -159,45 +161,49 @@ const DateSelector = ({
       presentationStyle="fullScreen"
       onRequestClose={handleClose}
     >
-      <SafeAreaView style={styles.container}>
-        {isReady && (
-          <View style={styles.modal}>
-            {/* Header */}
-            <View style={styles.header}>
-              <Text style={styles.title}>Browse News by Date</Text>
-              <Text style={styles.subtitle}>
-                {availableDates.length} days of positive news available
-              </Text>
-              <TouchableOpacity 
-                onPress={handleClose} 
-                style={styles.closeButton}
-                activeOpacity={0.7}
-                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-              >
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Quick stats */}
-            <View style={styles.statsContainer}>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>{availableDates.length}</Text>
-                <Text style={styles.statLabel}>Days</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>
-                  {availableDates.length > 0 ? Math.ceil(availableDates.length / 7) : 0}
+      <LinearGradient
+        colors={themeColors}
+        style={styles.container}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          {isReady && (
+            <View style={styles.modal}>
+              {/* Header */}
+              <View style={styles.header}>
+                <Text style={styles.title}>Browse News by Date</Text>
+                <Text style={styles.subtitle}>
+                  {availableDates.length} days of positive news available
                 </Text>
-                <Text style={styles.statLabel}>Weeks</Text>
+                <TouchableOpacity 
+                  onPress={handleClose} 
+                  style={styles.closeButton}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                >
+                  <Text style={styles.closeButtonText}>✕</Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>∞</Text>
-                <Text style={styles.statLabel}>Awesome</Text>
-              </View>
-            </View>
 
-            {/* Date List */}
-            <FlatList
+              {/* Quick stats */}
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{availableDates.length}</Text>
+                  <Text style={styles.statLabel}>Days</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>
+                    {availableDates.length > 0 ? Math.ceil(availableDates.length / 7) : 0}
+                  </Text>
+                  <Text style={styles.statLabel}>Weeks</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>∞</Text>
+                  <Text style={styles.statLabel}>Awesome</Text>
+                </View>
+              </View>
+
+              {/* Date List */}
+              <FlatList
               data={availableDates}
               renderItem={renderDateItem}
               keyExtractor={(item) => item}
@@ -220,7 +226,8 @@ const DateSelector = ({
             />
           </View>
         )}
-      </SafeAreaView>
+        </SafeAreaView>
+      </LinearGradient>
     </Modal>
   );
 };
@@ -228,7 +235,9 @@ const DateSelector = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(102, 126, 234, 0.9)',
+  },
+  safeArea: {
+    flex: 1,
   },
   modal: {
     flex: 1,
