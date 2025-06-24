@@ -26,10 +26,21 @@ const DateSelector = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [isReady, setIsReady] = useState(false);
+  const [currentViewDate, setCurrentViewDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list' - default to calendar
 
   useEffect(() => {
     setSelectedDate(currentDate);
-  }, [currentDate]);
+    // Set the current view to the month of the current/selected date, or latest available
+    if (currentDate) {
+      const date = parseDate(currentDate);
+      setCurrentViewDate(new Date(date.getFullYear(), date.getMonth(), 1));
+    } else if (availableDates.length > 0) {
+      // If no current date, show the month of the most recent available date
+      const latestDate = parseDate(availableDates[0]);
+      setCurrentViewDate(new Date(latestDate.getFullYear(), latestDate.getMonth(), 1));
+    }
+  }, [currentDate, availableDates]);
 
   useEffect(() => {
     if (visible) {
@@ -107,7 +118,73 @@ const DateSelector = ({
     onClose();
   };
 
-  const renderDateItem = ({ item: date, index }) => {
+  const renderCalendarDay = (dayInfo) => {
+    const { dateString, isCurrentMonth, hasNews, isSelected, isToday, day } = dayInfo;
+    
+    if (!isCurrentMonth) {
+      return (
+        <View key={dateString} style={styles.calendarDayEmpty}>
+          <Text style={styles.calendarDayEmptyText}>{day}</Text>
+        </View>
+      );
+    }
+
+    const isActive = hasNews;
+    
+    return (
+      <TouchableOpacity
+        key={dateString}
+        style={[
+          styles.calendarDay,
+          isActive && styles.calendarDayActive,
+          isSelected && styles.calendarDaySelected,
+          isToday && styles.calendarDayToday,
+        ]}
+        onPress={() => isActive ? handleDatePress(dateString) : null}
+        activeOpacity={isActive ? 0.7 : 1}
+        disabled={!isActive}
+      >
+        <View style={styles.calendarDayContent}>
+          <Text style={[
+            styles.calendarDayText,
+            isActive && styles.calendarDayTextActive,
+            isSelected && styles.calendarDayTextSelected,
+            isToday && styles.calendarDayTextToday,
+          ]}>
+            {day}
+          </Text>
+          {isActive && (
+            <View style={[
+              styles.calendarDayDot,
+              isSelected && styles.calendarDayDotSelected,
+            ]} />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderCalendarGrid = () => {
+    const days = getCalendarDays();
+    const weeks = [];
+    
+    for (let i = 0; i < days.length; i += 7) {
+      const week = days.slice(i, i + 7);
+      weeks.push(
+        <View key={i} style={styles.calendarWeek}>
+          {week.map(dayInfo => renderCalendarDay(dayInfo))}
+        </View>
+      );
+    }
+    
+    return weeks;
+  };
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'calendar' ? 'list' : 'calendar');
+  };
+
+  const renderListItem = ({ item: date, index }) => {
     const isSelected = date === selectedDate;
     const isLatestDate = isLatest(date, index);
     const isTodayDate = isToday(date);
@@ -115,26 +192,26 @@ const DateSelector = ({
     return (
       <TouchableOpacity
         style={[
-          styles.dateItem,
-          isSelected && styles.dateItemSelected,
-          isLatestDate && styles.dateItemLatest,
+          styles.listItem,
+          isSelected && styles.listItemSelected,
+          isLatestDate && styles.listItemLatest,
         ]}
         onPress={() => handleDatePress(date)}
         activeOpacity={0.7}
       >
-        <BlurView intensity={isSelected ? 30 : 20} style={styles.dateItemBlur}>
-          <View style={styles.dateItemContent}>
+        <BlurView intensity={isSelected ? 30 : 20} style={styles.listItemBlur}>
+          <View style={styles.listItemContent}>
             <Text style={[
-              styles.dateText,
-              isSelected && styles.dateTextSelected,
-              isLatestDate && styles.dateTextLatest,
+              styles.listItemDate,
+              isSelected && styles.listItemDateSelected,
+              isLatestDate && styles.listItemDateLatest,
             ]}>
               {formatShortDate(date)}
             </Text>
             <Text style={[
-              styles.dateSubtext,
-              isSelected && styles.dateSubtextSelected,
-              isLatestDate && styles.dateSubtextLatest,
+              styles.listItemSubtext,
+              isSelected && styles.listItemSubtextSelected,
+              isLatestDate && styles.listItemSubtextLatest,
             ]}>
               {getDaysAgo(date)}
             </Text>
@@ -152,6 +229,90 @@ const DateSelector = ({
         </BlurView>
       </TouchableOpacity>
     );
+  };
+
+  // Calendar navigation functions
+  const goToPreviousMonth = () => {
+    setCurrentViewDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+  };
+
+  const goToNextMonth = () => {
+    setCurrentViewDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  const hasNewsForDate = (dateString) => {
+    return availableDates.includes(dateString);
+  };
+
+  const formatDateToString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getCalendarDays = () => {
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+    
+    // First day of the month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Days from previous month to fill the grid
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    // Generate calendar grid (6 weeks = 42 days)
+    const days = [];
+    const currentDate = new Date(startDate);
+    
+    for (let i = 0; i < 42; i++) {
+      const dateString = formatDateToString(currentDate);
+      const isCurrentMonth = currentDate.getMonth() === month;
+      const hasNews = hasNewsForDate(dateString);
+      const isSelected = dateString === selectedDate;
+      const isToday = dateString === formatDateToString(new Date());
+      
+      days.push({
+        date: new Date(currentDate),
+        dateString,
+        isCurrentMonth,
+        hasNews,
+        isSelected,
+        isToday,
+        day: currentDate.getDate()
+      });
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return days;
+  };
+
+  const getMonthYearText = () => {
+    return currentViewDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long' 
+    });
+  };
+
+  const getAvailableMonths = () => {
+    const months = new Set();
+    availableDates.forEach(dateString => {
+      const date = parseDate(dateString);
+      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      months.add(monthYear);
+    });
+    return Array.from(months).sort().reverse(); // Most recent first
   };
 
   return (
@@ -203,29 +364,58 @@ const DateSelector = ({
               </View>
 
               {/* Date List */}
-              <FlatList
-              data={availableDates}
-              renderItem={renderDateItem}
-              keyExtractor={(item) => item}
-              style={styles.dateList}
-              contentContainerStyle={styles.dateListContent}
-              showsVerticalScrollIndicator={false}
-              numColumns={2}
-              columnWrapperStyle={styles.row}
-              ListHeaderComponent={() => (
-                <Text style={styles.listHeader}>
-                  📅 Select a date to explore that day's awesome news
-                </Text>
-              )}
-              ListEmptyComponent={() => (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>No dates available</Text>
-                  <Text style={styles.emptySubtext}>Check back later for more awesome news!</Text>
+              {viewMode === 'list' ? (
+                <FlatList
+                  data={availableDates}
+                  renderItem={renderListItem}
+                  keyExtractor={(item) => item}
+                  style={styles.dateList}
+                  contentContainerStyle={styles.dateListContent}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={2}
+                  columnWrapperStyle={styles.row}
+                  ListHeaderComponent={() => (
+                    <Text style={styles.listHeader}>
+                      📅 Select a date to explore that day's awesome news
+                    </Text>
+                  )}
+                  ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>No dates available</Text>
+                      <Text style={styles.emptySubtext}>Check back later for more awesome news!</Text>
+                    </View>
+                  )}
+                />
+              ) : (
+                <View style={styles.calendarContainer}>
+                  {/* Calendar Header */}
+                  <View style={styles.calendarHeader}>
+                    <TouchableOpacity onPress={goToPreviousMonth} style={styles.calendarNavButton}>
+                      <Text style={styles.calendarNavButtonText}>◀</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.calendarTitle}>{getMonthYearText()}</Text>
+                    <TouchableOpacity onPress={goToNextMonth} style={styles.calendarNavButton}>
+                      <Text style={styles.calendarNavButtonText}>▶</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Calendar Days Header */}
+                  <View style={styles.calendarDaysHeader}>
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      <Text key={day} style={styles.calendarDayHeaderText}>{day}</Text>
+                    ))}
+                  </View>
+
+                  {/* Calendar Grid */}
+                  <ScrollView style={styles.calendarScrollView}>
+                    <View style={styles.calendarGrid}>
+                      {renderCalendarGrid()}
+                    </View>
+                  </ScrollView>
                 </View>
               )}
-            />
-          </View>
-        )}
+            </View>
+          )}
         </SafeAreaView>
       </LinearGradient>
     </Modal>
@@ -325,82 +515,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 22,
   },
-  dateItem: {
-    width: '48%',
-    marginBottom: 15,
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
-  dateItemBlur: {
-    borderRadius: 15,
-  },
-  dateItemContent: {
-    padding: 15,
-    alignItems: 'center',
-    position: 'relative',
-  },
-  dateItemSelected: {
-    borderWidth: 2,
-    borderColor: '#FFD700',
-  },
-  dateItemLatest: {
-    borderWidth: 2,
-    borderColor: 'rgba(255, 215, 0, 0.6)',
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  dateTextSelected: {
-    color: '#FFD700',
-    fontWeight: 'bold',
-  },
-  dateTextLatest: {
-    color: '#FFD700',
-  },
-  dateSubtext: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.7,
-  },
-  dateSubtextSelected: {
-    color: '#FFD700',
-    opacity: 1,
-  },
-  dateSubtextLatest: {
-    color: '#FFD700',
-    opacity: 0.9,
-  },
-  latestBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  latestBadgeText: {
-    fontSize: 8,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  todayBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  todayBadgeText: {
-    fontSize: 8,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   emptyContainer: {
     alignItems: 'center',
     paddingVertical: 40,
@@ -416,6 +530,175 @@ const styles = StyleSheet.create({
     color: '#fff',
     opacity: 0.7,
     textAlign: 'center',
+  },
+  // Calendar styles
+  calendarContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
+  calendarNavButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarNavButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  calendarTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  calendarDaysHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 10,
+  },
+  calendarDayHeaderText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    opacity: 0.8,
+    width: (width - 40) / 7,
+    textAlign: 'center',
+  },
+  calendarScrollView: {
+    flex: 1,
+  },
+  calendarGrid: {
+    paddingBottom: 20,
+  },
+  calendarWeek: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 5,
+  },
+  calendarDay: {
+    width: (width - 40) / 7,
+    height: (width - 40) / 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  calendarDayEmpty: {
+    width: (width - 40) / 7,
+    height: (width - 40) / 7,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarDayEmptyText: {
+    color: '#fff',
+    opacity: 0.3,
+    fontSize: 14,
+  },
+  calendarDayActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  calendarDaySelected: {
+    backgroundColor: '#FFD700',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  calendarDayToday: {
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+  },
+  calendarDayContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  calendarDayText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    opacity: 0.5,
+  },
+  calendarDayTextActive: {
+    opacity: 1,
+    fontWeight: '600',
+  },
+  calendarDayTextSelected: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  calendarDayTextToday: {
+    fontWeight: 'bold',
+  },
+  calendarDayDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#FFD700',
+    marginTop: 2,
+  },
+  calendarDayDotSelected: {
+    backgroundColor: '#333',
+  },
+  // List styles (updated from original dateItem styles)
+  listItem: {
+    width: '48%',
+    marginBottom: 15,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  listItemBlur: {
+    borderRadius: 15,
+  },
+  listItemContent: {
+    padding: 15,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  listItemSelected: {
+    borderWidth: 2,
+    borderColor: '#FFD700',
+  },
+  listItemLatest: {
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.6)',
+  },
+  listItemDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  listItemDateSelected: {
+    color: '#FFD700',
+    fontWeight: 'bold',
+  },
+  listItemDateLatest: {
+    color: '#FFD700',
+  },
+  listItemSubtext: {
+    fontSize: 12,
+    color: '#fff',
+    opacity: 0.7,
+  },
+  listItemSubtextSelected: {
+    color: '#FFD700',
+    opacity: 1,
+  },
+  listItemSubtextLatest: {
+    color: '#FFD700',
+    opacity: 0.9,
   },
 });
 
