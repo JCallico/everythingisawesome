@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev:ios": "concurrently \"npm run server\" \"cd mobile && npm run ios\"",
+    "dev:android": "concurrently \"npm run server\" \"cd mobile && npm run android\"",
     "dev:mobile": "concurrently \"npm run server\" \"npm run mobile\"",
     "dev:all": "concurrently \"npm run server\" \"npm run client\" \"npm run mobile\"",
     "server": "nodemon server/index.js",
