@@ -23,10 +23,21 @@ const DateSelector = ({
   onDateSelect 
 }) => {
   const [selectedDate, setSelectedDate] = useState(currentDate);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     setSelectedDate(currentDate);
   }, [currentDate]);
+
+  useEffect(() => {
+    if (visible) {
+      // Small delay to ensure SafeAreaView has calculated insets
+      const timer = setTimeout(() => setIsReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setIsReady(false);
+    }
+  }, [visible]);
 
   // Utility function to parse date string without timezone issues
   const parseDate = (dateString) => {
@@ -81,6 +92,10 @@ const DateSelector = ({
     if (diffDays <= 7) return `${diffDays} days ago`;
     if (diffDays <= 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
     return `${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  const handleClose = () => {
+    onClose();
   };
 
   const handleDatePress = (date) => {
@@ -142,10 +157,10 @@ const DateSelector = ({
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
-      <BlurView intensity={100} style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.container}>
+        {isReady && (
           <View style={styles.modal}>
             {/* Header */}
             <View style={styles.header}>
@@ -153,7 +168,12 @@ const DateSelector = ({
               <Text style={styles.subtitle}>
                 {availableDates.length} days of positive news available
               </Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <TouchableOpacity 
+                onPress={handleClose} 
+                style={styles.closeButton}
+                activeOpacity={0.7}
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+              >
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -199,8 +219,8 @@ const DateSelector = ({
               )}
             />
           </View>
-        </SafeAreaView>
-      </BlurView>
+        )}
+      </SafeAreaView>
     </Modal>
   );
 };
@@ -208,13 +228,10 @@ const DateSelector = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  safeArea: {
-    flex: 1,
+    backgroundColor: 'rgba(102, 126, 234, 0.9)',
   },
   modal: {
     flex: 1,
-    backgroundColor: 'rgba(102, 126, 234, 0.95)',
   },
   header: {
     padding: 20,
@@ -237,7 +254,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 20,
+    top: 10,
     right: 20,
     width: 40,
     height: 40,
@@ -250,6 +267,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
+    zIndex: 1000,
   },
   closeButtonText: {
     color: '#121212',
