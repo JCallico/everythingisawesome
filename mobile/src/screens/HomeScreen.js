@@ -454,32 +454,6 @@ const HomeScreen = ({ navigation }) => {
                   <Text style={styles.storySummary}>{currentStory.summary}</Text>
                 </View>
 
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => openStoryLink(currentStory.link)}
-                  >
-                    <Text style={styles.actionButtonText}>📖 Read</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.shareButton]}
-                    onPress={() => shareStory(currentStory)}
-                  >
-                    <Text style={styles.actionButtonText}>📤 Share</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Browse Dates Button */}
-                {availableDates.length > 1 && (
-                  <TouchableOpacity 
-                    onPress={() => setShowDateSelector(true)}
-                    style={styles.browseDatesButton}
-                  >
-                    <Text style={styles.browseDatesButtonText}>📅 Browse Dates</Text>
-                  </TouchableOpacity>
-                )}
-
                 {/* Theme Badge */}
                 <View style={styles.themeBadge}>
                   <Text style={styles.themeBadgeText}>
@@ -490,6 +464,32 @@ const HomeScreen = ({ navigation }) => {
             </BlurView>
           </Animated.View>
         </ScrollView>
+
+        {/* Action Buttons - Fixed at bottom */}
+        <View style={styles.actionButtonsContainer}>
+          <TouchableOpacity
+            style={styles.bottomActionButton}
+            onPress={() => openStoryLink(currentStory.link)}
+          >
+            <Text style={styles.bottomActionButtonText}>Read</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.bottomActionButton}
+            onPress={() => shareStory(currentStory)}
+          >
+            <Text style={styles.bottomActionButtonText}>Share</Text>
+          </TouchableOpacity>
+
+          {availableDates.length > 1 && (
+            <TouchableOpacity 
+              onPress={() => setShowDateSelector(true)}
+              style={styles.bottomActionButton}
+            >
+              <Text style={styles.bottomActionButtonText}>Browse Dates</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* Navigation Controls - exactly like web */}
         <View style={styles.navigation}>
@@ -763,13 +763,16 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     lineHeight: 24,
   },
-  actionButtons: {
+  actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     gap: 8,
-    marginBottom: 15,
   },
-  actionButton: {
+  bottomActionButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -782,10 +785,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-  shareButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-  },
-  actionButtonText: {
+  bottomActionButtonText: {
     color: '#121212',
     fontSize: 14,
     fontWeight: '600',
@@ -833,25 +833,6 @@ const styles = StyleSheet.create({
     color: '#121212',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  browseDatesButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 12,
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  browseDatesButtonText: {
-    color: '#121212',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
   },
 });
 
