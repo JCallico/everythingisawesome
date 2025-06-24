@@ -504,7 +504,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={isPaused ? resumeAutoRotation : pauseAutoRotation}
             style={[styles.navButton, styles.pauseButton]}
           >
-            <Text style={styles.navButtonText}>{isPaused ? '▶' : '⏸'}</Text>
+            <Text style={[styles.navButtonText, isPaused ? {} : styles.pauseButtonText]}>{isPaused ? '▶' : '▐▐'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -833,6 +833,11 @@ const styles = StyleSheet.create({
     color: '#121212',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  pauseButtonText: {
+    fontSize: 14,
+    letterSpacing: 1,
+    marginLeft: -5
   },
 });
 
