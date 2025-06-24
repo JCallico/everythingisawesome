@@ -516,61 +516,13 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Date Selector Modal */}
-        {showDateSelector && (
-          <View style={styles.dateModal}>
-            <BlurView intensity={100} style={styles.dateModalContent}>
-              <View style={styles.dateModalHeader}>
-                <Text style={styles.dateModalTitle}>📅 Browse News by Date</Text>
-                <TouchableOpacity 
-                  onPress={() => setShowDateSelector(false)}
-                  style={styles.closeButton}
-                >
-                  <Text style={styles.closeButtonText}>✕</Text>
-                </TouchableOpacity>
-              </View>
-              
-              <ScrollView 
-                style={styles.datesList}
-                contentContainerStyle={styles.datesListContent}
-                showsVerticalScrollIndicator={false}
-              >
-                <Text style={styles.dateListHeader}>
-                  {availableDates.length} days of awesome news available
-                </Text>
-                
-                {availableDates.map((date, index) => (
-                  <TouchableOpacity
-                    key={date}
-                    style={[
-                      styles.dateItem,
-                      date === news?.date && styles.dateItemActive
-                    ]}
-                    onPress={() => handleDateSelect(date)}
-                  >
-                    <View style={styles.dateItemContent}>
-                      <Text style={[
-                        styles.dateItemText,
-                        date === news?.date && styles.dateItemTextActive
-                      ]}>
-                        {formatShortDate(date)}
-                      </Text>
-                      {index === 0 && (
-                        <View style={styles.latestBadge}>
-                          <Text style={styles.latestBadgeText}>Latest</Text>
-                        </View>
-                      )}
-                      {date === news?.date && (
-                        <View style={styles.currentBadge}>
-                          <Text style={styles.currentBadgeText}>Current</Text>
-                        </View>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </BlurView>
-          </View>
-        )}
+        <DateSelector
+          visible={showDateSelector}
+          onClose={() => setShowDateSelector(false)}
+          availableDates={availableDates}
+          currentDate={news?.date}
+          onDateSelect={handleDateSelect}
+        />
       </SafeAreaView>
     </LinearGradient>
   );
@@ -905,112 +857,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  dateModal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  dateModalContent: {
-    backgroundColor: 'rgba(102, 126, 234, 0.95)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: height * 0.7,
-  },
-  dateModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingBottom: 15,
-  },
-  dateModalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  closeButtonText: {
-    color: '#121212',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  datesList: {
-    flex: 1,
-  },
-  datesListContent: {
-    padding: 20,
-    paddingTop: 0,
-  },
-  dateListHeader: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.8,
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  dateItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginBottom: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  dateItemActive: {
-    backgroundColor: 'rgba(255, 215, 0, 0.2)',
-    borderColor: '#FFD700',
-  },
-  dateItemContent: {
-    padding: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  dateItemText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  dateItemTextActive: {
-    color: '#FFD700',
-  },
-  latestBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  latestBadgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  currentBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  currentBadgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#333',
   },
 });
 

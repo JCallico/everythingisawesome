@@ -9,6 +9,7 @@ import {
   Dimensions,
   FlatList,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 
@@ -140,63 +141,65 @@ const DateSelector = ({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
       <BlurView intensity={100} style={styles.container}>
-        <View style={styles.modal}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Browse News by Date</Text>
-            <Text style={styles.subtitle}>
-              {availableDates.length} days of positive news available
-            </Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Quick stats */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{availableDates.length}</Text>
-              <Text style={styles.statLabel}>Days</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
-                {availableDates.length > 0 ? Math.ceil(availableDates.length / 7) : 0}
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.modal}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Browse News by Date</Text>
+              <Text style={styles.subtitle}>
+                {availableDates.length} days of positive news available
               </Text>
-              <Text style={styles.statLabel}>Weeks</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>∞</Text>
-              <Text style={styles.statLabel}>Awesome</Text>
-            </View>
-          </View>
 
-          {/* Date List */}
-          <FlatList
-            data={availableDates}
-            renderItem={renderDateItem}
-            keyExtractor={(item) => item}
-            style={styles.dateList}
-            contentContainerStyle={styles.dateListContent}
-            showsVerticalScrollIndicator={false}
-            numColumns={2}
-            columnWrapperStyle={styles.row}
-            ListHeaderComponent={() => (
-              <Text style={styles.listHeader}>
-                📅 Select a date to explore that day's awesome news
-              </Text>
-            )}
-            ListEmptyComponent={() => (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No dates available</Text>
-                <Text style={styles.emptySubtext}>Check back later for more awesome news!</Text>
+            {/* Quick stats */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{availableDates.length}</Text>
+                <Text style={styles.statLabel}>Days</Text>
               </View>
-            )}
-          />
-        </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>
+                  {availableDates.length > 0 ? Math.ceil(availableDates.length / 7) : 0}
+                </Text>
+                <Text style={styles.statLabel}>Weeks</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>∞</Text>
+                <Text style={styles.statLabel}>Awesome</Text>
+              </View>
+            </View>
+
+            {/* Date List */}
+            <FlatList
+              data={availableDates}
+              renderItem={renderDateItem}
+              keyExtractor={(item) => item}
+              style={styles.dateList}
+              contentContainerStyle={styles.dateListContent}
+              showsVerticalScrollIndicator={false}
+              numColumns={2}
+              columnWrapperStyle={styles.row}
+              ListHeaderComponent={() => (
+                <Text style={styles.listHeader}>
+                  📅 Select a date to explore that day's awesome news
+                </Text>
+              )}
+              ListEmptyComponent={() => (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>No dates available</Text>
+                  <Text style={styles.emptySubtext}>Check back later for more awesome news!</Text>
+                </View>
+              )}
+            />
+          </View>
+        </SafeAreaView>
       </BlurView>
     </Modal>
   );
@@ -206,13 +209,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  safeArea: {
+    flex: 1,
+  },
   modal: {
     flex: 1,
     backgroundColor: 'rgba(102, 126, 234, 0.95)',
   },
   header: {
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     alignItems: 'center',
     position: 'relative',
   },
@@ -231,7 +237,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 60,
+    top: 20,
     right: 20,
     width: 40,
     height: 40,
