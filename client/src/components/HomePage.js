@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
 import { fetchLatestNews, fetchAvailableDates } from '../services/api';
 import NewsDisplay from './NewsDisplay';
+import DateSelector from './DateSelector';
 
 const HomePage = () => {
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
+  const [showDateSelector, setShowDateSelector] = useState(false);
 
   useEffect(() => {
     loadLatestNews();
@@ -36,18 +36,6 @@ const HomePage = () => {
     } catch (err) {
       console.error('Error loading available dates:', err);
     }
-  };
-
-  const getNavigationInfo = () => {
-    if (!news || !availableDates.length) return { prevDate: null, nextDate: null };
-    
-    const currentDate = news.date;
-    const currentIndex = availableDates.indexOf(currentDate);
-    
-    return {
-      prevDate: currentIndex < availableDates.length - 1 ? availableDates[currentIndex + 1] : null,
-      nextDate: currentIndex > 0 ? availableDates[currentIndex - 1] : null
-    };
   };
 
   if (loading) {
@@ -79,8 +67,6 @@ const HomePage = () => {
     );
   }
 
-  const { prevDate, nextDate } = getNavigationInfo();
-
   return (
     <div className="news-container">
       <div className="news-date">
@@ -94,32 +80,20 @@ const HomePage = () => {
       />
 
       <div className="navigation">
-        {prevDate && (
-          <Link to={`/${prevDate}`} className="nav-button">
-            ← Previous Day ({moment(prevDate).format('MMM Do')})
-          </Link>
-        )}
-        
-        {nextDate && (
-          <Link to={`/${nextDate}`} className="nav-button">
-            Next Day ({moment(nextDate).format('MMM Do')}) →
-          </Link>
-        )}
+        <button 
+          className="nav-button"
+          onClick={() => setShowDateSelector(true)}
+        >
+          Browse Dates
+        </button>
       </div>
 
-      {availableDates.length > 1 && (
-        <div className="date-selector">
-          {availableDates.slice(0, 9).map(date => (
-            <Link
-              key={date}
-              to={date === news.date ? '/' : `/${date}`}
-              className={`date-option ${date === news.date ? 'active' : ''}`}
-            >
-              {moment(date).format('MMM Do')}
-            </Link>
-          ))}
-        </div>
-      )}
+      <DateSelector
+        visible={showDateSelector}
+        onClose={() => setShowDateSelector(false)}
+        availableDates={availableDates}
+        currentDate={news?.date}
+      />
     </div>
   );
 };
