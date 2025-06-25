@@ -119,16 +119,8 @@ const DateSelector = ({
   };
 
   const renderCalendarDay = (dayInfo) => {
-    const { dateString, isCurrentMonth, hasNews, isSelected, isToday, day } = dayInfo;
+    const { dateString, hasNews, isSelected, isToday, day } = dayInfo;
     
-    if (!isCurrentMonth) {
-      return (
-        <View key={dateString} style={styles.calendarDayEmpty}>
-          <Text style={styles.calendarDayEmptyText}>{day}</Text>
-        </View>
-      );
-    }
-
     const isActive = hasNews;
     
     return (
@@ -170,9 +162,19 @@ const DateSelector = ({
     
     for (let i = 0; i < days.length; i += 7) {
       const week = days.slice(i, i + 7);
+      
+      // Fill remaining slots with empty cells to maintain 7-day grid
+      while (week.length < 7) {
+        week.push(null);
+      }
+      
       weeks.push(
         <View key={i} style={styles.calendarWeek}>
-          {week.map(dayInfo => renderCalendarDay(dayInfo))}
+          {week.map((dayInfo, index) => 
+            dayInfo ? renderCalendarDay(dayInfo) : (
+              <View key={`empty-${i}-${index}`} style={styles.calendarDay} />
+            )
+          )}
         </View>
       );
     }
@@ -263,36 +265,28 @@ const DateSelector = ({
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     
-    // First day of the month
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    // Get the number of days in the current month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Days from previous month to fill the grid
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
-    // Generate calendar grid (6 weeks = 42 days)
+    // Generate only the days for the current month
     const days = [];
-    const currentDate = new Date(startDate);
     
-    for (let i = 0; i < 42; i++) {
-      const dateString = formatDateToString(currentDate);
-      const isCurrentMonth = currentDate.getMonth() === month;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentCalendarDate = new Date(year, month, day);
+      const dateString = formatDateToString(currentCalendarDate);
       const hasNews = hasNewsForDate(dateString);
       const isSelected = dateString === selectedDate;
       const isToday = dateString === formatDateToString(new Date());
       
       days.push({
-        date: new Date(currentDate),
+        date: new Date(currentCalendarDate),
         dateString,
-        isCurrentMonth,
+        isCurrentMonth: true, // All days are current month now
         hasNews,
         isSelected,
         isToday,
-        day: currentDate.getDate()
+        day: day
       });
-      
-      currentDate.setDate(currentDate.getDate() + 1);
     }
     
     return days;
@@ -586,7 +580,7 @@ const styles = StyleSheet.create({
   },
   calendarDaysHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'flex-start',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.2)',
@@ -610,7 +604,7 @@ const styles = StyleSheet.create({
   },
   calendarWeek: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'flex-start',
     marginBottom: 5,
   },
   calendarDay: {
