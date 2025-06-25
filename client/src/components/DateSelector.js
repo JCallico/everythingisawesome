@@ -37,16 +37,8 @@ const DateSelector = ({
   };
 
   const renderCalendarDay = (dayInfo) => {
-    const { dateString, isCurrentMonth, hasNews, isSelected, isTodayDate, day } = dayInfo;
+    const { dateString, hasNews, isSelected, isTodayDate, day } = dayInfo;
     
-    if (!isCurrentMonth) {
-      return (
-        <div key={dateString} className="calendar-day-empty">
-          <span className="calendar-day-empty-text">{day}</span>
-        </div>
-      );
-    }
-
     const isActive = hasNews;
     
     return (
@@ -120,20 +112,15 @@ const DateSelector = ({
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     
-    // First day of the month
-    const firstDay = new Date(year, month, 1);
+    // Get the number of days in the current month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Days from previous month to fill the grid
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
-    // Generate calendar grid (6 weeks = 42 days)
+    // Generate only the days for the current month
     const days = [];
-    const currentCalendarDate = new Date(startDate);
     
-    for (let i = 0; i < 42; i++) {
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentCalendarDate = new Date(year, month, day);
       const dateString = formatDateToString(currentCalendarDate);
-      const isCurrentMonth = currentCalendarDate.getMonth() === month;
       const hasNews = hasNewsForDate(dateString);
       const isSelected = dateString === currentDate;
       const isTodayDate = moment(dateString).isSame(moment(), 'day');
@@ -141,14 +128,12 @@ const DateSelector = ({
       days.push({
         date: new Date(currentCalendarDate),
         dateString,
-        isCurrentMonth,
+        isCurrentMonth: true, // All days are current month now
         hasNews,
         isSelected,
         isTodayDate,
-        day: currentCalendarDate.getDate()
+        day: day
       });
-      
-      currentCalendarDate.setDate(currentCalendarDate.getDate() + 1);
     }
     
     return days;
