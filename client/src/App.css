@@ -1466,7 +1466,7 @@ body.theme-default {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 500px;
-  max-height: 75vh;
+  max-height: 95vh;
   overflow-y: auto;
   position: relative;
 }
@@ -1549,7 +1549,7 @@ body.theme-default .date-selector-modal {
 }
 
 .date-selector-header {
-  padding: 1.5rem;
+  padding: 1.0rem;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
@@ -1784,16 +1784,34 @@ body.theme-default .date-selector-modal {
 }
 
 .calendar-day-text-inactive {
-  color: rgba(255, 255, 255, 0.4);
-  text-shadow: none;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 .calendar-day-dot {
-  width: 4px;
-  height: 4px;
-  background: #FFD700;
+  width: 6px;
+  height: 6px;
+  background: #764ba2;
   border-radius: 50%;
-  margin-top: 2px;
+  margin-top: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 8px rgba(118, 75, 162, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.calendar-day-placeholder {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inactive calendar day styles */
+.calendar-day-inactive {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Responsive Design */

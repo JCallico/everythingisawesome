@@ -44,7 +44,7 @@ const DateSelector = ({
     return (
       <div
         key={dateString}
-        className={`calendar-day ${isActive ? 'calendar-day-active' : ''} ${
+        className={`calendar-day ${isActive ? 'calendar-day-active' : 'calendar-day-inactive'} ${
           isSelected ? 'calendar-day-selected' : ''
         } ${isTodayDate ? 'calendar-day-today' : ''}`}
       >
@@ -73,9 +73,19 @@ const DateSelector = ({
     
     for (let i = 0; i < days.length; i += 7) {
       const week = days.slice(i, i + 7);
+      
+      // Fill remaining slots with empty cells to maintain 7-day grid
+      while (week.length < 7) {
+        week.push(null);
+      }
+      
       weeks.push(
         <div key={i} className="calendar-week">
-          {week.map(dayInfo => renderCalendarDay(dayInfo))}
+          {week.map((dayInfo, index) => 
+            dayInfo ? renderCalendarDay(dayInfo) : (
+              <div key={`empty-${i}-${index}`} className="calendar-day-placeholder" />
+            )
+          )}
         </div>
       );
     }
@@ -134,6 +144,12 @@ const DateSelector = ({
         isTodayDate,
         day: day
       });
+    }
+    
+    // Ensure we have at least 35 days (5 weeks) for consistent layout
+    // Add placeholder days if needed to fill out the grid
+    while (days.length < 35) {
+      days.push(null);
     }
     
     return days;
