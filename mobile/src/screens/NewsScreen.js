@@ -15,16 +15,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import axios from 'axios';
+import Constants from 'expo-constants';
+import { getApiBaseUrl } from '../services/api';
 
 const { width } = Dimensions.get('window');
-
-// API configuration
-const getApiBaseUrl = () => {
-  if (__DEV__) {
-    return 'http://localhost:3001/api';
-  }
-  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api';
-};
 
 // Utility functions
 // Utility function to parse date string without timezone issues

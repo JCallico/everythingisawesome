@@ -1,25 +1,22 @@
 import axios from 'axios';
 import { createImageService, createApiService } from '@everythingisawesome/shared-api';
+import Constants from 'expo-constants';
 
-// Mobile-specific API configuration
+// Centralized API configuration using Expo app.json extra
 const getApiBaseUrl = () => {
-  // Check for React Native development environment
+  const { apiBaseUrlDev, apiBaseUrlProd } = Constants.expoConfig.extra;
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return 'http://localhost:3001/api';
+    return apiBaseUrlDev;
   }
-  
-  // For mobile production, use the full Azure website URL
-  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api';
+  return apiBaseUrlProd;
 };
 
 const getImageBaseUrl = () => {
-  // Check for React Native development environment
+  const { imageBaseUrlDev, imageBaseUrlProd } = Constants.expoConfig.extra;
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return 'http://localhost:3001';
+    return imageBaseUrlDev;
   }
-  
-  // For mobile production, use the full Azure website URL
-  return 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net';
+  return imageBaseUrlProd;
 };
 
 const API_BASE_URL = getApiBaseUrl();
