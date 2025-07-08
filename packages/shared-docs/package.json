@@ -1,0 +1,14 @@
+{
+  "name": "@everythingisawesome/shared-docs",
+  "version": "1.0.0",
+  "description": "Shared documentation content and markdown loader for Everything Is Awesome project",
+  "main": "index.js",
+  "module": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["docs", "markdown", "shared", "content"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

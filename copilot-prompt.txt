@@ -1,0 +1,13 @@
+I want to create a website for a domain named everythingisawesome.new
+
+This website will display the most optimistic, feel good, awe inspiring news of the previous day. The kind of news that restore your hope in humanity and makes you feel good about the human race.
+
+The website should be simple, the home page displays the latest news available, usually from the previous day and allows to navigate to previous days and back.
+
+The daily news are stored in a file system database, preferably in markdown format, where the name of the file denotes the date, The file names should be sortable to allow for the website to pick the latest available day to be displayed in the home page. See example.json and use it as template.
+
+The application should also have a scheduled job that will run daily. This job will connect to a LLM Completion API (like Grok for example "https://api.x.ai/v1/chat/completions") and request the news from the previous day using a prompt like this "Do a deep research and choose the top 10 most optimistic, feel good, awe inspiring news of the previous day. The kind of news that restore your hope in humanity and makes you feel good about the human race. Format the results as json. Every item should have a title, summary, hyperlink and aawesome index, where the most awesome news gets the most points. See attached example.json to be used as template to format the results.". The results are to be saved to the files representing the news for the given day. If a news file for a given day exists, then overwrite it with the new file.
+
+Use Node.js as programming language and React as web framework.
+
+Install all the necessary to make this application functional on my local environment.

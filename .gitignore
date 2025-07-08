@@ -1,0 +1,32 @@
+node_modules/
+.env
+.DS_Store
+client/build/
+data/generated-images/story*.png
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/
+*.log
+data/*.json
+
+# Mobile specific
+mobile/.expo/
+mobile/dist/
+mobile/npm-debug.*
+mobile/*.log
+mobile/*.keystore
+mobile/*.p8
+mobile/*.p12
+mobile/*.mobileprovision
+mobile/web-build/
+
+# React Native
+mobile/ios/build/
+mobile/android/build/
+mobile/android/app/build/
+mobile/.gradle/
+mobile/.idea/
+
+# Expo
+.expo-shared/
