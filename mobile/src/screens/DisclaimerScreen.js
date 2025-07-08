@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,76 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { loadMarkdownContent, createMarkdownRenderer, disclaimerFooter, getCurrentDate } from '@everythingisawesome/shared-docs';
 
 const DisclaimerScreen = ({ navigation }) => {
-  const openLink = async (url) => {
+  const [content, setContent] = useState(null);
+
+  // Create a renderer instance once using the generic renderer with native-specific options
+  const renderer = useMemo(() => createMarkdownRenderer({
+    platform: 'native',
+    createLinkElement: (text, url, key) => {
+      const handlePress = () => {
+        Linking.openURL(url).catch(err => console.error('Error opening link:', err));
+      };
+      
+      return (
+        <Text key={key} style={styles.link} onPress={handlePress}>
+          {text}
+        </Text>
+      );
+    },
+    createBoldElement: (text, key) => (
+      <Text key={key} style={styles.boldText}>
+        {text}
+      </Text>
+    ),
+    createTextWrapper: (children, key) => (
+      <Text key={key}>
+        {children}
+      </Text>
+    ),
+  }), []);
+  const { renderContent, renderListItems } = renderer;
+
+  useEffect(() => {
     try {
-      await Linking.openURL(url);
+      const markdownContent = loadMarkdownContent('disclaimer.md');
+      setContent(markdownContent);
     } catch (error) {
-      console.error('Error opening link:', error);
+      console.error('Error loading disclaimer content:', error);
+      setContent({
+        title: 'Legal Disclaimer & Terms of Use',
+        sections: [{
+          title: 'Error',
+          content: 'Unable to load content at this time.'
+        }]
+      });
     }
-  };
+  }, []);
+
+  if (!content) {
+    return (
+      <LinearGradient
+        colors={['#ffecd2', '#fcb69f']}
+        style={styles.container}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Loading...</Text>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.closeButton}
+              activeOpacity={0.7}
+              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            >
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   return (
     <LinearGradient
@@ -26,7 +87,7 @@ const DisclaimerScreen = ({ navigation }) => {
     >
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Text style={styles.title}>Legal Disclaimer & Terms of Use</Text>
+          <Text style={styles.title}>{content.title}</Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.closeButton}
@@ -40,141 +101,55 @@ const DisclaimerScreen = ({ navigation }) => {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About This Application</Text>
-              <Text style={styles.paragraph}>
-                "Everything Is Awesome" is an experimental news aggregation and analysis platform that combines 
-                news content from third-party sources with artificial intelligence to create summarized content 
-                and visual representations. This application is provided for informational and entertainment 
-                purposes only.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Data Sources & Processing</Text>
-              
-              <Text style={styles.subSectionTitle}>News Content</Text>
-              <Text style={styles.paragraph}>
-                News articles displayed on this platform are sourced from{' '}
-                <Text style={styles.boldText}>NewsAPI</Text> (
-                <Text 
-                  style={styles.linkText}
-                  onPress={() => openLink('https://newsapi.org')}
-                >
-                  newsapi.org
-                </Text>
-                ). We do not own or control the original news content. All news articles remain the intellectual 
-                property of their respective publishers and authors.
-              </Text>
-              
-              <Text style={styles.subSectionTitle}>AI-Generated Content</Text>
-              <Text style={styles.paragraph}>
-                The "Awesome Index" scores, news summaries, and article images are generated using{' '}
-                <Text style={styles.boldText}>Grok AI</Text> technology. These AI-generated elements are interpretative and 
-                should not be considered as factual reporting or professional analysis. The AI processing 
-                may introduce biases, inaccuracies, or misinterpretations of the original content.
-              </Text>
-
-              <Text style={styles.subSectionTitle}>Generated Images</Text>
-              <Text style={styles.paragraph}>
-                Article images are automatically generated by AI based on news content and are purely 
-                illustrative. These images do not represent actual events, people, or locations unless 
-                explicitly stated otherwise.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Limitations & Disclaimers</Text>
-              
-              <Text style={styles.subSectionTitle}>Accuracy</Text>
-              <Text style={styles.paragraph}>
-                We make no warranties or representations about the accuracy, completeness, or reliability 
-                of any content on this platform. News content accuracy depends on the original sources, 
-                and AI-generated content may contain errors or misinterpretations.
-              </Text>
-
-              <Text style={styles.subSectionTitle}>No Professional Advice</Text>
-              <Text style={styles.paragraph}>
-                Content on this platform should not be used as a substitute for professional advice in 
-                any field, including but not limited to financial, legal, medical, or technical matters. 
-                Always consult qualified professionals for important decisions.
-              </Text>
-
-              <Text style={styles.subSectionTitle}>Real-Time Updates</Text>
-              <Text style={styles.paragraph}>
-                News content may not reflect the most current information. Breaking news and rapidly 
-                developing stories may not be immediately updated or may contain outdated information.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Intellectual Property</Text>
-              <Text style={styles.paragraph}>
-                Original news content remains the property of respective publishers. AI-generated summaries, 
-                scores, and images are derivative works created for transformative purposes under fair use 
-                principles. This application does not claim ownership of original news content.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Third-Party Services</Text>
-              <Text style={styles.paragraph}>
-                This application relies on third-party services including NewsAPI and Grok AI. We are not 
-                responsible for the availability, accuracy, or functionality of these external services. 
-                Service interruptions may affect the application's performance.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Privacy & Data</Text>
-              <Text style={styles.paragraph}>
-                We do not collect personal information from users. News content is processed automatically 
-                without human review. No user behavior is tracked or stored beyond standard web server logs.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Liability Limitation</Text>
-              <Text style={styles.paragraph}>
-                To the fullest extent permitted by law, the creators and operators of this application 
-                disclaim all liability for any damages arising from the use of this platform, including 
-                but not limited to direct, indirect, incidental, or consequential damages.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Changes to Terms</Text>
-              <Text style={styles.paragraph}>
-                These terms may be updated periodically. Continued use of the application constitutes 
-                acceptance of any changes. Users are encouraged to review this disclaimer regularly.
-              </Text>
-            </View>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Contact</Text>
-              <Text style={styles.paragraph}>
-                This is an experimental project. For questions about this disclaimer or the application's 
-                data practices, please refer to the source code repository or contact information provided 
-                therein.
-              </Text>
-            </View>
+            {content.sections.map((section, index) => (
+              <View key={index} style={styles.section}>
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+                
+                {section.subsections && section.subsections.length > 0 ? (
+                  section.subsections.map((subsection, subIndex) => (
+                    <View key={subIndex}>
+                      <Text style={styles.stepTitle}>{subsection.title}</Text>
+                      {subsection.content && (
+                        <Text style={styles.paragraph}>{renderContent(subsection.content)}</Text>
+                      )}
+                      {subsection.listItems && subsection.listItems.length > 0 && 
+                        renderListItems(subsection.listItems, renderedItems => (
+                          <View style={styles.listContainer}>
+                            {renderedItems.map((item, idx) => (
+                              <Text key={idx} style={styles.listItem}>• {item}</Text>
+                            ))}
+                          </View>
+                        ))
+                      }
+                    </View>
+                  ))
+                ) : (
+                  <>
+                    {section.content && (
+                      <Text style={styles.paragraph}>{renderContent(section.content)}</Text>
+                    )}
+                    {section.listItems && section.listItems.length > 0 && 
+                      renderListItems(section.listItems, renderedItems => (
+                        <View style={styles.listContainer}>
+                          {renderedItems.map((item, idx) => (
+                            <Text key={idx} style={styles.listItem}>• {item}</Text>
+                          ))}
+                        </View>
+                      ))
+                    }
+                  </>
+                )}
+              </View>
+            ))}
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>
-                <Text style={styles.boldText}>
-                  By using this application, you acknowledge that you have read, understood, and 
-                  agree to be bound by this disclaimer.
-                </Text>
+                {disclaimerFooter.text}
               </Text>
               <Text style={styles.lastUpdated}>
-                Last updated: {new Date().toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
+                {disclaimerFooter.lastUpdatedLabel}: {getCurrentDate()}
               </Text>
             </View>
-
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -191,102 +166,100 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.3)',
-    position: 'relative',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-    zIndex: 1000,
-  },
-  closeButtonText: {
-    color: '#121212',
-    fontSize: 18,
-    fontWeight: 'bold',
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   title: {
-    color: '#1a1a1a',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    textAlign: 'center',
-    paddingHorizontal: 60, // Add padding to prevent overlap with close button
+    color: '#2c3e50',
+    flex: 1,
+    paddingRight: 15,
+  },
+  closeButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: '#2c3e50',
+    fontWeight: 'bold',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   section: {
     marginBottom: 25,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    padding: 20,
   },
   sectionTitle: {
-    color: '#1a1a1a',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#2c3e50',
     marginBottom: 12,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   },
-  subSectionTitle: {
-    color: '#2c2c2c',
+  stepTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 8,
+    color: '#34495e',
     marginTop: 12,
+    marginBottom: 8,
   },
   paragraph: {
-    color: '#2c2c2c',
-    fontSize: 15,
+    fontSize: 14,
     lineHeight: 22,
-    marginBottom: 10,
-    textAlign: 'justify',
+    color: '#2c3e50',
+    marginBottom: 8,
   },
   boldText: {
     fontWeight: 'bold',
-    color: '#1a1a1a',
   },
-  linkText: {
+  link: {
     color: '#3498db',
     textDecorationLine: 'underline',
   },
+  listContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  listItem: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#2c3e50',
+    marginBottom: 4,
+    marginLeft: 10,
+  },
   footer: {
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 10,
   },
   footerText: {
-    color: '#2c2c2c',
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2c3e50',
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   lastUpdated: {
-    color: '#666',
-    fontSize: 13,
-    fontStyle: 'italic',
+    fontSize: 12,
+    color: '#7f8c8d',
     textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 
