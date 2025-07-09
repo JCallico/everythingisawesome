@@ -36,6 +36,7 @@ jobs:
           echo "✅ Client dependencies installed successfully"
 
       - name: Lint root application
+        shell: bash
         run: |
           echo "🔍 Linting root application..."
           if npm run lint; then
@@ -46,6 +47,7 @@ jobs:
           fi
 
       - name: Lint client application
+        shell: bash
         run: |
           echo "🔍 Linting client application..."
           cd client
@@ -63,6 +65,7 @@ jobs:
           echo "✅ Client application built successfully"
 
       - name: Test application
+        shell: bash
         run: |
           echo "🧪 Running tests..."
           if npm run test 2>/dev/null; then
@@ -78,7 +81,7 @@ jobs:
           name: node-app
           path: .
 
-      - name: Build Summary
+      - name: 'Build Summary'
         if: always()
         run: |
           echo "## 🏗️ Build Summary" >> $GITHUB_STEP_SUMMARY
@@ -90,17 +93,56 @@ jobs:
           echo "| Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           echo "| Artifacts | ✅ Uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 Build completed successfully and is ready for deployment!" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 Build completed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⏳ **Next Step**: Manual approval required for production deployment" >> $GITHUB_STEP_SUMMARY
+          echo "📋 Please review the build results and approve the deployment to continue." >> $GITHUB_STEP_SUMMARY
+
+  approval:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: 
+      name: production
+      url: https://everythingisawesome.azurewebsites.net
+    
+    steps:
+      - name: 'Manual Approval Required'
+        run: |
+          echo "🔐 Manual approval required for production deployment"
+          echo "Build artifacts are ready and waiting for deployment approval"
+          echo "Please review the build summary and approve this deployment to continue"
+          
+      - name: 'Approval Summary'
+        run: |
+          echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The build has completed successfully and is now waiting for manual approval." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Pre-Deployment Checklist:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Code changes reviewed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Linting passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Artifacts ready for deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 **Ready to deploy to**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Click **Approve and deploy** to proceed with the production deployment." >> $GITHUB_STEP_SUMMARY
 
   deploy:
     runs-on: windows-latest
-    needs: build
+    needs: [build, approval]
     
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
 
     steps:
+      - name: 'Deployment Approved'
+        run: |
+          echo "✅ Deployment approved - proceeding with production deployment"
+          echo "🚀 Starting deployment process..."
+        
       - name: Download artifact from build job
         run: |
           echo "📥 Downloading build artifacts..."
@@ -111,6 +153,7 @@ jobs:
           name: node-app
       
       - name: Verify downloaded artifacts
+        shell: bash
         run: |
           echo "🔍 Verifying downloaded artifacts..."
           ls -la
@@ -128,6 +171,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
 
       - name: Verify Azure login
+        shell: bash
         run: |
           echo "✅ Azure login successful"
           echo "Current Azure account:"
@@ -143,6 +187,7 @@ jobs:
           clean: false
 
       - name: 'Verify Deployment Success'
+        shell: bash
         run: |
           echo "🔍 Verifying deployment status..."
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
@@ -230,7 +275,7 @@ jobs:
           
           # Check current app settings
           echo "Current app settings:"
-          az webapp config.appsettings list \
+          az webapp config appsettings list \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
             --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE']" \
