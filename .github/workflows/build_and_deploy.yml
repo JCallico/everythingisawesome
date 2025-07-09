@@ -225,7 +225,7 @@ jobs:
           echo "================================================================"
           
           # Also write to step summary for better visibility
-          echo "# � DEPLOYMENT REVIEW SUMMARY" >> $GITHUB_STEP_SUMMARY
+          echo "# � PRE-DEPLOYMENT SUMMARY" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## ✅ BUILD COMPLETED SUCCESSFULLY" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -280,15 +280,58 @@ jobs:
           echo "📊 DEPLOYMENT SUMMARY:"
           echo "  🎯 Target: Production Environment"
           echo "  🌐 URL: https://everythingisawesome.azurewebsites.net"
-          echo "  � Package: Node.js Application"
+          echo "  📦 Package: Node.js Application"
           echo "  ⚡ Runtime: Node.js 22"
+          echo ""
+          echo "⚠️  IMPORTANT: If you REJECT this deployment, the process will STOP here."
+          echo "   The 'deploy' job will NOT run if this approval is rejected."
           echo ""
           echo "🚀 APPROVAL GRANTED - PROCEEDING WITH DEPLOYMENT"
           echo "=========================================="
 
+  deploy-rejected:
+    runs-on: ubuntu-latest
+    needs: [deploy-approval]
+    if: ${{ needs.deploy-approval.result != 'success' }}
+    
+    steps:
+      - name: 'Deployment Rejected'
+        run: |
+          echo "❌ DEPLOYMENT REJECTED OR CANCELLED"
+          echo "=================================="
+          echo ""
+          echo "📋 Status: Manual approval was not granted"
+          echo "🚫 Action: Deployment has been stopped"
+          echo "📊 Build Status: Completed successfully (artifacts preserved)"
+          echo ""
+          echo "ℹ️  The build completed successfully but deployment was not approved."
+          echo "   You can re-run the workflow to attempt deployment again."
+          echo ""
+          echo "=================================="
+          
+          # Add to step summary
+          echo "## ❌ Deployment Rejected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment to production was rejected or cancelled during the manual approval process." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ What was completed:" >> $GITHUB_STEP_SUMMARY
+          echo "- Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- All quality checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifacts are ready for deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ❌ What was cancelled:" >> $GITHUB_STEP_SUMMARY
+          echo "- Production deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- Azure Web App update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔄 Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "- Review the changes if needed" >> $GITHUB_STEP_SUMMARY
+          echo "- Re-run the workflow when ready to deploy" >> $GITHUB_STEP_SUMMARY
+          echo "- Or make additional changes and push to trigger a new build" >> $GITHUB_STEP_SUMMARY
+
   deploy:
     runs-on: windows-latest
     needs: [build, deploy-approval]
+    if: ${{ needs.deploy-approval.result == 'success' }}
     
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -494,3 +537,33 @@ jobs:
           echo "- Network connectivity issues" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Please review the workflow logs and try deploying again." >> $GITHUB_STEP_SUMMARY
+
+  workflow-summary:
+    runs-on: ubuntu-latest
+    needs: [deploy, deploy-rejected]
+    if: always()
+    
+    steps:
+      - name: 'Workflow Summary'
+        run: |
+          echo "## 📊 Workflow Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check deploy job result
+          if [[ "${{ needs.deploy.result }}" == "success" ]]; then
+            echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+            echo "- 🌐 Application deployed to: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+            echo "- 🚀 Status: Live and running" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.deploy-rejected.result }}" == "success" ]]; then
+            echo "### ❌ Deployment Rejected" >> $GITHUB_STEP_SUMMARY
+            echo "- 🚫 Manual approval was rejected" >> $GITHUB_STEP_SUMMARY
+            echo "- 🏗️ Build artifacts are ready for future deployment" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ Deployment Status Unknown" >> $GITHUB_STEP_SUMMARY
+            echo "- Check individual job results above" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Tip**: You can re-run this workflow anytime to attempt deployment again." >> $GITHUB_STEP_SUMMARY
