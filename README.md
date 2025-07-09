@@ -399,8 +399,12 @@ cron.schedule('0 6 * * *', () => {
 
 The application is deployed on **Azure Web App** with automated CI/CD via GitHub Actions:
 
+#### 📋 Complete Deployment Setup
+**📖 For detailed deployment configuration with manual approval gates, see: [DEPLOYMENT_SETUP.md](./DEPLOYMENT_SETUP.md)**
+
 #### Deployment Features:
-- ✅ **Automated deployments** on every push to `main` branch
+- ✅ **Automated quality gates** - Linting, building, and testing
+- ✅ **Manual approval gate** - Human review before production deployment  
 - ✅ **Data persistence** - news data and generated images survive deployments
 - ✅ **Environment variable management** via Azure App Service settings
 - ✅ **Node.js 22** runtime on Windows App Service Plan
