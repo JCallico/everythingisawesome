@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
-  Dimensions,
   Animated,
   Alert,
   Linking,
@@ -23,11 +22,9 @@ import {
   fetchLatestNews, 
   fetchAvailableDates, 
   fetchNewsByDate, 
-  getImageBaseUrl,
-  resolveImageUrl 
+  getImageBaseUrl
 } from '../services/api';
-
-const { width, height } = Dimensions.get('window');
+import { Colors } from '../constants/colors';
 
 // Theme colors mapping - exactly matching web version
 const THEME_COLORS = {
@@ -69,9 +66,6 @@ const HomeScreen = ({ navigation, route }) => {
   const [currentDate, setCurrentDate] = useState(routeDate || null);
   
   // Animation references
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const autoRotateTimer = useRef(null);
   
@@ -102,7 +96,7 @@ const HomeScreen = ({ navigation, route }) => {
         clearInterval(autoRotateTimer.current);
       }
     };
-  }, [news, isPaused, currentIndex]);
+  }, [news, isPaused, currentIndex, startAutoRotation]);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -143,7 +137,7 @@ const HomeScreen = ({ navigation, route }) => {
       setError(null);
     } catch (err) {
       setError('Failed to load latest news. Please try again later.');
-      console.error('Error loading latest news:', err);
+      // Error already handled by UI state
     } finally {
       setLoading(false);
     }
@@ -154,7 +148,7 @@ const HomeScreen = ({ navigation, route }) => {
       const dates = await fetchAvailableDates();
       setAvailableDates(dates || []);
     } catch (err) {
-      console.error('Error loading available dates:', err);
+      // Error already handled by UI state
     }
   };
 
@@ -168,13 +162,13 @@ const HomeScreen = ({ navigation, route }) => {
       setError(null);
     } catch (err) {
       setError(`Failed to load news for ${date}. Please try again later.`);
-      console.error('Error loading news for date:', err);
+      // Error already handled by UI state
     } finally {
       setLoading(false);
     }
   };
 
-  const startAutoRotation = () => {
+  const startAutoRotation = useCallback(() => {
     if (autoRotateTimer.current) {
       clearInterval(autoRotateTimer.current);
     }
@@ -185,7 +179,7 @@ const HomeScreen = ({ navigation, route }) => {
         pagerRef.current.setPage(nextIndex);
       }
     }, 30000); // 30 seconds - same as web
-  };
+  }, [news, currentIndex, isPaused]);
 
   const pauseAutoRotation = () => {
     setIsPaused(true);
@@ -261,7 +255,7 @@ const HomeScreen = ({ navigation, route }) => {
         url: story.link
       });
     } catch (error) {
-      console.error('Error sharing story:', error);
+      // Error already handled by Alert
       Alert.alert('Share Error', 'Unable to share story at this time');
     }
   };
@@ -296,26 +290,6 @@ const HomeScreen = ({ navigation, route }) => {
       year: 'numeric', 
       month: 'long'
     }) + ` ${day}${suffix}, ${date.getFullYear()}`;
-  };
-
-  const getDaysAgo = (dateString) => {
-    const today = new Date();
-    const date = parseDate(dateString);
-    const diffTime = today - date;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays <= 7) return `${diffDays} days ago`;
-    return `${Math.ceil(diffDays / 7)} weeks ago`;
-  };
-
-  const formatShortDate = (dateString) => {
-    const date = parseDate(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    });
   };
 
   const handleDateSelect = (selectedDate) => {
@@ -609,37 +583,38 @@ const HomeScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+  actionButtonsContainer: {
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundOverlay,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12
+  },
+  bottomActionButton: {
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundPrimary,
+    borderRadius: 12,
+    elevation: 8,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: Colors.shadowPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12
+  },
+  bottomActionButtonText: {
+    color: Colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600'
+  },
   container: {
     flex: 1
   },
-  safeArea: {
+  contentWrapper: {
     flex: 1
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20
-  },
-  loadingText: {
-    color: '#1a1a1a',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 15,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3
-  },
-  loadingSubtext: {
-    color: '#2c2c2c',
-    fontSize: 14,
-    fontStyle: 'italic',
-    marginTop: 8,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3
   },
   errorContainer: {
     alignItems: 'center',
@@ -648,57 +623,32 @@ const styles = StyleSheet.create({
     padding: 20
   },
   errorText: {
-    color: '#1a1a1a',
+    color: Colors.textSecondary,
     fontSize: 18,
     lineHeight: 24,
     marginBottom: 20,
     textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3
   },
-  retryButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    elevation: 8,
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12
-  },
-  retryButtonText: {
-    color: '#121212',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center'
-  },
   header: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: Colors.backgroundOverlay,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 8
   },
-  headerTitleContainer: {
-    alignItems: 'center',
-    flex: 0.15,
-    justifyContent: 'center',
-    position: 'relative'
-  },
-  headerLogo: {
-    borderColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 25,
-    borderWidth: 3,
-    elevation: 6,
-    height: 50,
-    shadowColor: 'rgba(0, 0, 0, 0.3)',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    width: 50
+  headerDate: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    lineHeight: 16,
+    textAlign: 'left',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3
   },
   headerInfo: {
     alignItems: 'flex-start',
@@ -706,44 +656,64 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingRight: 15
   },
-  dateInfoContainer: {
-    alignItems: 'flex-start'
+  headerLogo: {
+    borderColor: Colors.borderSecondary,
+    borderRadius: 25,
+    borderWidth: 3,
+    elevation: 6,
+    height: 50,
+    shadowColor: Colors.shadowSecondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    width: 50
   },
   headerTitle: {
-    color: '#1a1a1a',
+    color: Colors.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     lineHeight: 18,
     textAlign: 'left',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3
   },
-  headerDate: {
-    color: '#1a1a1a',
-    fontSize: 13,
+  headerTitleContainer: {
+    alignItems: 'center',
+    flex: 0.15,
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20
+  },
+  loadingSubtext: {
+    color: Colors.textTertiary,
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 8,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3
+  },
+  loadingText: {
+    color: Colors.textSecondary,
+    fontSize: 18,
     fontWeight: '600',
-    lineHeight: 16,
-    textAlign: 'left',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3
-  },
-  headerSubtitle: {
-    color: '#2c2c2c',
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
-    opacity: 0.8,
-    textAlign: 'left',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 15,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3
   },
   menuButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: Colors.whiteOverlayMedium,
+    borderColor: Colors.borderGold,
     borderRadius: 25,
     borderWidth: 1,
     bottom: 0,
@@ -754,21 +724,21 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 10
   },
+  menuButtonPressed: {
+    backgroundColor: Colors.whiteOverlayStrong,
+    borderColor: Colors.borderGoldStrong,
+    transform: [{ translateY: -1 }]
+  },
   menuButtonText: {
-    color: '#ff6b6b',
+    color: Colors.accent,
     fontSize: 18,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3
   },
-  menuButtonPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-    transform: [{ translateY: -1 }]
-  },
   menuDropdown: {
-    borderColor: 'rgba(255, 255, 255, 0.4)',
+    borderColor: Colors.borderStrong,
     borderRadius: 16,
     borderWidth: 1,
     elevation: 15,
@@ -777,15 +747,36 @@ const styles = StyleSheet.create({
     padding: 12,
     position: 'absolute',
     right: 15,
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowColor: Colors.shadowSecondary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 32,
     top: 70,
     zIndex: 1000
   },
+  menuItem: {
+    borderColor: Colors.borderTransparent,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginVertical: 2,
+    paddingHorizontal: 16,
+    paddingVertical: 12
+  },
+  menuItemPressed: {
+    backgroundColor: Colors.whiteOverlayMedium,
+    borderColor: Colors.borderMedium,
+    transform: [{ translateX: -2 }]
+  },
+  menuItemText: {
+    color: Colors.accent,
+    fontSize: 16,
+    fontWeight: '500',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3
+  },
   menuOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: Colors.backgroundOverlay,
     bottom: 0,
     left: 0,
     position: 'absolute',
@@ -793,37 +784,53 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 999
   },
-  menuItem: {
-    borderColor: 'transparent',
-    borderRadius: 10,
-    borderWidth: 1,
-    marginVertical: 2,
-    paddingHorizontal: 16,
-    paddingVertical: 12
+  navButton: {
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundPrimary,
+    borderRadius: 12,
+    elevation: 8,
+    height: 50,
+    justifyContent: 'center',
+    marginHorizontal: 15,
+    shadowColor: Colors.shadowPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    width: 50
   },
-  menuItemText: {
-    color: '#ff6b6b',
-    fontSize: 16,
-    fontWeight: '500',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3
+  navButtonText: {
+    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: 'bold'
   },
-  menuItemPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    transform: [{ translateX: -2 }]
+  navigation: {
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundOverlay,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20
   },
-  scrollView: {
-    flex: 1
-  },
-  contentWrapper: {
-    flex: 1
-  },
-  storyContainer: {
+  nextButton: {},
+  page: {
+    alignItems: 'center',
     flex: 1,
-    minHeight: height - 200
+    justifyContent: 'center',
+    paddingHorizontal: 2
   },
+  pagerView: {
+    flex: 1,
+    marginHorizontal: 2
+  },
+  pauseButton: {
+    backgroundColor: Colors.goldOverlay
+  },
+  pauseButtonText: {
+    fontSize: 14,
+    letterSpacing: 1,
+    marginLeft: -5
+  },
+  prevButton: {},
   progressContainer: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -836,7 +843,7 @@ const styles = StyleSheet.create({
   },
   progressDot: {
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.backgroundTransparent,
     borderRadius: 12,
     flex: 0,
     height: 24,
@@ -846,29 +853,49 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: 24
   },
+  progressDotActive: {
+    transform: [{ scale: 1.2 }]
+  },
+  progressDotActiveInner: {
+    borderColor: Colors.borderFull,
+    elevation: 8,
+    shadowColor: Colors.shadowRed,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25
+  },
   progressDotInner: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: Colors.overlayStrong,
+    borderColor: Colors.borderSecondary,
     borderRadius: 5,
     borderWidth: 1.5,
     elevation: 4,
     height: 10,
-    shadowColor: '#fff',
+    shadowColor: Colors.primaryLight,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
     width: 10
   },
-  progressDotActive: {
-    transform: [{ scale: 1.2 }]
-  },
-  progressDotActiveInner: {
-    borderColor: 'rgba(255, 255, 255, 1)',
+  retryButton: {
+    backgroundColor: Colors.backgroundPrimary,
+    borderRadius: 12,
     elevation: 8,
-    shadowColor: '#ff6b6b',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 25
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    shadowColor: Colors.shadowPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12
+  },
+  retryButtonText: {
+    color: Colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center'
+  },
+  safeArea: {
+    flex: 1
   },
   swipeHintContainer: {
     alignItems: 'center',
@@ -876,97 +903,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8
   },
   swipeHintText: {
-    color: 'rgba(0, 0, 0, 0.7)',
+    color: Colors.blackOverlay,
     fontSize: 12,
     fontWeight: '500',
     textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2
-  },
-  actionButtonsContainer: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12
-  },
-  bottomActionButton: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    elevation: 8,
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12
-  },
-  bottomActionButtonText: {
-    color: '#121212',
-    fontSize: 14,
-    fontWeight: '600'
-  },
-  navigation: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20
-  },
-  navButton: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    elevation: 8,
-    height: 50,
-    justifyContent: 'center',
-    marginHorizontal: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    width: 50
-  },
-  prevButton: {},
-  nextButton: {},
-  pauseButton: {
-    backgroundColor: 'rgba(255, 215, 0, 0.9)'
-  },
-  navButtonText: {
-    color: '#121212',
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  pauseButtonText: {
-    fontSize: 14,
-    letterSpacing: 1,
-    marginLeft: -5
-  },
-  swipeOverlay: {
-    position: 'absolute',
-    top: 100, // Start below the header and progress indicators
-    left: 0,
-    right: 0,
-    bottom: 150, // End above the action buttons and navigation
-    backgroundColor: 'transparent',
-    zIndex: 5 // Lower z-index so it doesn't block other interactive elements
-  },
-  // PagerView styles
-  pagerView: {
-    flex: 1,
-    marginHorizontal: 2
-  },
-  page: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 2
   }
 });
 

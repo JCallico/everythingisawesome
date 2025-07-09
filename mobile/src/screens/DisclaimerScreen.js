@@ -5,8 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Linking
+  Linking,
+  Alert
 } from 'react-native';
+import { Colors } from '../constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { loadMarkdownContent, createMarkdownRenderer, disclaimerFooter, getCurrentDate } from '@everythingisawesome/shared-docs';
@@ -19,7 +21,9 @@ const DisclaimerScreen = ({ navigation }) => {
     platform: 'native',
     createLinkElement: (text, url, key) => {
       const handlePress = () => {
-        Linking.openURL(url).catch(err => console.error('Error opening link:', err));
+        Linking.openURL(url).catch(() => {
+          Alert.alert('Error', 'Unable to open link');
+        });
       };
       
       return (
@@ -46,7 +50,6 @@ const DisclaimerScreen = ({ navigation }) => {
       const markdownContent = loadMarkdownContent('disclaimer.md');
       setContent(markdownContent);
     } catch (error) {
-      console.error('Error loading disclaimer content:', error);
       setContent({
         title: 'Legal Disclaimer & Terms of Use',
         sections: [{
@@ -163,14 +166,14 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: Colors.backgroundSecondary,
     borderRadius: 15,
     height: 30,
     justifyContent: 'center',
     width: 30
   },
   closeButtonText: {
-    color: '#2c3e50',
+    color: Colors.slate,
     fontSize: 18,
     fontWeight: 'bold'
   },
@@ -182,13 +185,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20
   },
   footer: {
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.backgroundTransparent,
     borderRadius: 12,
     marginTop: 10,
     padding: 20
   },
   footerText: {
-    color: '#2c3e50',
+    color: Colors.slate,
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 10,
@@ -203,13 +206,13 @@ const styles = StyleSheet.create({
     paddingTop: 10
   },
   lastUpdated: {
-    color: '#7f8c8d',
+    color: Colors.textMuted,
     fontSize: 12,
     fontStyle: 'italic',
     textAlign: 'center'
   },
   link: {
-    color: '#3498db',
+    color: Colors.textLink,
     textDecorationLine: 'underline'
   },
   listContainer: {
@@ -217,14 +220,14 @@ const styles = StyleSheet.create({
     marginTop: 8
   },
   listItem: {
-    color: '#2c3e50',
+    color: Colors.slate,
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 4,
     marginLeft: 10
   },
   paragraph: {
-    color: '#2c3e50',
+    color: Colors.slate,
     fontSize: 14,
     lineHeight: 22,
     marginBottom: 8
@@ -236,26 +239,26 @@ const styles = StyleSheet.create({
     flex: 1
   },
   section: {
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.backgroundTransparent,
     borderRadius: 12,
     marginBottom: 25,
     padding: 20
   },
   sectionTitle: {
-    color: '#2c3e50',
+    color: Colors.slate,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12
   },
   stepTitle: {
-    color: '#34495e',
+    color: Colors.textSubtle,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 12
   },
   title: {
-    color: '#2c3e50',
+    color: Colors.slate,
     flex: 1,
     fontSize: 22,
     fontWeight: 'bold',

@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import { Colors } from '../constants/colors';
 
 const { width } = Dimensions.get('window');
 
@@ -27,7 +28,7 @@ const DateSelector = ({
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [isReady, setIsReady] = useState(false);
   const [currentViewDate, setCurrentViewDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list' - default to calendar
+  const [viewMode] = useState('calendar'); // 'calendar' or 'list' - default to calendar
 
   useEffect(() => {
     setSelectedDate(currentDate);
@@ -347,7 +348,7 @@ const DateSelector = ({
                   columnWrapperStyle={styles.row}
                   ListHeaderComponent={() => (
                     <Text style={styles.listHeader}>
-                      📅 Select a date to explore that day's awesome news
+                      📅 Select a date to explore that day&apos;s awesome news
                     </Text>
                   )}
                   ListEmptyComponent={() => (
@@ -394,136 +395,87 @@ const DateSelector = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  safeArea: {
-    flex: 1
-  },
-  modal: {
-    flex: 1
-  },
-  header: {
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 20,
-    position: 'relative'
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    textAlign: 'center',
-    marginBottom: 8,
-    paddingHorizontal: 60, // Add padding to prevent overlap with close button
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  subtitle: {
-    color: '#2c2c2c',
-    fontSize: 16,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1
-  },
-  closeButton: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    elevation: 8,
-    height: 40,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    top: 10,
-    width: 40,
-    zIndex: 1000
-  },
-  closeButtonText: {
-    color: '#121212',
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  statsContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-    marginHorizontal: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 15
-  },
-  statItem: {
-    alignItems: 'center'
-  },
-  statNumber: {
-    color: '#1a1a1a',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  statLabel: {
-    color: '#2c2c2c',
-    fontSize: 12,
-    marginTop: 2,
-    textShadowColor: 'rgba(255, 255, 255, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1
-  },
-  dateList: {
-    flex: 1
-  },
-  dateListContent: {
-    padding: 20,
-    paddingTop: 0
-  },
-  row: {
-    justifyContent: 'space-between'
-  },
-  listHeader: {
-    color: '#1a1a1a',
-    fontSize: 16,
-    lineHeight: 22,
-    marginBottom: 20,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 40
-  },
-  emptyText: {
-    color: '#1a1a1a',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  emptySubtext: {
-    color: '#2c2c2c',
-    fontSize: 14,
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1
-  },
-  // Calendar styles
   calendarContainer: {
     flex: 1,
     paddingHorizontal: 20
+  },
+  calendarDay: {
+    alignItems: 'center',
+    borderRadius: 8,
+    height: (width - 40) / 7,
+    justifyContent: 'center',
+    width: (width - 40) / 7
+  },
+  calendarDayActive: {
+    backgroundColor: Colors.whiteOverlay
+  },
+  calendarDayContent: {
+    alignItems: 'center',
+    height: '100%',
+    justifyContent: 'center',
+    width: '100%'
+  },
+  calendarDayDot: {
+    backgroundColor: Colors.primary,
+    borderRadius: 2,
+    height: 4,
+    marginTop: 2,
+    width: 4
+  },
+  calendarDayDotSelected: {
+    backgroundColor: Colors.primaryDark
+  },
+  calendarDayHeaderText: {
+    color: Colors.textTertiary,
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowMedium,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
+    width: (width - 40) / 7
+  },
+  calendarDaySelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primaryLight,
+    borderWidth: 2
+  },
+  calendarDayText: {
+    color: Colors.textDisabled,
+    fontSize: 14,
+    fontWeight: '500',
+    textShadowColor: Colors.textShadowSubtle,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1
+  },
+  calendarDayTextActive: {
+    color: Colors.textSecondary,
+    fontWeight: '600',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
+  },
+  calendarDayTextSelected: {
+    color: Colors.primaryDark,
+    fontWeight: 'bold'
+  },
+  calendarDayTextToday: {
+    fontWeight: 'bold'
+  },
+  calendarDayToday: {
+    borderColor: Colors.borderPrimary,
+    borderWidth: 2
+  },
+  calendarDaysHeader: {
+    borderBottomColor: Colors.borderLight,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+    paddingVertical: 10
+  },  
+  calendarGrid: {
+    paddingBottom: 20
   },
   calendarHeader: {
     alignItems: 'center',
@@ -534,128 +486,119 @@ const styles = StyleSheet.create({
   },
   calendarNavButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: Colors.whiteOverlay,
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',
     width: 40
   },
   calendarNavButtonText: {
-    color: '#1a1a1a',
+    color: Colors.textSecondary,
     fontSize: 18,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2
-  },
-  calendarTitle: {
-    color: '#1a1a1a',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  calendarDaysHeader: {
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginBottom: 10,
-    paddingVertical: 10
-  },
-  calendarDayHeaderText: {
-    color: '#2c2c2c',
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    textShadowColor: 'rgba(255, 255, 255, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
-    width: (width - 40) / 7
   },
   calendarScrollView: {
     flex: 1
   },
-  calendarGrid: {
-    paddingBottom: 20
+  calendarTitle: {
+    color: Colors.textSecondary,
+    fontSize: 20,
+    fontWeight: 'bold',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
   },
   calendarWeek: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginBottom: 5
   },
-  calendarDay: {
+  closeButton: {
     alignItems: 'center',
-    borderRadius: 8,
-    height: (width - 40) / 7,
+    backgroundColor: Colors.backgroundPrimary,
+    borderRadius: 12,
+    height: 24,
     justifyContent: 'center',
-    width: (width - 40) / 7
+    position: 'absolute',
+    right: 20,
+    shadowColor: Colors.shadowPrimary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    top: 20,
+    width: 24,
+    zIndex: 10
   },
-  calendarDayEmpty: {
+  closeButtonText: {
+    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  container: {
+    flex: 1
+  },
+  dateList: {
+    flex: 1
+  },
+  dateListContent: {
+    padding: 20,
+    paddingTop: 0
+  },
+  emptyContainer: {
     alignItems: 'center',
-    height: (width - 40) / 7,
-    justifyContent: 'center',
-    width: (width - 40) / 7
+    paddingVertical: 40
   },
-  calendarDayEmptyText: {
-    color: '#666',
+  emptySubtext: {
+    color: Colors.textTertiary,
     fontSize: 14,
-    textShadowColor: 'rgba(255, 255, 255, 0.4)',
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowMedium,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1
   },
-  calendarDayActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)'
-  },
-  calendarDaySelected: {
-    backgroundColor: '#FFD700',
-    borderColor: '#fff',
-    borderWidth: 2
-  },
-  calendarDayToday: {
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    borderWidth: 2
-  },
-  calendarDayContent: {
-    alignItems: 'center',
-    height: '100%',
-    justifyContent: 'center',
-    width: '100%'
-  },
-  calendarDayText: {
-    color: '#666',
-    fontSize: 14,
-    fontWeight: '500',
-    textShadowColor: 'rgba(255, 255, 255, 0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1
-  },
-  calendarDayTextActive: {
-    color: '#1a1a1a',
+  emptyText: {
+    color: Colors.textSecondary,
+    fontSize: 18,
     fontWeight: '600',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 8,
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2
   },
-  calendarDayTextSelected: {
-    color: '#333',
+  header: {
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 20,
+    position: 'relative'
+  },
+  latestBadge: {
+    backgroundColor: Colors.goldOverlay,
+    borderRadius: 8,
+    marginTop: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    position: 'absolute',
+    right: -5,
+    top: -5
+  },
+  latestBadgeText: {
+    color: Colors.primaryDark,
+    fontSize: 10,
     fontWeight: 'bold'
   },
-  calendarDayTextToday: {
-    fontWeight: 'bold'
+  listHeader: {
+    color: Colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 20,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
   },
-  calendarDayDot: {
-    backgroundColor: '#FFD700',
-    borderRadius: 2,
-    height: 4,
-    marginTop: 2,
-    width: 4
-  },
-  calendarDayDotSelected: {
-    backgroundColor: '#333'
-  },
-  // List styles (updated from original dateItem styles)
   listItem: {
     borderRadius: 15,
     marginBottom: 15,
@@ -670,44 +613,117 @@ const styles = StyleSheet.create({
     padding: 15,
     position: 'relative'
   },
-  listItemSelected: {
-    borderColor: '#FFD700',
-    borderWidth: 2
-  },
-  listItemLatest: {
-    borderColor: 'rgba(255, 215, 0, 0.6)',
-    borderWidth: 2
-  },
   listItemDate: {
-    color: '#1a1a1a',
+    color: Colors.textSecondary,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2
   },
+  listItemDateLatest: {
+    color: Colors.primary
+  },
   listItemDateSelected: {
-    color: '#FFD700',
+    color: Colors.primary,
     fontWeight: 'bold'
   },
-  listItemDateLatest: {
-    color: '#FFD700'
+  listItemLatest: {
+    borderColor: Colors.goldBorder,
+    borderWidth: 2
+  },
+  listItemSelected: {
+    borderColor: Colors.primary,
+    borderWidth: 2
   },
   listItemSubtext: {
-    color: '#2c2c2c',
+    color: Colors.textTertiary,
     fontSize: 12,
-    textShadowColor: 'rgba(255, 255, 255, 0.6)',
+    textShadowColor: Colors.textShadowMedium,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1
   },
+  listItemSubtextLatest: {
+    color: Colors.primary,
+    opacity: 0.9
+  },
   listItemSubtextSelected: {
-    color: '#FFD700',
+    color: Colors.primary,
     opacity: 1
   },
-  listItemSubtextLatest: {
-    color: '#FFD700',
-    opacity: 0.9
+  modal: {
+    flex: 1
+  },
+  row: {
+    justifyContent: 'space-between'
+  },
+  safeArea: {
+    flex: 1
+  },
+  statItem: {
+    alignItems: 'center'
+  },
+  statLabel: {
+    color: Colors.textTertiary,
+    fontSize: 12,
+    marginTop: 2,
+    textShadowColor: Colors.textShadowMedium,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1
+  },
+  statNumber: {
+    color: Colors.textSecondary,
+    fontSize: 24,
+    fontWeight: 'bold',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
+  },
+  statsContainer: {
+    backgroundColor: Colors.whiteOverlayLight,
+    borderRadius: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15
+  },
+  subtitle: {
+    color: Colors.textTertiary,
+    fontSize: 16,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowMedium,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1
+  },
+  title: {
+    alignItems: 'center',
+    color: Colors.textSecondary,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    paddingHorizontal: 60,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
+  },
+  todayBadge: {
+    backgroundColor: Colors.greenOverlay,
+    borderRadius: 8,
+    marginTop: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    position: 'absolute',
+    right: -5,
+    top: -5
+  },
+  todayBadgeText: {
+    color: Colors.primaryLight,
+    fontSize: 10,
+    fontWeight: 'bold'
   }
 });
 

@@ -2,18 +2,18 @@ import React from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Image,
   Dimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Colors } from '../constants/colors';
 import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
-const StoryCard = ({ story, getStoryImage, onLinkPress, onSharePress }) => {
+const StoryCard = ({ story, getStoryImage, _onLinkPress, _onSharePress }) => {
   return (
     <ScrollView 
       style={styles.storyCard}
@@ -58,7 +58,72 @@ const StoryCard = ({ story, getStoryImage, onLinkPress, onSharePress }) => {
 };
 
 const styles = StyleSheet.create({
-  // Story Card styles
+  awesomeIndexBadge: {
+    backgroundColor: Colors.accent,
+    borderRadius: 25,
+    borderWidth: 0,
+    elevation: 8,
+    minWidth: 80,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    shadowColor: Colors.shadowAccent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12
+  },
+  awesomeIndexContainer: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+    zIndex: 10
+  },
+  awesomeLabel: {
+    color: Colors.textOnPrimary,
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    lineHeight: 14,
+    opacity: 0.95,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowDark,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    textTransform: 'capitalize'
+  },
+  awesomeScore: {
+    color: Colors.textOnPrimary,
+    fontSize: 24,
+    fontWeight: '800',
+    lineHeight: 26,
+    textAlign: 'center',
+    textShadowColor: Colors.textShadowDark,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
+  },
+  cardContent: {
+    padding: 16
+  },
+  contentCard: {
+    borderRadius: 20,
+    marginBottom: 20,
+    marginHorizontal: 8,
+    overflow: 'hidden'
+  },
+  imageContainer: {
+    borderRadius: 20,
+    height: height * 0.4,
+    marginBottom: 20,
+    marginHorizontal: 8,
+    overflow: 'hidden',
+    position: 'relative'
+  },
+  imageGradient: {
+    bottom: 0,
+    height: '50%',
+    left: 0,
+    position: 'absolute',
+    right: 0
+  },
   storyCard: {
     flex: 1,
     width: width - 12
@@ -70,99 +135,33 @@ const styles = StyleSheet.create({
     minHeight: height - 300,
     overflow: 'hidden',
     position: 'relative',
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowColor: Colors.shadowSecondary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8
   },
-  imageContainer: {
-    borderRadius: 20,
-    height: height * 0.4,
-    marginBottom: 20,
-    marginHorizontal: 8,
-    overflow: 'hidden',
-    position: 'relative'
+  storyContentArea: {
+    marginBottom: 20
   },
   storyImage: {
     height: '100%',
     width: '100%'
   },
-  imageGradient: {
-    bottom: 0,
-    height: '50%',
-    left: 0,
-    position: 'absolute',
-    right: 0
-  },
-  awesomeIndexContainer: {
-    position: 'absolute',
-    right: 15,
-    top: 15,
-    zIndex: 10
-  },
-  awesomeIndexBadge: {
-    backgroundColor: '#ff6b6b',
-    borderRadius: 25,
-    borderWidth: 0,
-    elevation: 8,
-    minWidth: 80,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    shadowColor: 'rgba(255, 107, 107, 0.3)',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
-    shadowRadius: 12
-  },
-  awesomeScore: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '800',
-    lineHeight: 26,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+  storySummary: {
+    color: Colors.textTertiary,
+    fontSize: 16,
+    lineHeight: 24,
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2
-  },
-  awesomeLabel: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    lineHeight: 14,
-    opacity: 0.95,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    textTransform: 'capitalize'
-  },
-  contentCard: {
-    borderRadius: 20,
-    marginBottom: 20,
-    marginHorizontal: 8,
-    overflow: 'hidden'
-  },
-  cardContent: {
-    padding: 16
-  },
-  storyContentArea: {
-    marginBottom: 20
+    textShadowRadius: 3
   },
   storyTitle: {
-    color: '#1a1a1a',
+    color: Colors.textSecondary,
     fontSize: 22,
     fontWeight: 'bold',
     lineHeight: 28,
     marginBottom: 12,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3
-  },
-  storySummary: {
-    color: '#2c2c2c',
-    fontSize: 16,
-    lineHeight: 24,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3
   }

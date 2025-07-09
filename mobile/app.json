@@ -31,9 +31,9 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiBaseUrlDev": "http://10.0.0.7:3001/api",
+      "apiBaseUrlDev": "http://192.168.101.120:3001/api",
       "apiBaseUrlProd": "https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api",
-      "imageBaseUrlDev": "http://10.0.0.7:3001",
+      "imageBaseUrlDev": "http://192.168.101.120:3001",
       "imageBaseUrlProd": "https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net"
     }
   }
