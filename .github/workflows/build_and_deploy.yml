@@ -110,14 +110,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Next Step**: Navigate to the Actions tab and click 'Approve and deploy' to proceed with production deployment." >> $GITHUB_STEP_SUMMARY
 
-  pre-approval:
+  pre-deployment-summary:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: '📋 Generate Deployment Review Summary'
+      - name: '📋 Generate Pre-deployment Summary'
         run: |
           echo "================================================================"
-          echo "📋 DEPLOYMENT REVIEW SUMMARY - BUILD COMPLETED SUCCESSFULLY"
+          echo "📋 PRE-DEPLOYMENT SUMMARY - BUILD COMPLETED SUCCESSFULLY"
           echo "================================================================"
           echo ""
           echo "🔍 QUALITY GATE RESULTS:"
@@ -176,9 +176,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Next**: Go to the 'Manual Approval Required' job below and click 'Approve and deploy'" >> $GITHUB_STEP_SUMMARY
 
-  approval:
+  deployment-approval:
     runs-on: ubuntu-latest
-    needs: [build, pre-approval]
+    needs: [build, pre-deployment-summary]
     environment: 
       name: production
       url: https://everythingisawesome.azurewebsites.net
@@ -205,7 +205,7 @@ jobs:
 
   deploy:
     runs-on: windows-latest
-    needs: [build, approval]
+    needs: [build, deployment-approval]
     
     permissions:
       id-token: write #This is required for requesting the JWT
