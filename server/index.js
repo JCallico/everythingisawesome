@@ -92,7 +92,7 @@ if (cron) {
       console.log('Running scheduled news fetch...');
       fetchDailyNews();
     }, {
-      timezone: "America/New_York"
+      timezone: 'America/New_York'
     });
     console.log('Daily news fetch scheduled for 6:00 AM');
   } catch (error) {

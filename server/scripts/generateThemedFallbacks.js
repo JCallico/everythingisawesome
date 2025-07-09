@@ -13,75 +13,75 @@ const path = require('path');
 const THEMES = {
   health: {
     name: 'Health/Medical',
-    prompt: "A bright, modern medical research laboratory with scientists in white coats working on breakthrough treatments, conveying hope and healing. Clean, professional atmosphere with microscopes and medical equipment, soft lighting, inspiring and hopeful mood."
+    prompt: 'A bright, modern medical research laboratory with scientists in white coats working on breakthrough treatments, conveying hope and healing. Clean, professional atmosphere with microscopes and medical equipment, soft lighting, inspiring and hopeful mood.'
   },
   nature: {
     name: 'Nature/Environment',
-    prompt: "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future. Lush green forest with clean air, flowing water, wildlife, bright sunlight filtering through trees."
+    prompt: 'A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future. Lush green forest with clean air, flowing water, wildlife, bright sunlight filtering through trees.'
   },
   innovation: {
     name: 'Innovation/Technology',
-    prompt: "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation. Modern office with sleek computers, holographic displays, bright lighting, inspiring atmosphere of technological advancement."
+    prompt: 'A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation. Modern office with sleek computers, holographic displays, bright lighting, inspiring atmosphere of technological advancement.'
   },
   community: {
     name: 'Community/Social',
-    prompt: "People coming together in a positive community setting, showing unity, support, and collaborative spirit. Diverse group of people helping each other, warm lighting, smiling faces, sense of togetherness and mutual support."
+    prompt: 'People coming together in a positive community setting, showing unity, support, and collaborative spirit. Diverse group of people helping each other, warm lighting, smiling faces, sense of togetherness and mutual support.'
   },
   education: {
     name: 'Education/Learning',
-    prompt: "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement. Modern educational setting with books, digital boards, natural lighting, conveying knowledge and academic success."
+    prompt: 'A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement. Modern educational setting with books, digital boards, natural lighting, conveying knowledge and academic success.'
   },
   sports: {
     name: 'Sports/Athletics',
-    prompt: "An inspiring athletic achievement moment with a team celebration and triumph, showing human potential and success. Diverse athletes from different parts of the world in the same team celebrating victory, stadium with cheering crowd, dynamic action, energy and achievement atmosphere."
+    prompt: 'An inspiring athletic achievement moment with a team celebration and triumph, showing human potential and success. Diverse athletes from different parts of the world in the same team celebrating victory, stadium with cheering crowd, dynamic action, energy and achievement atmosphere.'
   },
   science: {
     name: 'Science/Research',
-    prompt: "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress. Modern laboratory with advanced equipment, researchers at work, clean bright environment, atmosphere of scientific achievement."
+    prompt: 'A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress. Modern laboratory with advanced equipment, researchers at work, clean bright environment, atmosphere of scientific achievement.'
   },
   arts: {
     name: 'Arts/Culture',
-    prompt: "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting. Art studio with paintings, musical instruments, creative workspace, colorful and inspiring artistic atmosphere."
+    prompt: 'A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting. Art studio with paintings, musical instruments, creative workspace, colorful and inspiring artistic atmosphere.'
   },
   business: {
     name: 'Business/Finance',
-    prompt: "A modern, successful business environment with professionals collaborating on innovative projects, representing growth and achievement. Clean office space with charts showing positive trends, natural lighting, atmosphere of success and progress."
+    prompt: 'A modern, successful business environment with professionals collaborating on innovative projects, representing growth and achievement. Clean office space with charts showing positive trends, natural lighting, atmosphere of success and progress.'
   },
   entertainment: {
     name: 'Entertainment/Media',
-    prompt: "A vibrant entertainment venue with performances and creative expression, showcasing joy and artistic achievement. Theater or concert hall with warm lighting, celebrating human creativity and cultural expression."
+    prompt: 'A vibrant entertainment venue with performances and creative expression, showcasing joy and artistic achievement. Theater or concert hall with warm lighting, celebrating human creativity and cultural expression.'
   },
   travel: {
     name: 'Travel/Adventure',
-    prompt: "A breathtaking travel destination showcasing natural beauty and adventure, inspiring wanderlust and discovery. Scenic landscape with mountains, clear skies, peaceful atmosphere, conveying exploration and positive experiences."
+    prompt: 'A breathtaking travel destination showcasing natural beauty and adventure, inspiring wanderlust and discovery. Scenic landscape with mountains, clear skies, peaceful atmosphere, conveying exploration and positive experiences.'
   },
   food: {
     name: 'Food/Cuisine',
-    prompt: "A beautifully presented culinary scene with fresh, colorful ingredients and artistic food presentation, celebrating culinary arts and nourishment. Professional kitchen or elegant dining setting with natural lighting, appetizing and inspiring."
+    prompt: 'A beautifully presented culinary scene with fresh, colorful ingredients and artistic food presentation, celebrating culinary arts and nourishment. Professional kitchen or elegant dining setting with natural lighting, appetizing and inspiring.'
   },
   lifestyle: {
     name: 'Lifestyle/Wellness',
-    prompt: "A serene wellness and lifestyle scene promoting health and well-being, showcasing balance and positive living. Peaceful setting with elements of self-care, natural lighting, calming atmosphere, inspiring healthy living."
+    prompt: 'A serene wellness and lifestyle scene promoting health and well-being, showcasing balance and positive living. Peaceful setting with elements of self-care, natural lighting, calming atmosphere, inspiring healthy living.'
   },
   politics: {
     name: 'Politics/Governance',
-    prompt: "A dignified government building or civic space representing democratic values and positive governance, conveying stability and progress. Clean architectural design with inspiring elements, professional atmosphere of public service."
+    prompt: 'A dignified government building or civic space representing democratic values and positive governance, conveying stability and progress. Clean architectural design with inspiring elements, professional atmosphere of public service.'
   },
   economy: {
     name: 'Economy/Financial',
-    prompt: "A modern financial district with tall buildings and positive economic indicators, representing growth and prosperity. Clean urban environment with architectural elements suggesting stability and economic progress."
+    prompt: 'A modern financial district with tall buildings and positive economic indicators, representing growth and prosperity. Clean urban environment with architectural elements suggesting stability and economic progress.'
   },
   world: {
     name: 'World/International',
-    prompt: "A beautiful global scene showing international cooperation and cultural diversity, representing unity and worldwide positive change. Earth from space or diverse cultural landmarks, inspiring sense of global community."
+    prompt: 'A beautiful global scene showing international cooperation and cultural diversity, representing unity and worldwide positive change. Earth from space or diverse cultural landmarks, inspiring sense of global community.'
   },
   inspiring: {
     name: 'Inspiring/Uplifting',
-    prompt: "A bright, inspiring sunrise over a peaceful landscape with soft, warm light rays breaking through clouds, conveying hope, positivity, and new beginnings. Beautiful natural scene with golden light, peaceful atmosphere, uplifting mood."
+    prompt: 'A bright, inspiring sunrise over a peaceful landscape with soft, warm light rays breaking through clouds, conveying hope, positivity, and new beginnings. Beautiful natural scene with golden light, peaceful atmosphere, uplifting mood.'
   },
   hope: {
     name: 'Hope/General',
-    prompt: "A bright, inspiring sunrise over a peaceful landscape with soft, warm light rays breaking through clouds, conveying hope, positivity, and new beginnings. Beautiful natural scene with golden light, peaceful atmosphere, uplifting mood."
+    prompt: 'A bright, inspiring sunrise over a peaceful landscape with soft, warm light rays breaking through clouds, conveying hope, positivity, and new beginnings. Beautiful natural scene with golden light, peaceful atmosphere, uplifting mood.'
   }
 };
 
@@ -96,10 +96,10 @@ const generateFallbackImage = async (theme, themeData) => {
     console.log(`   Using prompt: "${themeData.prompt}"`);
 
     const response = await axios.post('https://api.x.ai/v1/images/generations', {
-      model: "grok-2-image",
+      model: 'grok-2-image',
       prompt: themeData.prompt,
       n: 1,
-      response_format: "b64_json"
+      response_format: 'b64_json'
     }, {
       headers: {
         'Authorization': `Bearer ${grokApiKey}`,
@@ -148,7 +148,7 @@ const generateAllFallbackImages = async () => {
 
     let successCount = 0;
     let skippedCount = 0;
-    let totalCount = Object.keys(THEMES).length;
+    const totalCount = Object.keys(THEMES).length;
     let toGenerateCount = 0;
 
     // First, check which images need to be generated

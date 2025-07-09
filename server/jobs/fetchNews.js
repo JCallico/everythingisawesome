@@ -248,10 +248,10 @@ const generateStoryImage = async (story, storyIndex) => {
     // Try Grok image generation with grok-2-image
     try {
       const response = await axios.post('https://api.x.ai/v1/images/generations', {
-        model: "grok-2-image",
+        model: 'grok-2-image',
         prompt: imagePrompt,
         n: 1,
-        response_format: "b64_json"
+        response_format: 'b64_json'
       }, {
         headers: {
           'Authorization': `Bearer ${grokApiKey}`,
@@ -340,37 +340,33 @@ Respond with only the image generation prompt (max 300 characters).`;
 
 // Create a basic image prompt without using Grok
 const createBasicImagePrompt = (story) => {
-  const title = story.title.toLowerCase();
-  const summary = story.summary.toLowerCase();
-  const combinedText = `${title} ${summary}`;
-  
   // Detect the main theme and create appropriate prompt using unified theme system
   const themes = {
-    'health': "A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing",
-    'nature': "A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future",
-    'innovation': "A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation",
-    'community': "People coming together in a positive community setting, showing unity, support, and collaborative spirit",
-    'education': "A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement",
-    'sports': "An inspiring athletic achievement moment with celebration and triumph, showing human potential and success",
-    'science': "A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress",
-    'arts': "A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting",
-    'business': "A modern, dynamic business environment with entrepreneurs and innovators creating positive change, showing growth and success",
-    'entertainment': "A joyful entertainment scene with performers and audiences celebrating creativity and shared experiences",
-    'travel': "An inspiring travel destination showcasing adventure, discovery, and cultural connection, conveying wonder and exploration",
-    'food': "A warm, inviting culinary scene with chefs and food enthusiasts celebrating culture and community through cuisine",
-    'lifestyle': "A balanced, harmonious lifestyle scene showing wellness, personal growth, and positive living choices",
-    'politics': "A hopeful civic scene showing democratic participation, positive governance, and community engagement for the greater good",
-    'economy': "An optimistic economic scene showing innovation, fair trade, and sustainable prosperity for all",
-    'world': "A peaceful, connected global scene showing international cooperation and positive diplomatic relationships",
-    'inspiring': "An uplifting scene of human achievement and triumph, showing the best of humanity and inspiring hope for the future",
-    'hope': "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere"
+    'health': 'A bright, modern medical research laboratory with scientists working on breakthrough treatments, conveying hope and healing',
+    'nature': 'A beautiful, pristine natural landscape showcasing environmental conservation and sustainability, conveying hope for the future',
+    'innovation': 'A futuristic, clean technology workspace with innovative devices and digital interfaces, representing progress and innovation',
+    'community': 'People coming together in a positive community setting, showing unity, support, and collaborative spirit',
+    'education': 'A bright, inspiring classroom or learning environment with students engaged in discovery, showing growth and achievement',
+    'sports': 'An inspiring athletic achievement moment with celebration and triumph, showing human potential and success',
+    'science': 'A state-of-the-art research facility with scientists making discoveries, representing breakthrough and progress',
+    'arts': 'A vibrant, creative artistic scene showcasing cultural expression and creativity, inspiring and uplifting',
+    'business': 'A modern, dynamic business environment with entrepreneurs and innovators creating positive change, showing growth and success',
+    'entertainment': 'A joyful entertainment scene with performers and audiences celebrating creativity and shared experiences',
+    'travel': 'An inspiring travel destination showcasing adventure, discovery, and cultural connection, conveying wonder and exploration',
+    'food': 'A warm, inviting culinary scene with chefs and food enthusiasts celebrating culture and community through cuisine',
+    'lifestyle': 'A balanced, harmonious lifestyle scene showing wellness, personal growth, and positive living choices',
+    'politics': 'A hopeful civic scene showing democratic participation, positive governance, and community engagement for the greater good',
+    'economy': 'An optimistic economic scene showing innovation, fair trade, and sustainable prosperity for all',
+    'world': 'A peaceful, connected global scene showing international cooperation and positive diplomatic relationships',
+    'inspiring': 'An uplifting scene of human achievement and triumph, showing the best of humanity and inspiring hope for the future',
+    'hope': 'A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere'
   };
   
   // Find the best matching theme using the unified detection function
   const detectedTheme = detectStoryTheme(story);
   
   // Return the prompt for the detected theme or a default
-  return themes[detectedTheme] || "A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere";
+  return themes[detectedTheme] || 'A bright, uplifting scene showing hope, progress, and positive human achievement, with warm lighting and inspiring atmosphere';
 };
 
 // Save base64 image data to file
@@ -545,7 +541,7 @@ const removeDuplicates = (stories, threshold = 70) => {
   // For each duplicate group, keep only the story with highest awesome_index
   const toRemove = new Set();
   
-  duplicateGroups.forEach((group, groupIndex) => {
+  duplicateGroups.forEach((group, _groupIndex) => {
     // Sort by awesome_index descending
     group.sort((a, b) => stories[b].awesome_index - stories[a].awesome_index);
     
@@ -616,7 +612,7 @@ const fetchDailyNews = async (targetDate = null) => {
       
       // Generate summary
       const summary = await generateSummaryWithGrok(articleText);
-       // Calculate awesome index
+      // Calculate awesome index
       const awesomeIndex = calculateAwesomeIndex(sentimentScore, keywordCount);
       
       // Detect theme for the story

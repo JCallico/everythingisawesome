@@ -74,7 +74,7 @@ async function createMissingFallbackImages() {
     }
   }
   
-  console.log(`\n📊 Summary:`);
+  console.log('\n📊 Summary:');
   console.log(`   ✅ Created: ${createdCount} new fallback images`);
   console.log(`   ⏭️  Skipped: ${skippedCount} existing images`);
   console.log(`   📁 Total themes: ${ALL_THEMES.length}`);
