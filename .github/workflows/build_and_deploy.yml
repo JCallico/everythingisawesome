@@ -538,7 +538,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Please review the workflow logs and try deploying again." >> $GITHUB_STEP_SUMMARY
 
-  workflow-summary:
+  completed:
     runs-on: ubuntu-latest
     needs: [deploy, deploy-rejected]
     if: always()
