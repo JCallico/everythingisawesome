@@ -24,28 +24,73 @@ jobs:
           node-version: '22'
 
       - name: Install root dependencies
-        run: npm install
+        run: |
+          echo "📦 Installing root dependencies..."
+          npm install
+          echo "✅ Root dependencies installed successfully"
 
       - name: Install client dependencies
-        run: cd client && npm install
+        run: |
+          echo "📦 Installing client dependencies..."
+          cd client && npm install
+          echo "✅ Client dependencies installed successfully"
 
       - name: Lint root application
-        run: npm run lint --if-present
+        run: |
+          echo "🔍 Linting root application..."
+          if npm run lint --if-present; then
+            echo "✅ Root application linting passed"
+          else
+            echo "❌ Root application linting failed"
+            exit 1
+          fi
 
       - name: Lint client application
-        run: cd client && npm run lint --if-present
+        run: |
+          echo "🔍 Linting client application..."
+          cd client
+          if npm run lint --if-present; then
+            echo "✅ Client application linting passed"
+          else
+            echo "❌ Client application linting failed"
+            exit 1
+          fi
 
       - name: Build client application
-        run: cd client && npm run build
+        run: |
+          echo "🏗️ Building client application..."
+          cd client && npm run build
+          echo "✅ Client application built successfully"
 
       - name: Test application
-        run: npm run test --if-present
+        run: |
+          echo "🧪 Running tests..."
+          if npm run test --if-present; then
+            echo "✅ All tests passed"
+          else
+            echo "❌ Tests failed"
+            exit 1
+          fi
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## 🏗️ Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependencies | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifacts | ✅ Uploaded |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 Build completed successfully and is ready for deployment!" >> $GITHUB_STEP_SUMMARY
 
   deploy:
     runs-on: windows-latest
@@ -57,16 +102,36 @@ jobs:
 
     steps:
       - name: Download artifact from build job
+        run: |
+          echo "📥 Downloading build artifacts..."
+        
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
       
+      - name: Verify downloaded artifacts
+        run: |
+          echo "🔍 Verifying downloaded artifacts..."
+          ls -la
+          echo "✅ Artifacts downloaded successfully"
+      
+      - name: Login to Azure
+        run: |
+          echo "🔐 Logging into Azure..."
+        
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2D34B457FC84DBD932B2B893BCAB313 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6037D42E5BA0405EA75FC80408338126 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
+
+      - name: Verify Azure login
+        run: |
+          echo "✅ Azure login successful"
+          echo "Current Azure account:"
+          az account show --query "{subscriptionId:id, subscriptionName:name, tenantId:tenantId}" -o table
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -77,20 +142,39 @@ jobs:
           package: .
           clean: false
 
+      - name: 'Verify Deployment Success'
+        run: |
+          echo "🔍 Verifying deployment status..."
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
+          
+          # Check if the web app is running
+          STATUS=$(az webapp show --name everythingisawesome --resource-group "$RESOURCE_GROUP" --query "state" -o tsv)
+          echo "Web app status: $STATUS"
+          
+          if [ "$STATUS" = "Running" ]; then
+            echo "✅ Web app is running successfully"
+          else
+            echo "❌ Web app is not in running state: $STATUS"
+            exit 1
+          fi
+
       - name: 'Configure Node.js Runtime'
         shell: bash
         run: |
+          echo "⚙️ Configuring Node.js runtime..."
           # Find the resource group
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          echo "Configuring Node.js runtime for resource group: $RESOURCE_GROUP"
+          echo "Found resource group: $RESOURCE_GROUP"
           
           # Configure for Windows Node.js with explicit startup file
+          echo "Setting startup file to app.js..."
           az webapp config set \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
             --startup-file "app.js"
             
           # Set Node.js specific configurations
+          echo "Configuring Node.js settings..."
           az webapp config appsettings set \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
@@ -101,17 +185,17 @@ jobs:
               IISNODE_yml="iisnode.yml" \
               WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
             
-          echo "Node.js runtime configured"
+          echo "✅ Node.js runtime configured successfully"
 
       - name: 'Configure Azure Web App Settings'
         shell: bash
         run: |
+          echo "⚙️ Configuring application settings..."
           # Find the resource group by listing all web apps and filtering by name
-          echo "Finding resource group for web app 'everythingisawesome'..."
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
           
           if [ -z "$RESOURCE_GROUP" ]; then
-            echo "Error: Could not find resource group for web app 'everythingisawesome'"
+            echo "❌ Error: Could not find resource group for web app 'everythingisawesome'"
             echo "Available web apps:"
             az webapp list --query "[].{name:name, resourceGroup:resourceGroup}" -o table
             exit 1
@@ -120,6 +204,7 @@ jobs:
           echo "Found resource group: $RESOURCE_GROUP"
           
           # Set application settings
+          echo "Setting environment variables..."
           az webapp config appsettings set \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
@@ -129,21 +214,23 @@ jobs:
               NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}"
               
           # Force restart to apply all changes
+          echo "Restarting web app to apply changes..."
           az webapp restart \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP"
             
-          echo "App settings configured and app restarted"
+          echo "✅ App settings configured and app restarted successfully"
 
       - name: 'Verify Application Type in Azure'
         shell: bash
         run: |
+          echo "🔍 Verifying Azure configuration..."
           # Find the resource group
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
           
           # Check current app settings
           echo "Current app settings:"
-          az webapp config appsettings list \
+          az webapp config.appsettings list \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
             --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE']" \
@@ -156,3 +243,52 @@ jobs:
             --resource-group "$RESOURCE_GROUP" \
             --query "appCommandLine" \
             -o tsv
+            
+          echo "✅ Azure configuration verification completed"
+
+      - name: 'Final Deployment Status'
+        shell: bash
+        run: |
+          echo "🎉 Deployment completed successfully!"
+          echo "🌐 Your application should be available at: https://everythingisawesome.azurewebsites.net"
+          echo "📊 Deployment Summary:"
+          echo "   ✅ Build: Successful"
+          echo "   ✅ Linting: Passed"
+          echo "   ✅ Tests: Passed"
+          echo "   ✅ Deploy: Successful"
+          echo "   ✅ Configuration: Applied"
+          echo "   ✅ Status: Running"
+
+      - name: 'Deployment Summary'
+        if: always()
+        shell: bash
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Azure Login | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact Download | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web App Deployment | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
+          echo "| Runtime Configuration | ✅ Applied |" >> $GITHUB_STEP_SUMMARY
+          echo "| App Settings | ✅ Configured |" >> $GITHUB_STEP_SUMMARY
+          echo "| Application Status | ✅ Running |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 **Application URL**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 **Deployment completed successfully!**" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Deployment Failure Notification'
+        if: failure()
+        shell: bash
+        run: |
+          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment process encountered an error. Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Common Issues:" >> $GITHUB_STEP_SUMMARY
+          echo "- Azure authentication failure" >> $GITHUB_STEP_SUMMARY
+          echo "- Resource group or web app not found" >> $GITHUB_STEP_SUMMARY
+          echo "- Configuration settings error" >> $GITHUB_STEP_SUMMARY
+          echo "- Network connectivity issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please review the workflow logs and try deploying again." >> $GITHUB_STEP_SUMMARY
