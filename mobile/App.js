@@ -20,13 +20,13 @@ export default function App() {
           initialRouteName="Home"
           screenOptions={{
             headerStyle: {
-              backgroundColor: 'transparent',
+              backgroundColor: 'transparent'
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: 'bold'
             },
-            headerTransparent: true,
+            headerTransparent: true
           }}
         >
           <Stack.Screen 

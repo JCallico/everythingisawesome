@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  Dimensions,
+  Dimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -61,111 +61,111 @@ const styles = StyleSheet.create({
   // Story Card styles
   storyCard: {
     flex: 1,
-    width: width - 12,
+    width: width - 12
   },
   storyCardContent: {
-    flexGrow: 1,
     borderRadius: 20,
+    elevation: 4,
+    flexGrow: 1,
+    minHeight: height - 300,
     overflow: 'hidden',
     position: 'relative',
-    elevation: 4,
     shadowColor: 'rgba(0, 0, 0, 0.2)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    minHeight: height - 300,
+    shadowRadius: 8
   },
   imageContainer: {
-    height: height * 0.4,
-    marginHorizontal: 8,
     borderRadius: 20,
-    overflow: 'hidden',
+    height: height * 0.4,
     marginBottom: 20,
-    position: 'relative',
+    marginHorizontal: 8,
+    overflow: 'hidden',
+    position: 'relative'
   },
   storyImage: {
-    width: '100%',
     height: '100%',
+    width: '100%'
   },
   imageGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
     bottom: 0,
     height: '50%',
+    left: 0,
+    position: 'absolute',
+    right: 0
   },
   awesomeIndexContainer: {
     position: 'absolute',
-    top: 15,
     right: 15,
-    zIndex: 10,
+    top: 15,
+    zIndex: 10
   },
   awesomeIndexBadge: {
+    backgroundColor: '#ff6b6b',
+    borderRadius: 25,
+    borderWidth: 0,
+    elevation: 8,
+    minWidth: 80,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 25,
-    backgroundColor: '#ff6b6b',
-    borderWidth: 0,
     shadowColor: 'rgba(255, 107, 107, 0.3)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
-    shadowRadius: 12,
-    elevation: 8,
-    minWidth: 80,
+    shadowRadius: 12
   },
   awesomeScore: {
     color: '#fff',
     fontSize: 24,
     fontWeight: '800',
-    textAlign: 'center',
     lineHeight: 26,
+    textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   awesomeLabel: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
-    textAlign: 'center',
-    opacity: 0.95,
-    textTransform: 'capitalize',
     letterSpacing: 0.5,
     lineHeight: 14,
+    opacity: 0.95,
+    textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+    textTransform: 'capitalize'
   },
   contentCard: {
-    marginHorizontal: 8,
     borderRadius: 20,
-    overflow: 'hidden',
     marginBottom: 20,
+    marginHorizontal: 8,
+    overflow: 'hidden'
   },
   cardContent: {
-    padding: 16,
+    padding: 16
   },
   storyContentArea: {
-    marginBottom: 20,
+    marginBottom: 20
   },
   storyTitle: {
+    color: '#1a1a1a',
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 12,
     lineHeight: 28,
+    marginBottom: 12,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   storySummary: {
-    fontSize: 16,
     color: '#2c2c2c',
+    fontSize: 16,
     lineHeight: 24,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
+    textShadowRadius: 3
+  }
 });
 
 export default StoryCard;

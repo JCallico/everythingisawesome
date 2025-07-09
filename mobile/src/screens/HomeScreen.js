@@ -11,7 +11,7 @@ import {
   Animated,
   Alert,
   Linking,
-  Share,
+  Share
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -49,7 +49,7 @@ const THEME_COLORS = {
   economy: ['#218c74', '#33d9b2', '#2ed573'],
   world: ['#66c9ff', '#5db8ff', '#7ea4d3'],
   inspiring: ['#ff9a56', '#fad0c4', '#ffd1ff'],
-  default: ['#ffecd2', '#fcb69f'],
+  default: ['#ffecd2', '#fcb69f']
 };
 
 const HomeScreen = ({ navigation, route }) => {
@@ -121,13 +121,13 @@ const HomeScreen = ({ navigation, route }) => {
           Animated.timing(pulseAnim, {
             toValue: 1.3,
             duration: 1000,
-            useNativeDriver: true,
+            useNativeDriver: true
           }),
           Animated.timing(pulseAnim, {
             toValue: 1,
             duration: 1000,
-            useNativeDriver: true,
-          }),
+            useNativeDriver: true
+          })
         ])
       );
       pulse.start();
@@ -258,7 +258,7 @@ const HomeScreen = ({ navigation, route }) => {
       await Share.share({
         message: message,
         title: story.title,
-        url: story.link,
+        url: story.link
       });
     } catch (error) {
       console.error('Error sharing story:', error);
@@ -289,8 +289,8 @@ const HomeScreen = ({ navigation, route }) => {
     const date = parseDate(dateString);
     const day = date.getDate();
     const suffix = day === 1 || day === 21 || day === 31 ? 'st' :
-                   day === 2 || day === 22 ? 'nd' :
-                   day === 3 || day === 23 ? 'rd' : 'th';
+      day === 2 || day === 22 ? 'nd' :
+        day === 3 || day === 23 ? 'rd' : 'th';
     
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
@@ -610,149 +610,149 @@ const HomeScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   safeArea: {
-    flex: 1,
+    flex: 1
   },
   loadingContainer: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    padding: 20
   },
   loadingText: {
     color: '#1a1a1a',
     fontSize: 18,
-    marginTop: 15,
     fontWeight: '600',
+    marginTop: 15,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   loadingSubtext: {
     color: '#2c2c2c',
     fontSize: 14,
-    marginTop: 8,
     fontStyle: 'italic',
+    marginTop: 8,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   errorContainer: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    padding: 20
   },
   errorText: {
     color: '#1a1a1a',
     fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
     lineHeight: 24,
+    marginBottom: 20,
+    textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   retryButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
     borderRadius: 12,
+    elevation: 8,
+    paddingHorizontal: 30,
+    paddingVertical: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowRadius: 12
   },
   retryButtonText: {
     color: '#121212',
     fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center',
+    textAlign: 'center'
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    paddingVertical: 8
   },
   headerTitleContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
     flex: 0.15,
-    position: 'relative',
+    justifyContent: 'center',
+    position: 'relative'
   },
   headerLogo: {
-    width: 50,
-    height: 50,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 25,
     borderWidth: 3,
-    borderColor: 'rgba(255, 255, 255, 0.9)',
+    elevation: 6,
+    height: 50,
     shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 8,
-    elevation: 6,
+    width: 50
   },
   headerInfo: {
-    flex: 1,
     alignItems: 'flex-start',
+    flex: 1,
     justifyContent: 'center',
-    paddingRight: 15,
+    paddingRight: 15
   },
   dateInfoContainer: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   headerTitle: {
     color: '#1a1a1a',
     fontSize: 13,
     fontWeight: '600',
-    textAlign: 'left',
     lineHeight: 18,
+    textAlign: 'left',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   headerDate: {
     color: '#1a1a1a',
     fontSize: 13,
     fontWeight: '600',
-    textAlign: 'left',
     lineHeight: 16,
+    textAlign: 'left',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   headerSubtitle: {
     color: '#2c2c2c',
     fontSize: 12,
     fontWeight: '500',
-    textAlign: 'left',
     marginTop: 2,
     opacity: 0.8,
+    textAlign: 'left',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   menuButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 25,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    zIndex: 10,
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
+    borderRadius: 25,
+    borderWidth: 1,
+    bottom: 0,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 10
   },
   menuButtonText: {
     color: '#ff6b6b',
@@ -760,46 +760,46 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   menuButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.45)',
     borderColor: 'rgba(255, 255, 255, 0.5)',
-    transform: [{ translateY: -1 }],
+    transform: [{ translateY: -1 }]
   },
   menuDropdown: {
-    position: 'absolute',
-    top: 70,
-    right: 15,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
     borderRadius: 16,
+    borderWidth: 1,
+    elevation: 15,
+    maxWidth: 220,
+    minWidth: 180,
     padding: 12,
+    position: 'absolute',
+    right: 15,
     shadowColor: 'rgba(0, 0, 0, 0.2)',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 32,
-    elevation: 15,
-    zIndex: 1000,
-    minWidth: 180,
-    maxWidth: 220,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
+    top: 70,
+    zIndex: 1000
   },
   menuOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    zIndex: 999,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 999
   },
   menuItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    marginVertical: 2,
-    borderWidth: 1,
     borderColor: 'transparent',
+    borderRadius: 10,
+    borderWidth: 1,
+    marginVertical: 2,
+    paddingHorizontal: 16,
+    paddingVertical: 12
   },
   menuItemText: {
     color: '#ff6b6b',
@@ -807,73 +807,73 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 3
   },
   menuItemPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderColor: 'rgba(255, 255, 255, 0.3)',
-    transform: [{ translateX: -2 }],
+    transform: [{ translateX: -2 }]
   },
   scrollView: {
-    flex: 1,
+    flex: 1
   },
   contentWrapper: {
-    flex: 1,
+    flex: 1
   },
   storyContainer: {
     flex: 1,
-    minHeight: height - 200,
+    minHeight: height - 200
   },
   progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    marginHorizontal: 10,
-    gap: 4,
+    flexDirection: 'row',
     flexWrap: 'nowrap',
+    gap: 4,
+    justifyContent: 'center',
+    marginHorizontal: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 12
   },
   progressDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'transparent',
-    marginHorizontal: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    backgroundColor: 'transparent',
+    borderRadius: 12,
     flex: 0,
+    height: 24,
+    justifyContent: 'center',
+    marginHorizontal: 1,
     minWidth: 24,
+    position: 'relative',
+    width: 24
   },
   progressDotInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 5,
+    borderWidth: 1.5,
+    elevation: 4,
+    height: 10,
     shadowColor: '#fff',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 4,
+    width: 10
   },
   progressDotActive: {
-    transform: [{ scale: 1.2 }],
+    transform: [{ scale: 1.2 }]
   },
   progressDotActiveInner: {
     borderColor: 'rgba(255, 255, 255, 1)',
+    elevation: 8,
     shadowColor: '#ff6b6b',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
-    shadowRadius: 25,
-    elevation: 8,
+    shadowRadius: 25
   },
   swipeHintContainer: {
     alignItems: 'center',
-    paddingVertical: 8,
     marginHorizontal: 8,
+    paddingVertical: 8
   },
   swipeHintText: {
     color: 'rgba(0, 0, 0, 0.7)',
@@ -882,66 +882,66 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   actionButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    flexDirection: 'row',
     gap: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12
   },
   bottomActionButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    flex: 1,
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    elevation: 8,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowRadius: 12
   },
   bottomActionButtonText: {
     color: '#121212',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   navigation: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    paddingVertical: 20
   },
   navButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    elevation: 8,
+    height: 50,
+    justifyContent: 'center',
     marginHorizontal: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 8,
+    width: 50
   },
   prevButton: {},
   nextButton: {},
   pauseButton: {
-    backgroundColor: 'rgba(255, 215, 0, 0.9)',
+    backgroundColor: 'rgba(255, 215, 0, 0.9)'
   },
   navButtonText: {
     color: '#121212',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   pauseButtonText: {
     fontSize: 14,
@@ -955,19 +955,19 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 150, // End above the action buttons and navigation
     backgroundColor: 'transparent',
-    zIndex: 5, // Lower z-index so it doesn't block other interactive elements
+    zIndex: 5 // Lower z-index so it doesn't block other interactive elements
   },
   // PagerView styles
   pagerView: {
     flex: 1,
-    marginHorizontal: 2,
+    marginHorizontal: 2
   },
   page: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 2,
-  },
+    paddingHorizontal: 2
+  }
 });
 
 export default HomeScreen;

@@ -5,10 +5,34 @@ This guide explains how to set up the complete deployment pipeline with manual a
 ## Overview
 
 The deployment pipeline includes:
-- ✅ **Automated Quality Gates**: Linting, building, and testing
-- 📋 **Pre-Approval Summary**: Comprehensive build status review
+- ✅ **Automated Quality Gates**: Linting, building, and testing for all platforms
+- 📱 **Multi-Platform Support**: Web (React) + Mobile (React Native + Expo) validation
+- 📋 **Pre-Approval Summary**: Comprehensive build status review for all components
 - 🔐 **Manual Approval Gate**: Human review before production deployment
 - 🚀 **Automated Deployment**: Deploy to Azure Web App after approval
+
+## 📱 Mobile Application Support
+
+The pipeline now includes comprehensive support for the React Native mobile application:
+
+### Mobile Quality Gates
+- **📦 Dependencies**: Installs mobile npm packages including ESLint and Expo CLI
+- **🔍 Code Quality**: ESLint validation with React Native specific rules
+- **✅ App Validation**: Expo configuration and project structure validation
+- **🧪 Testing**: Mobile-specific test execution (if configured)
+
+### Mobile Build Process
+The mobile app goes through these validation steps:
+1. **Dependency Installation**: Install all mobile packages
+2. **ESLint Analysis**: Check code quality with React Native rules
+3. **Expo Configuration**: Validate app.json and project structure
+4. **Build Readiness**: Verify critical files and dependencies exist
+
+### Mobile Deployment Readiness
+While the web application is automatically deployed to Azure, the mobile app is validated and prepared for:
+- 📱 **Development Builds**: Ready for Expo development server
+- 🏗️ **Production Builds**: Validated for iOS/Android builds
+- 📦 **App Store Deployment**: Structure verified for submission
 
 ## 🏗️ Pipeline Workflow
 

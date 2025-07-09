@@ -7,14 +7,14 @@ import {
   ScrollView,
   Modal,
   Dimensions,
-  FlatList,
+  FlatList
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const DateSelector = ({ 
   visible, 
@@ -58,29 +58,11 @@ const DateSelector = ({
     return new Date(year, month - 1, day);
   };
 
-  const formatDisplayDate = (dateString) => {
-    const date = parseDate(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      weekday: 'long'
-    });
-  };
-
   const formatShortDate = (dateString) => {
     const date = parseDate(dateString);
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
       day: 'numeric' 
-    });
-  };
-
-  const formatYearMonth = (dateString) => {
-    const date = parseDate(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long' 
     });
   };
 
@@ -130,7 +112,7 @@ const DateSelector = ({
           styles.calendarDay,
           isActive && styles.calendarDayActive,
           isSelected && styles.calendarDaySelected,
-          isToday && styles.calendarDayToday,
+          isToday && styles.calendarDayToday
         ]}
         onPress={() => isActive ? handleDatePress(dateString) : null}
         activeOpacity={isActive ? 0.7 : 1}
@@ -141,14 +123,14 @@ const DateSelector = ({
             styles.calendarDayText,
             isActive && styles.calendarDayTextActive,
             isSelected && styles.calendarDayTextSelected,
-            isToday && styles.calendarDayTextToday,
+            isToday && styles.calendarDayTextToday
           ]}>
             {day}
           </Text>
           {isActive && (
             <View style={[
               styles.calendarDayDot,
-              isSelected && styles.calendarDayDotSelected,
+              isSelected && styles.calendarDayDotSelected
             ]} />
           )}
         </View>
@@ -182,10 +164,6 @@ const DateSelector = ({
     return weeks;
   };
 
-  const toggleViewMode = () => {
-    setViewMode(viewMode === 'calendar' ? 'list' : 'calendar');
-  };
-
   const renderListItem = ({ item: date, index }) => {
     const isSelected = date === selectedDate;
     const isLatestDate = isLatest(date, index);
@@ -196,7 +174,7 @@ const DateSelector = ({
         style={[
           styles.listItem,
           isSelected && styles.listItemSelected,
-          isLatestDate && styles.listItemLatest,
+          isLatestDate && styles.listItemLatest
         ]}
         onPress={() => handleDatePress(date)}
         activeOpacity={0.7}
@@ -206,14 +184,14 @@ const DateSelector = ({
             <Text style={[
               styles.listItemDate,
               isSelected && styles.listItemDateSelected,
-              isLatestDate && styles.listItemDateLatest,
+              isLatestDate && styles.listItemDateLatest
             ]}>
               {formatShortDate(date)}
             </Text>
             <Text style={[
               styles.listItemSubtext,
               isSelected && styles.listItemSubtextSelected,
-              isLatestDate && styles.listItemSubtextLatest,
+              isLatestDate && styles.listItemSubtextLatest
             ]}>
               {getDaysAgo(date)}
             </Text>
@@ -306,16 +284,6 @@ const DateSelector = ({
       year: 'numeric', 
       month: 'long' 
     });
-  };
-
-  const getAvailableMonths = () => {
-    const months = new Set();
-    availableDates.forEach(dateString => {
-      const date = parseDate(dateString);
-      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      months.add(monthYear);
-    });
-    return Array.from(months).sort().reverse(); // Most recent first
   };
 
   return (
@@ -427,19 +395,19 @@ const DateSelector = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   safeArea: {
-    flex: 1,
+    flex: 1
   },
   modal: {
-    flex: 1,
+    flex: 1
   },
   header: {
+    alignItems: 'center',
     padding: 20,
     paddingTop: 20,
-    alignItems: 'center',
-    position: 'relative',
+    position: 'relative'
   },
   title: {
     fontSize: 18,
@@ -450,127 +418,127 @@ const styles = StyleSheet.create({
     paddingHorizontal: 60, // Add padding to prevent overlap with close button
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   subtitle: {
-    fontSize: 16,
     color: '#2c2c2c',
+    fontSize: 16,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.6)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    elevation: 8,
+    height: 40,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 8,
-    zIndex: 1000,
+    top: 10,
+    width: 40,
+    zIndex: 1000
   },
   closeButtonText: {
     color: '#121212',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   statsContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 15,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginHorizontal: 20,
     marginBottom: 20,
-    borderRadius: 15,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: 'center'
   },
   statNumber: {
+    color: '#1a1a1a',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1a1a1a',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   statLabel: {
-    fontSize: 12,
     color: '#2c2c2c',
+    fontSize: 12,
     marginTop: 2,
     textShadowColor: 'rgba(255, 255, 255, 0.6)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   dateList: {
-    flex: 1,
+    flex: 1
   },
   dateListContent: {
     padding: 20,
-    paddingTop: 0,
+    paddingTop: 0
   },
   row: {
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   listHeader: {
-    fontSize: 16,
     color: '#1a1a1a',
-    textAlign: 'center',
-    marginBottom: 20,
+    fontSize: 16,
     lineHeight: 22,
+    marginBottom: 20,
+    textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 40
   },
   emptyText: {
-    fontSize: 18,
     color: '#1a1a1a',
+    fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   emptySubtext: {
-    fontSize: 14,
     color: '#2c2c2c',
+    fontSize: 14,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.6)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   // Calendar styles
   calendarContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   calendarHeader: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
     paddingHorizontal: 10,
+    paddingVertical: 15
   },
   calendarNavButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40
   },
   calendarNavButtonText: {
     color: '#1a1a1a',
@@ -578,7 +546,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   calendarTitle: {
     color: '#1a1a1a',
@@ -586,74 +554,74 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   calendarDaysHeader: {
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 10,
+    paddingVertical: 10
   },
   calendarDayHeaderText: {
     color: '#2c2c2c',
     fontSize: 12,
     fontWeight: '600',
-    width: (width - 40) / 7,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.6)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+    width: (width - 40) / 7
   },
   calendarScrollView: {
-    flex: 1,
+    flex: 1
   },
   calendarGrid: {
-    paddingBottom: 20,
+    paddingBottom: 20
   },
   calendarWeek: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    marginBottom: 5,
+    marginBottom: 5
   },
   calendarDay: {
-    width: (width - 40) / 7,
-    height: (width - 40) / 7,
-    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-  },
-  calendarDayEmpty: {
-    width: (width - 40) / 7,
     height: (width - 40) / 7,
     justifyContent: 'center',
+    width: (width - 40) / 7
+  },
+  calendarDayEmpty: {
     alignItems: 'center',
+    height: (width - 40) / 7,
+    justifyContent: 'center',
+    width: (width - 40) / 7
   },
   calendarDayEmptyText: {
     color: '#666',
     fontSize: 14,
     textShadowColor: 'rgba(255, 255, 255, 0.4)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   calendarDayActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)'
   },
   calendarDaySelected: {
     backgroundColor: '#FFD700',
-    borderWidth: 2,
     borderColor: '#fff',
+    borderWidth: 2
   },
   calendarDayToday: {
-    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 2
   },
   calendarDayContent: {
-    justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
     height: '100%',
+    justifyContent: 'center',
+    width: '100%'
   },
   calendarDayText: {
     color: '#666',
@@ -661,86 +629,86 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textShadowColor: 'rgba(255, 255, 255, 0.4)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   calendarDayTextActive: {
     color: '#1a1a1a',
     fontWeight: '600',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   calendarDayTextSelected: {
     color: '#333',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   calendarDayTextToday: {
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   calendarDayDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
     backgroundColor: '#FFD700',
+    borderRadius: 2,
+    height: 4,
     marginTop: 2,
+    width: 4
   },
   calendarDayDotSelected: {
-    backgroundColor: '#333',
+    backgroundColor: '#333'
   },
   // List styles (updated from original dateItem styles)
   listItem: {
-    width: '48%',
-    marginBottom: 15,
     borderRadius: 15,
+    marginBottom: 15,
     overflow: 'hidden',
+    width: '48%'
   },
   listItemBlur: {
-    borderRadius: 15,
+    borderRadius: 15
   },
   listItemContent: {
-    padding: 15,
     alignItems: 'center',
-    position: 'relative',
+    padding: 15,
+    position: 'relative'
   },
   listItemSelected: {
-    borderWidth: 2,
     borderColor: '#FFD700',
+    borderWidth: 2
   },
   listItemLatest: {
-    borderWidth: 2,
     borderColor: 'rgba(255, 215, 0, 0.6)',
+    borderWidth: 2
   },
   listItemDate: {
+    color: '#1a1a1a',
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
     marginBottom: 4,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 2
   },
   listItemDateSelected: {
     color: '#FFD700',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   listItemDateLatest: {
-    color: '#FFD700',
+    color: '#FFD700'
   },
   listItemSubtext: {
-    fontSize: 12,
     color: '#2c2c2c',
+    fontSize: 12,
     textShadowColor: 'rgba(255, 255, 255, 0.6)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
+    textShadowRadius: 1
   },
   listItemSubtextSelected: {
     color: '#FFD700',
-    opacity: 1,
+    opacity: 1
   },
   listItemSubtextLatest: {
     color: '#FFD700',
-    opacity: 0.9,
-  },
+    opacity: 0.9
+  }
 });
 
 export default DateSelector;

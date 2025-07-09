@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -30,7 +30,7 @@ const HowItWorksScreen = ({ navigation }) => {
       <Text key={key}>
         {children}
       </Text>
-    ),
+    )
   }), []);
   const { renderContent, renderListItems } = renderer;
 
@@ -151,109 +151,109 @@ const HowItWorksScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    paddingTop: 10,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    flex: 1,
-    paddingRight: 15,
+  boldText: {
+    fontWeight: 'bold'
   },
   closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 15,
+    height: 30,
+    justifyContent: 'center',
+    width: 30
   },
   closeButtonText: {
-    fontSize: 18,
     color: '#2c3e50',
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: 'bold'
   },
-  scrollView: {
-    flex: 1,
+  container: {
+    flex: 1
   },
   content: {
-    paddingHorizontal: 20,
     paddingBottom: 30,
-  },
-  section: {
-    marginBottom: 25,
-    backgroundColor: 'transparent',
-    borderRadius: 12,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 12,
-  },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#34495e',
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  paragraph: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: '#2c3e50',
-    marginBottom: 8,
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-  link: {
-    color: '#3498db',
-    textDecorationLine: 'underline',
-  },
-  listContainer: {
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  listItem: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#2c3e50',
-    marginBottom: 4,
-    marginLeft: 10,
+    paddingHorizontal: 20
   },
   footer: {
     backgroundColor: 'transparent',
     borderRadius: 12,
-    padding: 20,
     marginTop: 10,
+    padding: 20
   },
   footerText: {
+    color: '#2c3e50',
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2c3e50',
-    textAlign: 'center',
     marginBottom: 10,
+    textAlign: 'center'
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 10
   },
   lastUpdated: {
-    fontSize: 12,
     color: '#7f8c8d',
-    textAlign: 'center',
+    fontSize: 12,
     fontStyle: 'italic',
+    textAlign: 'center'
   },
+  link: {
+    color: '#3498db',
+    textDecorationLine: 'underline'
+  },
+  listContainer: {
+    marginBottom: 8,
+    marginTop: 8
+  },
+  listItem: {
+    color: '#2c3e50',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 4,
+    marginLeft: 10
+  },
+  paragraph: {
+    color: '#2c3e50',
+    fontSize: 14,
+    lineHeight: 22,
+    marginBottom: 8
+  },
+  safeArea: {
+    flex: 1
+  },
+  scrollView: {
+    flex: 1
+  },
+  section: {
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    marginBottom: 25,
+    padding: 20
+  },
+  sectionTitle: {
+    color: '#2c3e50',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12
+  },
+  stepTitle: {
+    color: '#34495e',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 12
+  },
+  title: {
+    color: '#2c3e50',
+    flex: 1,
+    fontSize: 22,
+    fontWeight: 'bold',
+    paddingRight: 15
+  }
 });
 
 export default HowItWorksScreen;

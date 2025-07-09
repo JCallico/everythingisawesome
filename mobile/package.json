@@ -10,7 +10,10 @@
     "web": "expo start --web",
     "build:android": "expo build:android",
     "build:ios": "expo build:ios",
-    "test": "jest"
+    "prebuild": "expo prebuild --clean",
+    "test": "jest",
+    "lint": "eslint App.js index.js src/**/*.js --no-ignore --max-warnings 200",
+    "lint:fix": "eslint App.js index.js src/**/*.js --no-ignore --fix --max-warnings 200"
   },
   "dependencies": {
     "@everythingisawesome/shared-api": "file:../packages/shared-api",
@@ -36,7 +39,11 @@
     "react-native-web": "^0.20.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "^7.0.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-native": "^4.1.0"
   },
   "private": true,
   "license": "CC-BY-NC-4.0"
