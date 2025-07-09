@@ -14,7 +14,7 @@ module.exports = {
   },
   rules: {
     'indent': ['error', 2],
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': ['off'], // Allow both LF and CRLF line endings
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
     'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
