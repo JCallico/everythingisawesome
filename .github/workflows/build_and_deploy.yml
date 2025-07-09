@@ -95,8 +95,20 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎉 Build completed successfully!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⏳ **Next Step**: Manual approval required for production deployment" >> $GITHUB_STEP_SUMMARY
-          echo "📋 Please review the build results and approve the deployment to continue." >> $GITHUB_STEP_SUMMARY
+          echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The build has completed successfully and is now waiting for manual approval." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Pre-Deployment Checklist:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Code changes reviewed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Linting passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tests completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Artifacts ready for deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "� **Ready to deploy to**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Step**: Navigate to the Actions tab and click 'Approve and deploy' to proceed with production deployment." >> $GITHUB_STEP_SUMMARY
 
   approval:
     runs-on: ubuntu-latest
@@ -111,23 +123,10 @@ jobs:
           echo "🔐 Manual approval required for production deployment"
           echo "Build artifacts are ready and waiting for deployment approval"
           echo "Please review the build summary and approve this deployment to continue"
-          
-      - name: 'Approval Summary'
-        run: |
-          echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The build has completed successfully and is now waiting for manual approval." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📋 Pre-Deployment Checklist:" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Code changes reviewed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Linting passed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Tests completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Artifacts ready for deployment" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🚀 **Ready to deploy to**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Click **Approve and deploy** to proceed with the production deployment." >> $GITHUB_STEP_SUMMARY
+          echo ""
+          echo "✅ Build completed successfully"
+          echo "✅ All quality checks passed"
+          echo "🚀 Ready to deploy to production"
 
   deploy:
     runs-on: windows-latest
