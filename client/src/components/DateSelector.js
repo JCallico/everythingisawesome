@@ -25,10 +25,6 @@ const DateSelector = ({
 
 
 
-  const isToday = (dateString) => {
-    return moment(dateString).isSame(moment(), 'day');
-  };
-
   const handleDateClick = (dateString, event) => {
     event.preventDefault();
     const targetPath = dateString === availableDates[0] ? '/' : `/${dateString}`;
