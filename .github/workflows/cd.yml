@@ -254,23 +254,42 @@ jobs:
           
           echo "Looking for previous deployment in resource group: $RESOURCE_GROUP"
           
-          # Get the last successful deployment
-          LAST_DEPLOYMENT=$(az webapp deployment list \
+          # Get deployment history using the correct Azure CLI command
+          echo "Checking deployment slots..."
+          az webapp deployment slot list \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
-            --resource-group "$RESOURCE_GROUP" \
-            --query "[?status=='4'].id | [0]" -o tsv)
+            --resource-group "$RESOURCE_GROUP" || echo "No deployment slots found"
           
-          if [ -n "$LAST_DEPLOYMENT" ]; then
-            echo "Rolling back to deployment: $LAST_DEPLOYMENT"
-            az webapp deployment source sync \
-              --name ${{ env.AZURE_WEBAPP_NAME }} \
-              --resource-group "$RESOURCE_GROUP"
-          else
-            echo "No previous successful deployment found"
-          fi
+          # Try to get deployment history
+          echo "Checking deployment history..."
+          DEPLOYMENT_HISTORY=$(az webapp deployment source show \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" 2>/dev/null || echo "No deployment history found")
+          
+          echo "Deployment history: $DEPLOYMENT_HISTORY"
+          
+          # For now, restart the app to try to recover from a failed state
+          echo "Attempting to restart the web app to recover from failed deployment..."
+          az webapp restart \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP"
+          
+          echo "Web app restarted. Manual intervention may be required for full rollback."
+          echo "Consider using Azure Portal to restore from a backup or redeploy a previous version."
 
       - name: Notify rollback
         run: |
           echo "## ⚠️ Deployment Rollback Executed" >> $GITHUB_STEP_SUMMARY
-          echo "The deployment failed and has been rolled back to the previous version." >> $GITHUB_STEP_SUMMARY
-          echo "Please check the deployment logs and fix any issues before retrying." >> $GITHUB_STEP_SUMMARY
+          echo "The deployment failed and rollback steps have been attempted:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔄 Rollback Actions Taken:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Web app restarted to recover from failed state" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Deployment history checked" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛠️ Manual Actions Required:" >> $GITHUB_STEP_SUMMARY
+          echo "- Check the Azure Portal for app status" >> $GITHUB_STEP_SUMMARY
+          echo "- Consider restoring from backup if available" >> $GITHUB_STEP_SUMMARY
+          echo "- Review deployment logs and fix issues before retrying" >> $GITHUB_STEP_SUMMARY
+          echo "- Re-run the workflow when ready" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Note**: The `/data` folder should remain preserved even during rollback attempts."
