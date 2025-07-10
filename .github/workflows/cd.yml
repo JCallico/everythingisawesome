@@ -64,8 +64,32 @@ jobs:
 
       - name: Configure App Settings
         run: |
-          # Get resource group
-          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          # Debug: Show current Azure context
+          echo "Current Azure subscription:"
+          az account show --query "{subscriptionId:id, name:name}" -o table
+          
+          echo "Looking for web app: ${{ env.AZURE_WEBAPP_NAME }}"
+          
+          # Debug: List ALL web apps first
+          echo "All web apps in current subscription:"
+          az webapp list --query "[].{Name:name, ResourceGroup:resourceGroup, State:state}" -o table
+          
+          # Get resource group with better error handling
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          
+          if [ -z "$RESOURCE_GROUP" ]; then
+            echo "ERROR: Could not find web app '${{ env.AZURE_WEBAPP_NAME }}'"
+            echo ""
+            echo "This could mean:"
+            echo "1. The web app doesn't exist yet"
+            echo "2. The web app name is different" 
+            echo "3. The web app is in a different subscription"
+            echo ""
+            echo "Please check the Azure portal or create the web app first."
+            exit 1
+          fi
+          
+          echo "Found resource group: $RESOURCE_GROUP"
           
           # Configure app settings
           az webapp config appsettings set \
@@ -81,7 +105,14 @@ jobs:
 
       - name: Restart application
         run: |
-          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          
+          if [ -z "$RESOURCE_GROUP" ]; then
+            echo "ERROR: Could not find web app '${{ env.AZURE_WEBAPP_NAME }}'"
+            exit 1
+          fi
+          
+          echo "Restarting web app in resource group: $RESOURCE_GROUP"
           az webapp restart --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP"
 
       - name: Run production smoke tests
@@ -125,7 +156,14 @@ jobs:
 
       - name: Rollback to previous deployment
         run: |
-          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          
+          if [ -z "$RESOURCE_GROUP" ]; then
+            echo "ERROR: Could not find web app '${{ env.AZURE_WEBAPP_NAME }}'"
+            exit 1
+          fi
+          
+          echo "Looking for previous deployment in resource group: $RESOURCE_GROUP"
           
           # Get the last successful deployment
           LAST_DEPLOYMENT=$(az webapp deployment list \
