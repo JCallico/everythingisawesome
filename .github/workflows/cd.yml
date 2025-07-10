@@ -25,9 +25,10 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
-    environment: 
-      name: production
-      url: https://everythingisawesome.azurewebsites.net
+    # Temporarily remove environment to fix federated identity subject mismatch
+    # environment: 
+    #   name: production
+    #   url: https://everythingisawesome.azurewebsites.net
     
     steps:
       - name: Download artifacts
