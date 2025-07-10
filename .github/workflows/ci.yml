@@ -96,16 +96,20 @@ jobs:
       - name: Setup and test mobile
         run: |
           cd mobile
-          npm ci
-          npm test || echo "No mobile tests configured"
+          npm ci --legacy-peer-deps
+          npm test -- --coverage --watchAll=false
 
       - name: Upload coverage reports
         if: matrix.node-version == 22
         uses: codecov/codecov-action@v4
         with:
-          file: ./client/coverage/lcov.info
-          flags: client
-          name: client-coverage
+          file: |
+            ./client/coverage/lcov.info
+            ./mobile/coverage/lcov.info
+          flags: |
+            client
+            mobile
+          name: app-coverage
 
   # Job 3: Build Applications
   build:
