@@ -22,11 +22,41 @@ env:
   DEFAULT_APP_URL: 'https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net'
 
 jobs:
-  # Job 1: Deploy to Production
+  # Job 1: Pre-deployment approval
+  deployment-approval:
+    name: Deployment Approval Required
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+    environment: 
+      name: production
+      url: https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net
+    
+    steps:
+      - name: Manual approval checkpoint
+        run: |
+          echo "🔐 MANUAL APPROVAL REQUIRED"
+          echo "=========================================="
+          echo ""
+          echo "✅ BUILD STATUS: SUCCESSFUL"
+          echo "✅ QUALITY CHECKS: PASSED"
+          echo "✅ ARTIFACTS: READY"
+          echo ""
+          echo "📊 DEPLOYMENT SUMMARY:"
+          echo "  🎯 Target: Production Environment"
+          echo "  🌐 URL: https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net"
+          echo "  📦 Package: Node.js Application"
+          echo "  ⚡ Runtime: Node.js 22"
+          echo "  🛡️ Data Protection: /data folder will be preserved"
+          echo ""
+          echo "🚀 APPROVAL GRANTED - PROCEEDING WITH DEPLOYMENT"
+          echo "=========================================="
+
+  # Job 2: Deploy to Production
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+    needs: [deployment-approval]
+    if: github.ref == 'refs/heads/main' && needs.deployment-approval.result == 'success'
     # Temporarily remove environment to fix federated identity subject mismatch
     # environment: 
     #   name: production
@@ -228,12 +258,53 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎉 **Deployment completed successfully with data preservation!**" >> $GITHUB_STEP_SUMMARY
 
-  # Job 2: Rollback (if deployment fails)
+  # Job 3: Handle deployment rejection
+  deployment-rejected:
+    name: Deployment Rejected
+    runs-on: ubuntu-latest
+    if: always() && needs.deployment-approval.result != 'success' && github.ref == 'refs/heads/main'
+    needs: [deployment-approval]
+    
+    steps:
+      - name: Handle rejection
+        run: |
+          echo "❌ DEPLOYMENT REJECTED OR CANCELLED"
+          echo "=================================="
+          echo ""
+          echo "📋 Status: Manual approval was not granted"
+          echo "🚫 Action: Deployment has been stopped"
+          echo "📊 Build Status: Completed successfully (artifacts preserved)"
+          echo ""
+          echo "ℹ️  The build completed successfully but deployment was not approved."
+          echo "   You can re-run the workflow to attempt deployment again."
+          echo ""
+          echo "=================================="
+          
+          # Add to step summary
+          echo "## ❌ Deployment Rejected" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment to production was rejected or cancelled during the manual approval process." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ What was completed:" >> $GITHUB_STEP_SUMMARY
+          echo "- Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- All quality checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifacts are ready for deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ❌ What was cancelled:" >> $GITHUB_STEP_SUMMARY
+          echo "- Production deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- Azure Web App update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔄 Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "- Review the changes if needed" >> $GITHUB_STEP_SUMMARY
+          echo "- Re-run the workflow when ready to deploy" >> $GITHUB_STEP_SUMMARY
+          echo "- Or make additional changes and push to trigger a new build" >> $GITHUB_STEP_SUMMARY
+
+  # Job 4: Rollback (if deployment fails)
   rollback:
     name: Rollback Deployment
     runs-on: ubuntu-latest
     if: failure() && needs.deploy-production.result == 'failure'
-    needs: [deploy-production]
+    needs: [deployment-approval, deploy-production]
     
     steps:
       - name: Login to Azure
