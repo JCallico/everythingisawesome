@@ -26,6 +26,7 @@ jobs:
   deployment-approval:
     name: Deployment Approval Required
     runs-on: ubuntu-latest
+    # Only run if CI completed successfully on main branch
     if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
     environment: 
       name: production
@@ -37,7 +38,7 @@ jobs:
           echo "🔐 MANUAL APPROVAL REQUIRED"
           echo "=========================================="
           echo ""
-          echo "✅ BUILD STATUS: SUCCESSFUL"
+          echo "✅ BUILD STATUS: SUCCESSFUL (CI workflow completed successfully)"
           echo "✅ QUALITY CHECKS: PASSED"
           echo "✅ ARTIFACTS: READY"
           echo ""
@@ -47,6 +48,11 @@ jobs:
           echo "  📦 Package: Node.js Application"
           echo "  ⚡ Runtime: Node.js 22"
           echo "  🛡️ Data Protection: /data folder will be preserved"
+          echo ""
+          echo "💡 CI Workflow Info:"
+          echo "  📋 Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "  🆔 Run ID: ${{ github.event.workflow_run.id }}"
+          echo "  📝 Commit SHA: ${{ github.event.workflow_run.head_sha }}"
           echo ""
           echo "🚀 APPROVAL GRANTED - PROCEEDING WITH DEPLOYMENT"
           echo "=========================================="
