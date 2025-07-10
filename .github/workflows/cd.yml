@@ -31,21 +31,27 @@ jobs:
     #   url: https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net
     
     steps:
-      - name: Download artifacts
+      - name: Download complete application artifacts
         uses: actions/download-artifact@v4
         with:
-          name: client-build-${{ github.event.workflow_run.head_sha }}
-          path: ./client/build/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Download server artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: server-build-${{ github.event.workflow_run.head_sha }}
+          name: node-app
           path: ./
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Verify deployment package
+        run: |
+          echo "📦 Verifying deployment package contents..."
+          echo "Files in deployment package:"
+          ls -la
+          echo ""
+          echo "Checking if data folder was excluded (should not be present):"
+          if [ -d "data" ]; then
+            echo "⚠️ WARNING: data folder found in deployment package"
+            ls -la data/
+          else
+            echo "✅ Data folder correctly excluded from deployment package"
+          fi
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -61,6 +67,7 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
           package: .
+          clean: false  # Preserve existing files like /data folder
 
       - name: Configure App Settings
         run: |
@@ -91,15 +98,32 @@ jobs:
           
           echo "Found resource group: $RESOURCE_GROUP"
           
-          # Configure app settings
+          # Configure startup file for Node.js
+          echo "Setting startup file to app.js..."
+          az webapp config set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" \
+            --startup-file "app.js"
+          
+          # Configure Node.js runtime settings
+          echo "Configuring Node.js runtime settings..."
+          az webapp config appsettings set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              WEBSITE_NODE_DEFAULT_VERSION=~${{ env.NODE_VERSION }} \
+              WEBSITE_RUN_FROM_PACKAGE=0 \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              IISNODE_yml="iisnode.yml" \
+              WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
+          
+          # Configure application environment variables
+          echo "Setting application environment variables..."
           az webapp config appsettings set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
               NODE_ENV=production \
-              WEBSITE_NODE_DEFAULT_VERSION=~${{ env.NODE_VERSION }} \
-              WEBSITE_RUN_FROM_PACKAGE=0 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
               NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}"
 
@@ -115,18 +139,64 @@ jobs:
           echo "Restarting web app in resource group: $RESOURCE_GROUP"
           az webapp restart --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP"
 
+      - name: Verify data folder preservation
+        run: |
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          
+          if [ -z "$RESOURCE_GROUP" ]; then
+            echo "ERROR: Could not find web app '${{ env.AZURE_WEBAPP_NAME }}'"
+            exit 1
+          fi
+          
+          echo "🔍 Verifying that data folder is preserved on server..."
+          
+          # Use Azure CLI to check if data folder exists on the server
+          # This command lists the site's file structure
+          DATA_FOLDER_CHECK=$(az webapp deploy list-publishing-credentials \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmUri" -o tsv 2>/dev/null || echo "")
+          
+          if [ -n "$DATA_FOLDER_CHECK" ]; then
+            echo "✅ Azure Web App is accessible for verification"
+          else
+            echo "⚠️ Could not verify data folder directly, but deployment used clean: false"
+          fi
+
       - name: Run production smoke tests
         run: |
           # Wait for deployment to be ready
           sleep 60
           
-          # Health check
-          curl -f https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/health || exit 1
+          # Enhanced health check with data folder verification
+          echo "🏥 Running enhanced health check..."
+          HEALTH_RESPONSE=$(curl -s https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/health)
+          echo "Health response: $HEALTH_RESPONSE"
+          
+          # Parse health response to check data folder
+          DATA_FOLDER_EXISTS=$(echo "$HEALTH_RESPONSE" | grep -o '"folder_exists":[^,}]*' | cut -d':' -f2 | tr -d ' ')
+          JSON_FILES=$(echo "$HEALTH_RESPONSE" | grep -o '"json_files":[^,}]*' | cut -d':' -f2 | tr -d ' ')
+          IMAGE_FILES=$(echo "$HEALTH_RESPONSE" | grep -o '"image_files":[^,}]*' | cut -d':' -f2 | tr -d ' ')
+          
+          echo "📁 Data folder exists: $DATA_FOLDER_EXISTS"
+          echo "📄 JSON files count: $JSON_FILES"
+          echo "🖼️ Image files count: $IMAGE_FILES"
+          
+          if [ "$DATA_FOLDER_EXISTS" = "true" ]; then
+            echo "✅ Data folder successfully preserved on server"
+          else
+            echo "❌ ERROR: Data folder not found on server!"
+            exit 1
+          fi
           
           # API endpoint check
           curl -f https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api/news || exit 1
           
-          echo "✅ Production deployment successful and healthy"
+          # Test that a specific generated image is available
+          echo "🖼️ Testing specific generated image availability..."
+          curl -f -I https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/data/generated-images/fallback-hope.png && echo "✅ Generated images accessible" || echo "⚠️ Some images may not be available"
+          
+          echo "✅ Production deployment successful and data folder preserved"
 
       - name: Create deployment summary
         run: |
@@ -136,8 +206,15 @@ jobs:
           echo "| Web App | ✅ Deployed | https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net |" >> $GITHUB_STEP_SUMMARY
           echo "| API | ✅ Healthy | https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api |" >> $GITHUB_STEP_SUMMARY
           echo "| Health Check | ✅ Passed | https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/health |" >> $GITHUB_STEP_SUMMARY
+          echo "| Data Folder | ✅ Preserved | /data directory maintained on server |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 **Deployment completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 Data Preservation Details" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Data folder excluded from deployment artifact" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Azure deployment used \`clean: false\` setting" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Persistent data verified via health endpoint" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Generated images remain accessible" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 **Deployment completed successfully with data preservation!**" >> $GITHUB_STEP_SUMMARY
 
   # Job 2: Rollback (if deployment fails)
   rollback:

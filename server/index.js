@@ -54,6 +54,53 @@ const generatedImagesPath = path.join(__dirname, '../data/generated-images');
 app.use('/generated-images', express.static(generatedImagesPath));
 console.log('Generated images route configured:', generatedImagesPath);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const dataExists = fs.existsSync(dataDir);
+  const generatedImagesExists = fs.existsSync(generatedImagesDir);
+  
+  // Count JSON files and images
+  let jsonFileCount = 0;
+  let imageFileCount = 0;
+  
+  try {
+    if (dataExists) {
+      const files = fs.readdirSync(dataDir);
+      jsonFileCount = files.filter(file => file.endsWith('.json')).length;
+    }
+    
+    if (generatedImagesExists) {
+      const images = fs.readdirSync(generatedImagesDir);
+      const imagePattern = /\.(png|jpg|jpeg|gif)$/i;
+      imageFileCount = images.filter(file => imagePattern.test(file)).length;
+    }
+  } catch (error) {
+    console.error('Error reading directories for health check:', error);
+  }
+  
+  const health = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    server: {
+      node_version: process.version,
+      port: PORT,
+      env: process.env.NODE_ENV || 'development'
+    },
+    data: {
+      folder_exists: dataExists,
+      json_files: jsonFileCount,
+      generated_images_folder: generatedImagesExists,
+      image_files: imageFileCount
+    },
+    routes: {
+      news_api: true,
+      static_files: fs.existsSync(staticPath)
+    }
+  };
+  
+  res.json(health);
+});
+
 // Try to load news routes
 try {
   const newsRoutes = require('./routes/news');

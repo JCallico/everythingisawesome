@@ -30,7 +30,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Security audit
         run: npm audit --audit-level=high
@@ -44,7 +44,7 @@ jobs:
       - name: Setup client dependencies
         run: |
           cd client
-          npm ci
+          npm install
 
       - name: Lint client application
         run: |
@@ -54,7 +54,7 @@ jobs:
       - name: Setup mobile dependencies
         run: |
           cd mobile
-          npm ci
+          npm install
 
       - name: Lint mobile application
         run: |
@@ -82,7 +82,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run server tests
         run: npm test || echo "No server tests configured"
@@ -90,13 +90,13 @@ jobs:
       - name: Setup and test client
         run: |
           cd client
-          npm ci
+          npm install
           npm test -- --coverage --watchAll=false
 
       - name: Setup and test mobile
         run: |
           cd mobile
-          npm ci --legacy-peer-deps
+          npm install --legacy-peer-deps
           npm test -- --coverage --watchAll=false
 
       - name: Upload coverage reports
@@ -128,12 +128,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build client application
         run: |
           cd client
-          npm ci
+          npm install
           npm run build
 
       - name: Install Expo CLI
@@ -142,26 +142,21 @@ jobs:
       - name: Validate mobile application
         run: |
           cd mobile
-          npm ci
+          npm install
           npx expo config --type introspect
 
-      - name: Upload client build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: client-build-${{ github.sha }}
-          path: client/build/
-          retention-days: 30
+      - name: Prepare deployment artifact (exclude data folder)
+        run: |
+          echo "📦 Preparing deployment artifact..."
+          # Remove data folder to avoid overwriting persistent data on server
+          rm -rf data/
+          echo "✅ Data folder excluded from deployment artifact"
 
-      - name: Upload server artifacts
+      - name: Upload complete application for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: server-build-${{ github.sha }}
-          path: |
-            server/
-            app.js
-            package.json
-            package-lock.json
-            web.config
+          name: node-app
+          path: .
           retention-days: 30
 
       - name: Generate build summary
