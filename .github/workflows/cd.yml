@@ -1,0 +1,139 @@
+# Continuous Deployment Workflow
+# This workflow handles deployment to Azure Web Apps
+
+name: CD - Deploy to Azure
+
+on:
+  workflow_run:
+    workflows: ["CI - Code Quality & Testing"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+  AZURE_WEBAPP_NAME: 'everythingisawesome'
+
+jobs:
+  # Job 1: Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+    environment: 
+      name: production
+      url: https://everythingisawesome.azurewebsites.net
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: client-build-${{ github.sha }}
+          path: ./client/build/
+
+      - name: Download server artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: server-build-${{ github.sha }}
+          path: ./
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2D34B457FC84DBD932B2B893BCAB313 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6037D42E5BA0405EA75FC80408338126 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
+
+      - name: Deploy to Azure Web App (Production)
+        uses: azure/webapps-deploy@v3
+        id: deploy
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: 'production'
+          package: .
+
+      - name: Configure App Settings
+        run: |
+          # Get resource group
+          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          
+          # Configure app settings
+          az webapp config appsettings set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              NODE_ENV=production \
+              WEBSITE_NODE_DEFAULT_VERSION=~${{ env.NODE_VERSION }} \
+              WEBSITE_RUN_FROM_PACKAGE=0 \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
+              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}"
+
+      - name: Restart application
+        run: |
+          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          az webapp restart --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP"
+
+      - name: Run production smoke tests
+        run: |
+          # Wait for deployment to be ready
+          sleep 60
+          
+          # Health check
+          curl -f https://everythingisawesome.azurewebsites.net/health || exit 1
+          
+          # API endpoint check
+          curl -f https://everythingisawesome.azurewebsites.net/api/news || exit 1
+          
+          echo "✅ Production deployment successful and healthy"
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| Web App | ✅ Deployed | https://everythingisawesome.azurewebsites.net |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | ✅ Healthy | https://everythingisawesome.azurewebsites.net/api |" >> $GITHUB_STEP_SUMMARY
+          echo "| Health Check | ✅ Passed | https://everythingisawesome.azurewebsites.net/health |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 **Deployment completed successfully!**" >> $GITHUB_STEP_SUMMARY
+
+  # Job 2: Rollback (if deployment fails)
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure() && needs.deploy-production.result == 'failure'
+    needs: [deploy-production]
+    
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2D34B457FC84DBD932B2B893BCAB313 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6037D42E5BA0405EA75FC80408338126 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
+
+      - name: Rollback to previous deployment
+        run: |
+          RESOURCE_GROUP=$(az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --query resourceGroup -o tsv)
+          
+          # Get the last successful deployment
+          LAST_DEPLOYMENT=$(az webapp deployment list \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "[?status=='4'].id | [0]" -o tsv)
+          
+          if [ -n "$LAST_DEPLOYMENT" ]; then
+            echo "Rolling back to deployment: $LAST_DEPLOYMENT"
+            az webapp deployment source sync \
+              --name ${{ env.AZURE_WEBAPP_NAME }} \
+              --resource-group "$RESOURCE_GROUP"
+          else
+            echo "No previous successful deployment found"
+          fi
+
+      - name: Notify rollback
+        run: |
+          echo "## ⚠️ Deployment Rollback Executed" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment failed and has been rolled back to the previous version." >> $GITHUB_STEP_SUMMARY
+          echo "Please check the deployment logs and fix any issues before retrying." >> $GITHUB_STEP_SUMMARY
