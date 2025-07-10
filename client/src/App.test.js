@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 // Create a simple test component instead of testing the full App
@@ -20,18 +20,18 @@ describe('Application Tests', () => {
   });
 
   test('contains expected text content', () => {
-    const { getByText } = render(<SimpleComponent />);
+    render(<SimpleComponent />);
     
     // Check for expected content
-    expect(getByText('Everything Is Awesome')).toBeInTheDocument();
-    expect(getByText('Testing the application')).toBeInTheDocument();
+    expect(screen.getByText('Everything Is Awesome')).toBeInTheDocument();
+    expect(screen.getByText('Testing the application')).toBeInTheDocument();
   });
 
   test('renders with correct structure', () => {
-    const { getByTestId } = render(<SimpleComponent />);
+    render(<SimpleComponent />);
     
     // Check for the test id
-    const component = getByTestId('simple-component');
+    const component = screen.getByTestId('simple-component');
     expect(component).toBeInTheDocument();
   });
 });
