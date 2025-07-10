@@ -10,6 +10,11 @@ on:
     types: [completed]
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
 env:
   NODE_VERSION: '22'
   AZURE_WEBAPP_NAME: 'everythingisawesome'
