@@ -149,49 +149,43 @@ jobs:
         run: |
           echo "📦 Preparing clean deployment artifact..."
           
-          # Create a clean deployment directory
-          mkdir -p deployment-artifact
+          # Remove node_modules folders to avoid path length issues
+          echo "🗑️ Removing node_modules folders..."
+          rm -rf node_modules/
+          rm -rf client/node_modules/
+          rm -rf mobile/node_modules/
           
-          # Copy essential server files
-          cp -r server/ deployment-artifact/
-          cp app.js deployment-artifact/
-          cp package.json deployment-artifact/
-          cp package-lock.json deployment-artifact/
-          cp web.config deployment-artifact/
-          cp README.md deployment-artifact/
-          cp LICENSE deployment-artifact/
-          cp .deployment deployment-artifact/
-          cp deploy.cmd deployment-artifact/
-          
-          # Copy packages folder (contains shared libraries required by the app)
-          cp -r packages/ deployment-artifact/
-          
-          # Copy built client application to the expected location
-          mkdir -p deployment-artifact/client
-          cp -r client/build/ deployment-artifact/client/
+          # Remove packages/**/node_modules if they exist
+          find packages/ -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true
           
           # Remove data folder to avoid overwriting persistent data on server
           rm -rf data/
-          echo "✅ Data folder excluded from deployment artifact"
-          echo "✅ node_modules excluded from deployment artifact"
-          echo "✅ Packages folder included (shared libraries)"
-          echo "✅ Only production files included"
           
-          # Show what's in the deployment artifact
+          echo "✅ Data folder excluded from deployment artifact"
+          echo "✅ All node_modules folders excluded from deployment artifact"
+          echo "✅ All project files included in deployment artifact"
+          
+          # Show what's in the deployment artifact (excluding large directories)
           echo "📋 Deployment artifact contents:"
-          ls -la deployment-artifact/
+          ls -la
           echo ""
-          echo "📋 Client build contents:"
-          ls -la deployment-artifact/client/build/ || echo "No client build found"
+          echo "📋 Client directory:"
+          ls -la client/ || echo "No client directory found"
           echo ""
-          echo "📋 Packages contents:"
-          ls -la deployment-artifact/packages/ || echo "No packages found"
+          echo "📋 Mobile directory:"
+          ls -la mobile/ || echo "No mobile directory found"
+          echo ""
+          echo "📋 Server directory:"
+          ls -la server/ || echo "No server directory found"
+          echo ""
+          echo "📋 Packages directory:"
+          ls -la packages/ || echo "No packages directory found"
 
       - name: Upload production deployment artifact
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: deployment-artifact/
+          path: .
           retention-days: 30
 
       - name: Generate build summary
@@ -204,9 +198,9 @@ jobs:
           echo "| Server | ✅ Ready | ${{ env.NODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Deployment Artifact Optimizations" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Path Length Issue Fixed**: Excluded node_modules from artifact" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Clean Deployment**: Only production files included" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Shared Libraries**: Packages folder included for shared utilities" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Path Length Issue Fixed**: Excluded all node_modules folders from artifact" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Maintainable Approach**: Include all files, exclude only problematic directories" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Complete Project**: All source code, configs, and dependencies included" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Data Preservation**: Data folder excluded to preserve server data" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Azure Optimized**: Dependencies will be installed on Azure during deployment" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
