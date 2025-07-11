@@ -118,6 +118,7 @@ jobs:
           [ -f "deployment/.deployment" ] && echo "✅ .deployment file found" || echo "❌ .deployment file missing"
           [ -f "deployment/deploy.cmd" ] && echo "✅ deploy.cmd found" || echo "❌ deploy.cmd missing"
           [ -d "deployment/server" ] && echo "✅ server directory found" || echo "❌ server directory missing"
+          [ -d "deployment/packages" ] && echo "✅ packages directory found" || echo "❌ packages directory missing"
           [ -d "deployment/client/build" ] && echo "✅ client/build directory found" || echo "❌ client/build directory missing"
           
           # Show client build contents
@@ -125,6 +126,13 @@ jobs:
             echo ""
             echo "📋 Client build files:"
             ls -la deployment/client/build/
+          fi
+          
+          # Show packages contents
+          if [ -d "deployment/packages" ]; then
+            echo ""
+            echo "📋 Shared packages:"
+            ls -la deployment/packages/
           fi
 
       - name: Login to Azure

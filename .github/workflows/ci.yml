@@ -163,6 +163,9 @@ jobs:
           cp .deployment deployment-artifact/
           cp deploy.cmd deployment-artifact/
           
+          # Copy packages folder (contains shared libraries required by the app)
+          cp -r packages/ deployment-artifact/
+          
           # Copy built client application to the expected location
           mkdir -p deployment-artifact/client
           cp -r client/build/ deployment-artifact/client/
@@ -171,6 +174,7 @@ jobs:
           rm -rf data/
           echo "✅ Data folder excluded from deployment artifact"
           echo "✅ node_modules excluded from deployment artifact"
+          echo "✅ Packages folder included (shared libraries)"
           echo "✅ Only production files included"
           
           # Show what's in the deployment artifact
@@ -179,6 +183,9 @@ jobs:
           echo ""
           echo "📋 Client build contents:"
           ls -la deployment-artifact/client/build/ || echo "No client build found"
+          echo ""
+          echo "📋 Packages contents:"
+          ls -la deployment-artifact/packages/ || echo "No packages found"
 
       - name: Upload production deployment artifact
         uses: actions/upload-artifact@v4
@@ -199,6 +206,7 @@ jobs:
           echo "### 📦 Deployment Artifact Optimizations" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Path Length Issue Fixed**: Excluded node_modules from artifact" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Clean Deployment**: Only production files included" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Shared Libraries**: Packages folder included for shared utilities" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Data Preservation**: Data folder excluded to preserve server data" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Azure Optimized**: Dependencies will be installed on Azure during deployment" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
