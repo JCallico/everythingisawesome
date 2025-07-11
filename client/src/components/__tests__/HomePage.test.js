@@ -72,11 +72,33 @@ const mockNewsData = {
 const mockAvailableDates = ['2025-07-10', '2025-07-09', '2025-07-08'];
 
 describe('HomePage Component', () => {
+  let originalConsoleError;
+  
   beforeEach(() => {
     jest.clearAllMocks();
     fetchAvailableDates.mockResolvedValue(mockAvailableDates);
     // Reset URL parameters to empty (latest news route)
     __mockSetParams({});
+    
+    // Suppress React act warnings from console
+    originalConsoleError = console.error;
+    console.error = (...args) => {
+      const errorMessage = args[0];
+      if (
+        typeof errorMessage === 'string' && 
+        (errorMessage.includes('An update to HomePage inside a test was not wrapped in act(...)') ||
+         errorMessage.includes('act(...)')
+        )
+      ) {
+        return; // Suppress React act warnings
+      }
+      originalConsoleError(...args); // Log other errors normally
+    };
+  });
+  
+  afterEach(() => {
+    // Restore original console.error
+    console.error = originalConsoleError;
   });
 
   // Helper function to render component with router
@@ -113,6 +135,8 @@ describe('HomePage Component', () => {
     });
 
     test('handles latest news fetch error', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       fetchLatestNews.mockRejectedValue(new Error('API Error'));
       
       renderWithRouter('/');
@@ -122,6 +146,8 @@ describe('HomePage Component', () => {
       });
       
       expect(screen.getByText('Try Again')).toBeInTheDocument();
+      
+      consoleSpy.mockRestore();
     });
   });
 
@@ -150,6 +176,8 @@ describe('HomePage Component', () => {
     });
 
     test('handles date-specific news fetch error', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       __mockSetParams({ date: '2025-07-10' });
       fetchNewsByDate.mockRejectedValue(new Error('API Error'));
       
@@ -160,6 +188,8 @@ describe('HomePage Component', () => {
       });
       
       expect(screen.getByText('Back to Latest News')).toBeInTheDocument();
+      
+      consoleSpy.mockRestore();
     });
 
     test('handles invalid story index in URL', async () => {
@@ -243,6 +273,8 @@ describe('HomePage Component', () => {
     });
 
     test('retry button works for latest news error', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       fetchLatestNews.mockRejectedValueOnce(new Error('API Error'))
                    .mockResolvedValueOnce(mockNewsData);
       
@@ -260,6 +292,8 @@ describe('HomePage Component', () => {
       });
       
       expect(fetchLatestNews).toHaveBeenCalledTimes(2);
+      
+      consoleSpy.mockRestore();
     });
   });
 
@@ -275,6 +309,8 @@ describe('HomePage Component', () => {
     });
 
     test('handles available dates fetch error gracefully', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       fetchLatestNews.mockResolvedValue(mockNewsData);
       fetchAvailableDates.mockRejectedValue(new Error('API Error'));
       
@@ -288,6 +324,8 @@ describe('HomePage Component', () => {
       // Date selector should still work (just with empty dates)
       fireEvent.click(screen.getByText('Browse Dates'));
       expect(screen.getByTestId('date-selector-dates')).toHaveTextContent('0 dates');
+      
+      consoleSpy.mockRestore();
     });
   });
 

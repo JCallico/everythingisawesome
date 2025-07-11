@@ -131,6 +131,8 @@ describe('Disclaimer Component', () => {
   });
 
   test('handles error loading content', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    
     const { loadMarkdownContent } = require('@everythingisawesome/shared-docs');
     loadMarkdownContent.mockImplementationOnce(() => {
       throw new Error('Failed to load');
@@ -142,6 +144,8 @@ describe('Disclaimer Component', () => {
       expect(screen.getByText('Legal Disclaimer & Terms of Use')).toBeInTheDocument();
       expect(screen.getByText('Unable to load content at this time.')).toBeInTheDocument();
     });
+    
+    consoleSpy.mockRestore();
   });
 
   test('applies correct CSS classes', async () => {
