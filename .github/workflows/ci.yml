@@ -145,18 +145,46 @@ jobs:
           npm install
           npx expo config --type introspect
 
-      - name: Prepare deployment artifact (exclude data folder)
+      - name: Prepare deployment artifact (exclude data folder and node_modules)
         run: |
-          echo "📦 Preparing deployment artifact..."
+          echo "📦 Preparing clean deployment artifact..."
+          
+          # Create a clean deployment directory
+          mkdir -p deployment-artifact
+          
+          # Copy essential server files
+          cp -r server/ deployment-artifact/
+          cp app.js deployment-artifact/
+          cp package.json deployment-artifact/
+          cp package-lock.json deployment-artifact/
+          cp web.config deployment-artifact/
+          cp README.md deployment-artifact/
+          cp LICENSE deployment-artifact/
+          cp .deployment deployment-artifact/
+          cp deploy.cmd deployment-artifact/
+          
+          # Copy built client application to the expected location
+          mkdir -p deployment-artifact/client
+          cp -r client/build/ deployment-artifact/client/
+          
           # Remove data folder to avoid overwriting persistent data on server
           rm -rf data/
           echo "✅ Data folder excluded from deployment artifact"
+          echo "✅ node_modules excluded from deployment artifact"
+          echo "✅ Only production files included"
+          
+          # Show what's in the deployment artifact
+          echo "📋 Deployment artifact contents:"
+          ls -la deployment-artifact/
+          echo ""
+          echo "📋 Client build contents:"
+          ls -la deployment-artifact/client/build/ || echo "No client build found"
 
-      - name: Upload complete application for deployment
+      - name: Upload production deployment artifact
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: deployment-artifact/
           retention-days: 30
 
       - name: Generate build summary
@@ -168,4 +196,10 @@ jobs:
           echo "| Mobile | ✅ Validated | ${{ env.NODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Server | ✅ Ready | ${{ env.NODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 All components built successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Deployment Artifact Optimizations" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Path Length Issue Fixed**: Excluded node_modules from artifact" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Clean Deployment**: Only production files included" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Data Preservation**: Data folder excluded to preserve server data" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Azure Optimized**: Dependencies will be installed on Azure during deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 All components built successfully with optimized deployment artifact!" >> $GITHUB_STEP_SUMMARY

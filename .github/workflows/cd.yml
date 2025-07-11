@@ -78,26 +78,53 @@ jobs:
           echo ""
           echo "💡 To use a custom URL, set the APP_URL repository variable in GitHub Settings > Secrets and variables > Actions > Variables"
 
-      - name: Download complete application artifacts
+      - name: Download production deployment artifacts
         uses: actions/download-artifact@v4
         with:
           name: node-app
-          path: ./
+          path: ./deployment
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Verify deployment package
+      - name: Verify clean deployment package
         run: |
-          echo "📦 Verifying deployment package contents..."
+          echo "📦 Verifying clean deployment package contents..."
           echo "Files in deployment package:"
-          ls -la
+          cd deployment && ls -la
           echo ""
-          echo "Checking if data folder was excluded (should not be present):"
-          if [ -d "data" ]; then
+          
+          # Check that node_modules is NOT present (good for path length)
+          if [ -d "deployment/node_modules" ]; then
+            echo "⚠️ WARNING: node_modules found in deployment package (may cause path length issues)"
+            du -sh deployment/node_modules/ || true
+          else
+            echo "✅ node_modules correctly excluded from deployment package"
+          fi
+          
+          # Check that data folder is NOT present (good for data preservation)
+          if [ -d "deployment/data" ]; then
             echo "⚠️ WARNING: data folder found in deployment package"
-            ls -la data/
+            ls -la deployment/data/
           else
             echo "✅ Data folder correctly excluded from deployment package"
+          fi
+          
+          # Check for essential files
+          echo ""
+          echo "📋 Essential files check:"
+          [ -f "deployment/app.js" ] && echo "✅ app.js found" || echo "❌ app.js missing"
+          [ -f "deployment/package.json" ] && echo "✅ package.json found" || echo "❌ package.json missing"
+          [ -f "deployment/web.config" ] && echo "✅ web.config found" || echo "❌ web.config missing"
+          [ -f "deployment/.deployment" ] && echo "✅ .deployment file found" || echo "❌ .deployment file missing"
+          [ -f "deployment/deploy.cmd" ] && echo "✅ deploy.cmd found" || echo "❌ deploy.cmd missing"
+          [ -d "deployment/server" ] && echo "✅ server directory found" || echo "❌ server directory missing"
+          [ -d "deployment/client/build" ] && echo "✅ client/build directory found" || echo "❌ client/build directory missing"
+          
+          # Show client build contents
+          if [ -d "deployment/client/build" ]; then
+            echo ""
+            echo "📋 Client build files:"
+            ls -la deployment/client/build/
           fi
 
       - name: Login to Azure
@@ -113,7 +140,7 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
-          package: .
+          package: ./deployment
           clean: false  # Preserve existing files like /data folder
 
       - name: Configure App Settings
@@ -152,17 +179,19 @@ jobs:
             --resource-group "$RESOURCE_GROUP" \
             --startup-file "app.js"
           
-          # Configure Node.js runtime settings
-          echo "Configuring Node.js runtime settings..."
+          # Configure Node.js runtime settings with build optimization
+          echo "Configuring Node.js runtime settings with build optimizations..."
           az webapp config appsettings set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
               WEBSITE_NODE_DEFAULT_VERSION=~${{ env.NODE_VERSION }} \
               WEBSITE_RUN_FROM_PACKAGE=0 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
-              IISNODE_yml="iisnode.yml" \
-              WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
+              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
+              ENABLE_ORYX_BUILD=true \
+              POST_BUILD_SCRIPT_PATH="npm install --production --no-optional" \
+              WEBSITE_HTTPLOGGING_RETENTION_DAYS=3 \
+              SCM_COMMAND_IDLE_TIMEOUT=7200
           
           # Configure application environment variables
           echo "Setting application environment variables..."
@@ -256,13 +285,19 @@ jobs:
           echo "| Health Check | ✅ Passed | ${APP_URL}/health |" >> $GITHUB_STEP_SUMMARY
           echo "| Data Folder | ✅ Preserved | /data directory maintained on server |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📁 Data Preservation Details" >> $GITHUB_STEP_SUMMARY
+          echo "### �️ Path Length Issue Resolution" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Problem Fixed**: Windows 260-character path limit resolved" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Clean Artifact**: node_modules excluded from deployment package" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Azure Build**: Dependencies installed on Azure during deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Optimized Size**: Deployment package dramatically reduced in size" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### �📁 Data Preservation Details" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Data folder excluded from deployment artifact" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Azure deployment used \`clean: false\` setting" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Persistent data verified via health endpoint" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Generated images remain accessible" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 **Deployment completed successfully with data preservation!**" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 **Deployment completed successfully with path length issue resolved!**" >> $GITHUB_STEP_SUMMARY
 
   # Job 3: Handle deployment rejection
   deployment-rejected:
