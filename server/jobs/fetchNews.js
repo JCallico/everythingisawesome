@@ -6,7 +6,7 @@ import { saveNewsByDate, formatDateForFilename, getPreviousDate } from '../utils
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fuzzball from 'fuzzball';
+import * as fuzzball from 'fuzzball';
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -713,8 +713,8 @@ const fetchDailyNews = async (targetDate = null) => {
   }
 };
 
-// Allow manual execution
-if (require.main === module) {
+// Allow manual execution (ES module equivalent of require.main === module)
+if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('Manually fetching daily news...');
   
   // Check for command line argument for target date
