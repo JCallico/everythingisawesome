@@ -136,8 +136,8 @@ const HomeScreen = ({ navigation, route }) => {
       setNews(data);
       setError(null);
     } catch (err) {
+      console.error('Failed to load latest news:', err.message);
       setError('Failed to load latest news. Please try again later.');
-      // Error already handled by UI state
     } finally {
       setLoading(false);
     }
@@ -147,8 +147,9 @@ const HomeScreen = ({ navigation, route }) => {
     try {
       const dates = await fetchAvailableDates();
       setAvailableDates(dates || []);
-    } catch (err) {
-      // Error already handled by UI state
+    } catch (error) {
+      console.warn('Failed to load available dates:', error.message);
+      // UI will show empty dates - not critical
     }
   };
 
@@ -161,8 +162,8 @@ const HomeScreen = ({ navigation, route }) => {
       setCurrentDate(date);
       setError(null);
     } catch (err) {
+      console.error(`Failed to load news for ${date}:`, err.message);
       setError(`Failed to load news for ${date}. Please try again later.`);
-      // Error already handled by UI state
     } finally {
       setLoading(false);
     }
@@ -239,6 +240,7 @@ const HomeScreen = ({ navigation, route }) => {
         Alert.alert('Error', 'Unable to open this link');
       }
     } catch (error) {
+      console.warn('Failed to open link:', error.message);
       Alert.alert('Error', 'Failed to open link');
     }
   };
@@ -255,7 +257,7 @@ const HomeScreen = ({ navigation, route }) => {
         url: story.link
       });
     } catch (error) {
-      // Error already handled by Alert
+      console.warn('Failed to share story:', error.message);
       Alert.alert('Share Error', 'Unable to share story at this time');
     }
   };

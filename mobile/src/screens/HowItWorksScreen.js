@@ -40,6 +40,7 @@ const HowItWorksScreen = ({ navigation }) => {
       const markdownContent = loadMarkdownContent('how-it-works.md');
       setContent(markdownContent);
     } catch (error) {
+      console.warn('Failed to load how-it-works.md:', error.message);
       setContent({
         title: 'How "Everything Is Awesome News" Works',
         sections: [{

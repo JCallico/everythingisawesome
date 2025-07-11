@@ -1,10 +1,16 @@
-require('dotenv').config();
-const axios = require('axios');
-const moment = require('moment');
-const { saveNewsByDate, formatDateForFilename, getPreviousDate } = require('../utils/newsUtils');
-const fs = require('fs-extra');
-const path = require('path');
-const fuzz = require('fuzzball');
+import dotenv from 'dotenv';
+dotenv.config();
+import axios from 'axios';
+import moment from 'moment';
+import { saveNewsByDate, formatDateForFilename, getPreviousDate } from '../utils/newsUtils.js';
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fuzzball from 'fuzzball';
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const NEWSAPI_URL = 'https://newsapi.org/v2/everything';
@@ -454,23 +460,23 @@ const isDuplicateStory = (story1, story2, threshold = 70) => {
   // No hardcoded keywords - works for any type of content
   
   // Test multiple fuzzy matching approaches for maximum accuracy
-  const titleRatio = fuzz.ratio(story1.title, story2.title);
-  const titlePartialRatio = fuzz.partial_ratio(story1.title, story2.title);
-  const titleTokenSort = fuzz.token_sort_ratio(story1.title, story2.title);
-  const titleTokenSet = fuzz.token_set_ratio(story1.title, story2.title);
+  const titleRatio = fuzzball.ratio(story1.title, story2.title);
+  const titlePartialRatio = fuzzball.partial_ratio(story1.title, story2.title);
+  const titleTokenSort = fuzzball.token_sort_ratio(story1.title, story2.title);
+  const titleTokenSet = fuzzball.token_set_ratio(story1.title, story2.title);
   
-  const summaryRatio = fuzz.ratio(story1.summary, story2.summary);
-  const summaryPartialRatio = fuzz.partial_ratio(story1.summary, story2.summary);
-  const summaryTokenSort = fuzz.token_sort_ratio(story1.summary, story2.summary);
-  const summaryTokenSet = fuzz.token_set_ratio(story1.summary, story2.summary);
+  const summaryRatio = fuzzball.ratio(story1.summary, story2.summary);
+  const summaryPartialRatio = fuzzball.partial_ratio(story1.summary, story2.summary);
+  const summaryTokenSort = fuzzball.token_sort_ratio(story1.summary, story2.summary);
+  const summaryTokenSet = fuzzball.token_set_ratio(story1.summary, story2.summary);
   
   // Combined text analysis for comprehensive comparison
   const text1 = `${story1.title} ${story1.summary}`;
   const text2 = `${story2.title} ${story2.summary}`;
-  const combinedRatio = fuzz.ratio(text1, text2);
-  const combinedPartialRatio = fuzz.partial_ratio(text1, text2);
-  const combinedTokenSort = fuzz.token_sort_ratio(text1, text2);
-  const combinedTokenSet = fuzz.token_set_ratio(text1, text2);
+  const combinedRatio = fuzzball.ratio(text1, text2);
+  const combinedPartialRatio = fuzzball.partial_ratio(text1, text2);
+  const combinedTokenSort = fuzzball.token_sort_ratio(text1, text2);
+  const combinedTokenSet = fuzzball.token_set_ratio(text1, text2);
   
   // Find the best score across all methods
   const allScores = [
@@ -727,4 +733,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { fetchDailyNews };
+export { fetchDailyNews };

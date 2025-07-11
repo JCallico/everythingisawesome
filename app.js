@@ -7,4 +7,4 @@ console.log('Platform:', process.platform);
 console.log('Working directory:', process.cwd());
 
 // Start the main application
-require('./server/index.js');
+import('./server/index.js');

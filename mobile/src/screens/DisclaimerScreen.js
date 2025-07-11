@@ -50,6 +50,7 @@ const DisclaimerScreen = ({ navigation }) => {
       const markdownContent = loadMarkdownContent('disclaimer.md');
       setContent(markdownContent);
     } catch (error) {
+      console.warn('Failed to load disclaimer.md:', error.message);
       setContent({
         title: 'Legal Disclaimer & Terms of Use',
         sections: [{

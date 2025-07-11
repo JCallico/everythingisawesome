@@ -1,6 +1,11 @@
-const fs = require('fs-extra');
-const path = require('path');
-const moment = require('moment');
+import fs from 'fs-extra';
+import path from 'path';
+import moment from 'moment';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_DIR = path.join(__dirname, '../../data');
 
@@ -75,7 +80,7 @@ const getPreviousDate = (date) => {
   return moment(date).subtract(1, 'day').format('YYYY-MM-DD');
 };
 
-module.exports = {
+export {
   getAvailableDates,
   getNewsByDate,
   getLatestNews,

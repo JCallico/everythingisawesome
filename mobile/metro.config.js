@@ -17,6 +17,14 @@ config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, '../node_modules'),
 ];
 
+// Exclude server files from being bundled
+const exclusionList = require('metro-config/src/defaults/exclusionList');
+config.resolver.blockList = exclusionList([
+  /.*\/server\/.*/,
+  /server\/.*/,
+  new RegExp(path.resolve(__dirname, '../server') + '/.*'),
+]);
+
 // Ensure Metro can resolve the shared packages
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 

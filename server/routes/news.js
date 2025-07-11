@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { getAvailableDates, getNewsByDate, getLatestNews } from '../utils/newsUtils.js';
+
 const router = express.Router();
-const { getAvailableDates, getNewsByDate, getLatestNews } = require('../utils/newsUtils');
 
 // Get all available dates
 router.get('/dates', async (req, res) => {
@@ -42,4 +43,4 @@ router.get('/latest', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

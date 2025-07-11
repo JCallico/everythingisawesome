@@ -140,7 +140,8 @@ function calculateTotalSize(imageFiles) {
       const stats = fs.statSync(imagePath);
       totalSize += stats.size;
     } catch (error) {
-      // Skip files that can't be accessed
+      console.warn(`Warning: Could not access file ${image}:`, error.message);
+      // Continue with next file
     }
   }
     
