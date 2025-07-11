@@ -94,17 +94,17 @@ jobs:
           echo ""
           
           # Check that node_modules is NOT present (good for path length)
-          if [ -d "deployment/node_modules" ]; then
+          if [ -d "node_modules" ]; then
             echo "⚠️ WARNING: node_modules found in deployment package (may cause path length issues)"
-            du -sh deployment/node_modules/ || true
+            du -sh node_modules/ || true
           else
             echo "✅ node_modules correctly excluded from deployment package"
           fi
           
           # Check that data folder is NOT present (good for data preservation)
-          if [ -d "deployment/data" ]; then
+          if [ -d "data" ]; then
             echo "⚠️ WARNING: data folder found in deployment package"
-            ls -la deployment/data/
+            ls -la data/
           else
             echo "✅ Data folder correctly excluded from deployment package"
           fi
@@ -112,27 +112,27 @@ jobs:
           # Check for essential files
           echo ""
           echo "📋 Essential files check:"
-          [ -f "deployment/app.js" ] && echo "✅ app.js found" || echo "❌ app.js missing"
-          [ -f "deployment/package.json" ] && echo "✅ package.json found" || echo "❌ package.json missing"
-          [ -f "deployment/web.config" ] && echo "✅ web.config found" || echo "❌ web.config missing"
-          [ -f "deployment/.deployment" ] && echo "✅ .deployment file found" || echo "❌ .deployment file missing"
-          [ -f "deployment/deploy.cmd" ] && echo "✅ deploy.cmd found" || echo "❌ deploy.cmd missing"
-          [ -d "deployment/server" ] && echo "✅ server directory found" || echo "❌ server directory missing"
-          [ -d "deployment/packages" ] && echo "✅ packages directory found" || echo "❌ packages directory missing"
-          [ -d "deployment/client/build" ] && echo "✅ client/build directory found" || echo "❌ client/build directory missing"
+          [ -f "app.js" ] && echo "✅ app.js found" || echo "❌ app.js missing"
+          [ -f "package.json" ] && echo "✅ package.json found" || echo "❌ package.json missing"
+          [ -f "web.config" ] && echo "✅ web.config found" || echo "❌ web.config missing"
+          [ -f ".deployment" ] && echo "✅ .deployment file found" || echo "❌ .deployment file missing"
+          [ -f "deploy.cmd" ] && echo "✅ deploy.cmd found" || echo "❌ deploy.cmd missing"
+          [ -d "server" ] && echo "✅ server directory found" || echo "❌ server directory missing"
+          [ -d "packages" ] && echo "✅ packages directory found" || echo "❌ packages directory missing"
+          [ -d "client/build" ] && echo "✅ client/build directory found" || echo "❌ client/build directory missing"
           
           # Show client build contents
-          if [ -d "deployment/client/build" ]; then
+          if [ -d "client/build" ]; then
             echo ""
             echo "📋 Client build files:"
-            ls -la deployment/client/build/
+            ls -la client/build/
           fi
           
           # Show packages contents
-          if [ -d "deployment/packages" ]; then
+          if [ -d "packages" ]; then
             echo ""
             echo "📋 Shared packages:"
-            ls -la deployment/packages/
+            ls -la packages/
           fi
 
       - name: Login to Azure
