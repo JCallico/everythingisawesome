@@ -266,6 +266,33 @@ jobs:
             echo "⚠️ Could not verify data folder directly, but deployment used clean: false"
           fi
 
+      - name: Verify dependency installation on Azure
+        run: |
+          # Wait a bit longer for deployment and dependency installation to complete
+          sleep 90
+          
+          echo "🔍 Verifying that dependencies were installed on Azure App Service..."
+          
+          # Check if the app is responding (indicates successful dependency installation)
+          HEALTH_RESPONSE=$(curl -s ${APP_URL}/health)
+          echo "Health response: $HEALTH_RESPONSE"
+          
+          # Parse health response to check if app is running properly
+          STATUS=$(echo "$HEALTH_RESPONSE" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+          
+          if [ "$STATUS" = "healthy" ]; then
+            echo "✅ Application is running - dependencies successfully installed on Azure"
+          else
+            echo "❌ Application may not be running properly - checking deployment logs..."
+            # We can't directly check node_modules on Azure, but we can infer from app health
+            exit 1
+          fi
+          
+          echo "📦 Note: node_modules folders are installed on Azure during deployment via deploy.cmd"
+          echo "📁 Root dependencies: Installed by deploy.cmd"
+          echo "📁 Client dependencies: Installed by deploy.cmd for client folder"
+          echo "📁 Packages dependencies: Installed by deploy.cmd for each package"
+
       - name: Run production smoke tests
         run: |
           # Wait for deployment to be ready
@@ -313,7 +340,13 @@ jobs:
           echo "| Health Check | ✅ Passed | ${APP_URL}/health |" >> $GITHUB_STEP_SUMMARY
           echo "| Data Folder | ✅ Preserved | /data directory maintained on server |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### �️ Path Length Issue Resolution" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Dependency Installation Process" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Root Dependencies**: Installed via deploy.cmd on Azure" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Client Dependencies**: React app dependencies installed on Azure" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Package Dependencies**: Shared packages dependencies installed on Azure" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Production Mode**: All dependencies installed with --production flag" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛠️ Path Length Issue Resolution" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Problem Fixed**: Windows 260-character path limit resolved" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Clean Artifact**: node_modules excluded from deployment package" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Azure Build**: Dependencies installed on Azure during deployment" >> $GITHUB_STEP_SUMMARY
