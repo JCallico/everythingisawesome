@@ -50,7 +50,8 @@ function ThemeHandler() {
   return null;
 }
 
-function App() {
+// Separate AppContent component for testing
+export function AppContent() {
   // Handle dynamic viewport height for mobile browsers
   useEffect(() => {
     const setVH = () => {
@@ -77,29 +78,35 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="App">
-        <ThemeHandler />
-        
-        {/* Floating particles background */}
-        <div className="particles">
-          {[...Array(9)].map((_, i) => (
-            <div key={i} className="particle"></div>
-          ))}
-        </div>
-
-        <Header />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/:date" element={<HomePage />} />
-            <Route path="/:date/:storyIndex" element={<HomePage />} />
-            <Route path="/disclaimer" element={<Disclaimer />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-          </Routes>
-          <Footer />
-        </main>
+    <div className="App">
+      <ThemeHandler />
+      
+      {/* Floating particles background */}
+      <div className="particles">
+        {[...Array(9)].map((_, i) => (
+          <div key={i} className="particle"></div>
+        ))}
       </div>
+
+      <Header />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:date" element={<HomePage />} />
+          <Route path="/:date/:storyIndex" element={<HomePage />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+        </Routes>
+        <Footer />
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
