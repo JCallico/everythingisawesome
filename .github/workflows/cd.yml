@@ -267,7 +267,7 @@ jobs:
           fi
           
           # API endpoint check
-          curl -f ${APP_URL}/api/news || exit 1
+          curl -f ${APP_URL}/api/news/latest || exit 1
           
           # Test that a specific generated image is available
           echo "🖼️ Testing specific generated image availability..."
@@ -281,7 +281,8 @@ jobs:
           echo "| Component | Status | URL |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
           echo "| Web App | ✅ Deployed | ${APP_URL} |" >> $GITHUB_STEP_SUMMARY
-          echo "| API | ✅ Healthy | ${APP_URL}/api |" >> $GITHUB_STEP_SUMMARY
+          echo "| API (Latest News) | ✅ Healthy | ${APP_URL}/api/news/latest |" >> $GITHUB_STEP_SUMMARY
+          echo "| API (Dates) | ✅ Healthy | ${APP_URL}/api/news/dates |" >> $GITHUB_STEP_SUMMARY
           echo "| Health Check | ✅ Passed | ${APP_URL}/health |" >> $GITHUB_STEP_SUMMARY
           echo "| Data Folder | ✅ Preserved | /data directory maintained on server |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
