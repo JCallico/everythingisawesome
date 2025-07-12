@@ -32,19 +32,19 @@ jobs:
       - name: Install root dependencies
         run: |
           echo "📦 Installing root dependencies..."
-          npm install
+          npm install --flat
           echo "✅ Root dependencies installed successfully"
 
       - name: Install client dependencies
         run: |
           echo "📦 Installing client dependencies..."
-          cd client && npm install
+          cd client && npm install --flat
           echo "✅ Client dependencies installed successfully"
 
       - name: Install mobile dependencies
         run: |
           echo "📦 Installing mobile dependencies..."
-          cd mobile && npm install
+          cd mobile &&  npm install --flat
           echo "✅ Mobile dependencies installed successfully"
 
       - name: Lint root application
