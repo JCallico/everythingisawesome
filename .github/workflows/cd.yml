@@ -63,6 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deployment-approval]
     if: github.ref == 'refs/heads/main' && needs.deployment-approval.result == 'success'
+    # Enable debug logging for this job
+    env:
+      ACTIONS_STEP_DEBUG: true
+      ACTIONS_RUNNER_DEBUG: true
     # Temporarily remove environment to fix federated identity subject mismatch
     # environment: 
     #   name: production
@@ -135,6 +139,19 @@ jobs:
           [ -d "client" ] && echo "✅ client directory found" || echo "❌ client directory missing"
           [ -d "client/build" ] && echo "✅ client/build directory found" || echo "❌ client/build directory missing"
           
+          # Show contents of deployment configuration files
+          echo ""
+          echo "📋 Deployment configuration:"
+          if [ -f ".deployment" ]; then
+            echo "Contents of .deployment file:"
+            cat .deployment
+          fi
+          if [ -f "deploy.cmd" ]; then
+            echo ""
+            echo "Deploy.cmd file exists (Azure will execute this for custom deployment)"
+            echo "Deploy.cmd size: $(wc -c < deploy.cmd) bytes"
+          fi
+          
           # Show key directory contents
           if [ -d "client/build" ]; then
             echo ""
@@ -161,6 +178,22 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6037D42E5BA0405EA75FC80408338126 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
 
+      - name: Enable deployment debugging
+        run: |
+          echo "🔍 Enabling detailed deployment logging..."
+          echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+          echo "ACTIONS_RUNNER_DEBUG=true" >> $GITHUB_ENV
+          
+          # Show pre-deployment Azure context
+          echo "📋 Pre-deployment Azure context:"
+          az account show
+          echo ""
+          echo "📋 Web app current state:"
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          if [ -n "$RESOURCE_GROUP" ]; then
+            az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP" --query "{name:name, state:state, hostNames:hostNames}" -o table
+          fi
+
       - name: Deploy to Azure Web App (Production)
         uses: azure/webapps-deploy@v3
         id: deploy
@@ -169,6 +202,36 @@ jobs:
           slot-name: 'production'
           package: ./deployment
           clean: false  # Preserve existing files like /data folder
+          # Enable detailed logging
+          startup-command: 'node app.js'
+        env:
+          # Enable debug logging for the deployment action
+          ACTIONS_STEP_DEBUG: true
+          # Enable verbose Azure CLI logging
+          AZURE_HTTP_USER_AGENT: "GitHubActions-EverythingIsAwesome"
+
+      - name: Capture deployment details
+        run: |
+          echo "📊 Deployment completed with details:"
+          echo "Deployment ID: ${{ steps.deploy.outputs.webapp-url }}"
+          echo "App URL: ${{ steps.deploy.outputs.webapp-url }}"
+          
+          # Get resource group
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup" -o tsv)
+          
+          if [ -n "$RESOURCE_GROUP" ]; then
+            echo ""
+            echo "📋 Post-deployment app status:"
+            az webapp show --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP" --query "{name:name, state:state, hostNames:hostNames}" -o table
+            
+            echo ""
+            echo "📋 Recent deployment logs (last 5):"
+            az webapp log deployment list --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP" --query "[0:4].{id:id, status:status, message:message, receivedTime:receivedTime}" -o table || echo "Could not retrieve deployment logs"
+            
+            echo ""
+            echo "📋 App settings related to deployment:"
+            az webapp config appsettings list --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group "$RESOURCE_GROUP" --query "[?contains(name, 'SCM') || contains(name, 'ORYX') || contains(name, 'BUILD')].{name:name, value:value}" -o table
+          fi
 
       - name: Configure App Settings
         run: |
@@ -206,8 +269,8 @@ jobs:
             --resource-group "$RESOURCE_GROUP" \
             --startup-file "app.js"
           
-          # Configure Node.js runtime settings with build optimization
-          echo "Configuring Node.js runtime settings with build optimizations..."
+          # Configure Node.js runtime settings for custom deployment
+          echo "Configuring Node.js runtime settings for custom deployment script..."
           az webapp config appsettings set \
             --name ${{ env.AZURE_WEBAPP_NAME }} \
             --resource-group "$RESOURCE_GROUP" \
@@ -216,7 +279,6 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE=0 \
               SCM_DO_BUILD_DURING_DEPLOYMENT=true \
               ENABLE_ORYX_BUILD=true \
-              POST_BUILD_SCRIPT_PATH="npm install --production --no-optional" \
               WEBSITE_HTTPLOGGING_RETENTION_DAYS=3 \
               SCM_COMMAND_IDLE_TIMEOUT=7200
           
@@ -341,10 +403,12 @@ jobs:
           echo "| Data Folder | ✅ Preserved | /data directory maintained on server |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔧 Dependency Installation Process" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Custom Deployment**: Uses .deployment file to trigger deploy.cmd" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Root Dependencies**: Installed via deploy.cmd on Azure" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Client Dependencies**: React app dependencies installed on Azure" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Package Dependencies**: Shared packages dependencies installed on Azure" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Production Mode**: All dependencies installed with --production flag" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 **Debug Logging**: Enabled verbose deployment logging for troubleshooting" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🛠️ Path Length Issue Resolution" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Problem Fixed**: Windows 260-character path limit resolved" >> $GITHUB_STEP_SUMMARY
