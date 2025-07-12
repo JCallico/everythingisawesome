@@ -202,8 +202,6 @@ jobs:
           slot-name: 'production'
           package: ./deployment
           clean: false  # Preserve existing files like /data folder
-          # Enable detailed logging
-          startup-command: 'node app.js'
         env:
           # Enable debug logging for the deployment action
           ACTIONS_STEP_DEBUG: true

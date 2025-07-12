@@ -121,6 +121,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify repository contents
+        run: |
+          echo "🔍 Verifying critical files are present after checkout..."
+          
+          # Check for deployment files
+          [ -f ".deployment" ] && echo "✅ .deployment file found" || echo "❌ .deployment file missing from repo"
+          [ -f "deploy.cmd" ] && echo "✅ deploy.cmd file found" || echo "❌ deploy.cmd file missing from repo"
+          [ -f "web.config" ] && echo "✅ web.config file found" || echo "❌ web.config file missing from repo"
+          
+          # Show hidden files in root
+          echo ""
+          echo "📋 Hidden files in repository root:"
+          ls -la | grep "^\\." | head -10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -165,7 +179,21 @@ jobs:
           echo "✅ All node_modules folders excluded from deployment artifact"
           echo "✅ All project files included in deployment artifact"
           
+          # Verify critical deployment files are present
+          echo "🔍 Verifying critical deployment files:"
+          [ -f ".deployment" ] && echo "✅ .deployment file present" || echo "❌ .deployment file missing"
+          [ -f "deploy.cmd" ] && echo "✅ deploy.cmd file present" || echo "❌ deploy.cmd file missing"
+          [ -f "web.config" ] && echo "✅ web.config file present" || echo "❌ web.config file missing"
+          [ -f "app.js" ] && echo "✅ app.js file present" || echo "❌ app.js file missing"
+          [ -f "package.json" ] && echo "✅ package.json file present" || echo "❌ package.json file missing"
+          
+          # Show what hidden files are included
+          echo ""
+          echo "📋 Hidden files in artifact (starting with .):"
+          ls -la | grep "^\." || echo "No hidden files found"
+          
           # Show what's in the deployment artifact (excluding large directories)
+          echo ""
           echo "📋 Deployment artifact contents:"
           ls -la
           echo ""
@@ -180,6 +208,33 @@ jobs:
           echo ""
           echo "📋 Packages directory:"
           ls -la packages/ || echo "No packages directory found"
+
+      - name: Final verification before artifact upload
+        run: |
+          echo "🔍 Final verification before creating deployment artifact..."
+          
+          # Double-check critical files exist
+          echo "Critical deployment files verification:"
+          if [ -f ".deployment" ]; then
+            echo "✅ .deployment file exists"
+            echo "Contents:"
+            cat .deployment
+          else
+            echo "❌ ERROR: .deployment file missing!"
+            exit 1
+          fi
+          
+          if [ -f "deploy.cmd" ]; then
+            echo "✅ deploy.cmd file exists ($(wc -c < deploy.cmd) bytes)"
+          else
+            echo "❌ ERROR: deploy.cmd file missing!"
+            exit 1
+          fi
+          
+          # Show all files that will be included (including hidden files)
+          echo ""
+          echo "📋 All files to be included in artifact:"
+          find . -type f ! -path "./data/*" ! -path "./node_modules/*" ! -path "./client/node_modules/*" ! -path "./mobile/node_modules/*" ! -path "./packages/*/node_modules/*" | sort
 
       - name: Upload production deployment artifact
         uses: actions/upload-artifact@v4
