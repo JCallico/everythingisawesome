@@ -12,15 +12,15 @@ jest.mock('expo-haptics', () => ({
     Light: 'light',
     Medium: 'medium',
     Heavy: 'heavy',
-  },
+  }
 }));
 
 jest.mock('expo-linear-gradient', () => ({
-  LinearGradient: 'LinearGradient',
-}));
+  LinearGradient: 'LinearGradient'
+}))
 
 jest.mock('expo-status-bar', () => ({
-  StatusBar: 'StatusBar',
+  StatusBar: 'StatusBar'
 }));
 
 // Mock React Navigation
@@ -29,24 +29,24 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: jest.fn(),
     goBack: jest.fn(),
-    dispatch: jest.fn(),
+    dispatch: jest.fn()
   }),
   useRoute: () => ({
-    params: {},
+    params: {}
   }),
-  useFocusEffect: jest.fn(),
+  useFocusEffect: jest.fn()
 }));
 
 jest.mock('@react-navigation/stack', () => ({
   createStackNavigator: () => ({
     Navigator: ({ children }) => children,
-    Screen: ({ children }) => children,
-  }),
+    Screen: ({ children }) => children
+  })
 }));
 
 // Mock safe area
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }) => children,
   SafeAreaView: ({ children }) => children,
-  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 })
 }));
