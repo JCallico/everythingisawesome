@@ -3,7 +3,7 @@
 
 // Mock Expo modules that are commonly used
 jest.mock('expo-blur', () => ({
-  BlurView: 'BlurView',
+  BlurView: 'BlurView'
 }));
 
 jest.mock('expo-haptics', () => ({
@@ -11,13 +11,13 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: {
     Light: 'light',
     Medium: 'medium',
-    Heavy: 'heavy',
+    Heavy: 'heavy'
   }
 }));
 
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: 'LinearGradient'
-}))
+}));
 
 jest.mock('expo-status-bar', () => ({
   StatusBar: 'StatusBar'
