@@ -133,9 +133,18 @@ jobs:
             echo "⚠️ No root tests found or tests not configured - skipping"
           fi
           
+          # Test client application
+          echo "Testing client application..."
+          cd client
+          if npm run test 2>/dev/null; then
+            echo "✅ Client tests passed"
+          else
+            echo "⚠️ No client tests found or tests not configured - skipping"
+          fi
+
           # Test mobile application
-          echo "Testing mobile application..."
-          cd mobile
+          echo "Testing mobile application..."          
+          cd ../mobile
           if npm run test 2>/dev/null; then
             echo "✅ Mobile tests passed"
           else
