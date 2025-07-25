@@ -6,7 +6,7 @@ A beautiful cross-platform application displaying optimistic, feel-good news sto
 
 ## 📱 Cross-Platform Architecture
 
-This monorepo contains three main components:
+This monorepo contains four main components:
 
 ### 🌐 Web Application (`/client`)
 - **React 19** web application
@@ -30,10 +30,19 @@ This monorepo contains three main components:
 - AI-powered news analysis
 - Shared by both web and mobile clients
 
-### 🔄 Shared Libraries (`/shared`)
-- Common utilities and types
-- API service layer
-- Business logic components
+### 🔄 Shared Libraries (`/packages`)
+- **shared-api** - Platform-agnostic API layer
+- **shared-components** - Reusable UI components
+- **shared-constants** - Application constants
+- **shared-docs** - Documentation utilities
+- **shared-hooks** - Custom React hooks
+- **shared-types** - Type definitions
+- **shared-utils** - Common utility functions
+- **shared** - Core shared functionality
+
+**Here's how the application looks across platforms:**
+
+![Everything Is Awesome - Web and Mobile Preview](docs/EverythingIsAwesomeWebAndMobile.jpg)
 
 ## 💻 Tech Stack
 
@@ -53,10 +62,11 @@ This monorepo contains three main components:
 - **dotenv** - Environment variable management
 
 ### AI & APIs
-- **Grok-3-latest** - X.AI's latest model for sentiment analysis and summarization
-- **Grok Image Generation** - AI-powered custom image creation
-- **NewsAPI** - Real-time news data from 100+ sources
-- **Advanced Prompting** - Sophisticated AI prompt engineering
+- **Grok-3-latest** - X.AI's most advanced model for enhanced sentiment analysis with anti-commercial filtering
+- **Grok-2-image** - AI-powered custom image generation based on story themes
+- **NewsAPI** - Real-time news data from 100+ diverse sources
+- **Advanced Prompting** - Specialized AI prompt engineering to distinguish genuine content from promotional material
+- **Generic Duplicate Detection** - Fuzzy string matching algorithms with scientifically optimized thresholds
 
 ### Cloud & DevOps
 - **Azure Web App** - Production hosting (Windows App Service Plan)
@@ -76,32 +86,18 @@ This monorepo contains three main components:
 - **Git** - Version control with GitHub integration
 - **VS Code** - Recommended development environment
 
-## 📊 Current Status
-
-**Live Application**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
-
-**Data Coverage**: June 1-17, 2025 (17 days)  
-**Image Collection**: 180+ AI-generated story images + 9 themed fallbacks  
-**Algorithm Version**: Multi-step AI analysis with Grok-3-latest + Generic Duplicate Detection  
-**Source Diversity**: 100+ news sources (filter disabled for maximum variety)  
-**Processing Capacity**: Up to 100 articles per day (limited to 50 for cost management)  
-**Success Rate**: ~10% articles pass all quality filters  
-**Average Awesome Index**: 85-90 for top stories  
-**Deployment**: Automated CI/CD with data persistence  e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
-
-![Website Preview](https://via.placeholder.com/800x400/667eea/white?text=Everything+Is+Awesome+News)
-
 ## ✨ Features
 
 ### 🌐 Web Application
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
-- **AI-Powered Analysis**: Uses Grok-3-latest for sentiment analysis and intelligent summarization
-- **AI-Generated Images**: Custom images generated using Grok's AI image generation for each story
-- **Smart Ranking System**: Advanced awesome_index algorithm (50-100 scale) combining sentiment scores and positive keywords
-- **Diverse Content Coverage**: Technology, science, culture, health, environment, and finance stories
+- **Advanced AI Curation**: Uses Grok-3-latest with specialized prompts to distinguish genuine inspiring content from commercial promotions
+- **AI-Generated Images**: Custom images generated using Grok-2-image based on story themes with fallback category images
+- **Proprietary Awesome Index**: Advanced 6-step algorithm (50-100 scale) with anti-commercial filtering and duplicate detection
+- **Generic Duplicate Detection**: Advanced fuzzy string matching using 12 similarity algorithms with 100% accuracy on test data
+- **Content Quality Assurance**: Multi-stage filtering eliminates promotional content, maintains 40+ positivity threshold
 - **Modern UI**: Glassmorphism design with smooth animations and responsive layout
 - **Smart Navigation**: Browse between different days with intuitive controls
-- **Automated Collection**: Configurable news fetching with robust error handling
+- **Automated Collection**: Daily processing with robust error handling and source diversity
 - **Azure Cloud Deployment**: Production-ready deployment on Azure Web App with CI/CD
 - **Persistent Data Storage**: Generated images and news data persist between deployments
 - **Source Flexibility**: Optional filtering by reputable sources (currently disabled for maximum diversity)
@@ -169,6 +165,8 @@ npm run build
 # Build mobile application
 npm run build:mobile
 ```
+
+**📖 For comprehensive development setup, testing, deployment, and troubleshooting, see: [DEVELOPMENT_AND_DEPLOYMENT.md](./docs/DEVELOPMENT_AND_DEPLOYMENT.md)**
 
 ## 📁 Project Structure
 
@@ -285,7 +283,7 @@ The project currently has news data for June 1-17, 2025 (17 days of content) wit
 
 ```
 everythingisawesome/
-├── client/                 # React frontend (port 3000)
+├── client/                 # React Web Application (port 3000)
 │   ├── src/
 │   │   ├── components/     # React components
 │   │   │   ├── Header.js   # Site header with navigation
@@ -296,7 +294,18 @@ everythingisawesome/
 │   │   └── App.css         # Beautiful glassmorphism styling
 │   ├── build/              # Production build (auto-generated)
 │   └── package.json
-├── server/                 # Node.js backend (port 3001)
+├── mobile/                 # React Native Mobile App
+│   ├── src/
+│   │   ├── screens/        # Mobile screens
+│   │   ├── components/     # Mobile components
+│   │   ├── services/       # Mobile API services
+│   │   └── constants/      # Mobile constants
+│   ├── App.js              # Main mobile app entry
+│   ├── app.json            # Expo configuration
+│   ├── android/            # Android platform files
+│   ├── ios/                # iOS platform files
+│   └── package.json
+├── server/                 # Node.js Backend API (port 3001)
 │   ├── routes/
 │   │   └── news.js         # News API endpoints
 │   ├── jobs/
@@ -306,16 +315,30 @@ everythingisawesome/
 │   ├── utils/
 │   │   └── newsUtils.js    # File and data operations
 │   └── index.js            # Express server with static file serving
-├── data/                   # Persistent data storage
+├── packages/               # Shared Libraries (Monorepo)
+│   ├── shared-api/         # Common API layer
+│   ├── shared-components/  # Reusable UI components
+│   ├── shared-constants/   # Shared constants
+│   ├── shared-docs/        # Documentation utilities
+│   ├── shared-hooks/       # Custom React hooks
+│   ├── shared-types/       # TypeScript/JSDoc types
+│   ├── shared-utils/       # Common utilities
+│   └── shared/             # Core shared functionality
+├── data/                   # Persistent Data Storage
 │   ├── generated-images/   # AI-generated story images
 │   │   ├── story-*.png     # Individual story images
 │   │   └── fallback-*.png  # Themed fallback images
 │   └── YYYY-MM-DD.json     # Daily news data files
-├── app.js                  # Azure Web App entry point
-├── web.config              # IIS/Azure configuration
+├── docs/                   # Documentation
+│   ├── DEVELOPMENT_AND_DEPLOYMENT.md # Comprehensive development & deployment guide
+│   └── *.jpg               # Screenshots and images
+├── android/                # Android build configuration
 ├── .github/workflows/      # GitHub Actions CI/CD
 │   └── main_everythingisawesome.yml # Deployment pipeline
-├── package.json            # Main dependencies and scripts
+├── app.js                  # Azure Web App entry point
+├── web.config              # IIS/Azure configuration
+├── deploy.cmd              # Azure deployment script
+├── package.json            # Root dependencies and scripts
 ├── .env.example            # Environment template
 └── README.md
 ```
@@ -348,16 +371,64 @@ Example API response:
 }
 ```
 
-## ⏰ News Fetching Process
+## 🤖 How the Algorithm Works
 
-### Algorithm Overview
-The application uses a sophisticated 5-step process to curate the most uplifting news:
+The application uses a sophisticated **6-step curation process** to surface genuinely inspiring stories while filtering out commercial content and negativity bias:
 
-1. **NewsAPI Integration**: Fetches up to 100 articles using 50+ positive keywords
-2. **Multi-Stage Filtering**: Eliminates articles with insufficient positive content
-3. **Grok AI Analysis**: Sentiment scoring (0-100) and summary generation
-4. **Awesome Index Ranking**: Combines sentiment + keyword density (final scores 50-100)
-5. **Top 10 Selection**: Chooses and enhances the most inspiring stories
+### Step 1: News Article Fetching
+- Uses **NewsAPI** to query up to 100 articles daily from 100+ diverse global sources
+- Searches with 50+ carefully selected positive keywords: "breakthrough," "cure," "rescue," "discovery," "innovation," "helping," "volunteer," "charity," "triumph," "milestone," "achievement"
+- Source filtering currently disabled for maximum content diversity
+- Processing limited to 50 articles for API cost management vs. coverage balance
+
+### Step 2: Multi-Stage Pre-Filtering
+- **Keyword Filter**: Eliminates articles with zero positive keywords
+- **Quality Check**: Filters out placeholder "[Removed]" content from NewsAPI
+- **Sentiment Threshold**: Removes articles scoring below 40/100 in positivity
+- **Commercial Content Detection**: AI-powered identification of sales/promotional content
+
+### Step 3: Enhanced AI Analysis with Grok-3-Latest
+- **Anti-Commercial Filtering**: Product sales/promotional content automatically scored 0-20
+- **Main Event Focus**: Algorithm evaluates the primary news event, not just positive entities mentioned
+- **Negative Event Detection**: Stories about crimes, scams, or disasters score low even if good organizations are mentioned
+- **Charity Exception**: Legitimate fundraising and charity auctions maintain high scores
+- **Genuine Content Prioritization**: Scientific breakthroughs, community achievements, and inspiring human stories score 80-100
+- **Contextual Understanding**: Distinguishes genuine achievements from marketing content
+- **Smart Summarization**: Generates concise, uplifting summaries highlighting inspiring aspects
+- **Robust Error Handling**: 3-retry system with fallback scores (50) for reliability
+
+### Step 4: Proprietary Awesome Index Calculation
+**Formula**: `Awesome Index = max(50, min(100, sentiment_score + keyword_boost))`
+
+- **Base Sentiment Score**: AI-generated positivity rating (50-100 range)
+- **Keyword Density Bonus**: Up to 10 additional points for articles mentioning multiple positive themes
+- **Commercial Penalty**: Significant score reduction for sales/promotional content
+- **Final Range**: All scores normalized to 50-100 scale, ensuring minimum positivity threshold
+
+### Step 5: Generic Duplicate Detection
+Advanced duplicate story detection using cutting-edge fuzzy string matching:
+- **12 Similarity Algorithms**: Analyzes titles, summaries, and combined text using ratio, partial ratio, token sort, and token set matching
+- **No Hardcoded Keywords**: Purely generic approach that works for any news content (health, sports, politics, entertainment, etc.)
+- **Optimal Threshold**: Uses scientifically determined threshold of 70 for maximum accuracy
+- **Smart Selection**: Keeps the highest awesome_index story from each duplicate group
+- **Proven Performance**: Achieved 100% precision and 100% recall on test data with zero false positives
+- **Universal Coverage**: Works across all news categories without requiring manual keyword maintenance
+
+### Step 6: Content Enhancement & Final Selection
+- Sorts by awesome_index in descending order
+- Removes duplicate stories using generic fuzzy matching algorithm
+- Selects top 10 most inspiring unique stories (or all if fewer than 10 qualify)
+- **Custom Image Generation**: AI-created visuals using Grok-2-image based on story themes
+- **Themed Fallbacks**: Pre-generated category images when AI generation fails
+- Preserves authentic source URLs for credibility
+
+### Performance Metrics & Results
+Recent algorithm performance (June 2025 data):
+- **Articles Processed**: 50-100 per day from NewsAPI
+- **Commercial Filtering Success**: ~95% of sales/promotional articles automatically filtered out
+- **Content Quality**: Awesome indices ranging from 52-91 with improved distribution
+- **Content Diversity**: Community service, scientific discoveries, education, technology breakthroughs, environmental progress
+- **Source Variety**: 20+ different news outlets and platforms with quality-focused filtering
 
 ### Configuration Options
 ```javascript
@@ -381,182 +452,6 @@ cron.schedule('0 6 * * *', () => {
 ```
 
 **Note**: Automated scheduling is currently disabled to avoid unnecessary API costs during development.
-
-## 🎨 Design Features
-
-- **Glassmorphism UI**: Translucent cards with backdrop blur
-- **Gradient Backgrounds**: Beautiful purple-to-blue gradients
-- **Responsive Design**: Works perfectly on mobile and desktop
-- **Smooth Animations**: Hover effects and transitions
-- **Accessibility**: Proper contrast and focus states
-- **Modern Typography**: Clean, readable fonts
-
-## 🚀 Deployment
-
-### Azure Cloud Deployment (Production)
-
-**Live Application**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
-
-The application is deployed on **Azure Web App** with automated CI/CD via GitHub Actions:
-
-#### 📋 Complete Deployment Setup
-**📖 For detailed deployment configuration with manual approval gates, see: [DEPLOYMENT_SETUP.md](./DEPLOYMENT_SETUP.md)**
-
-#### Deployment Features:
-- ✅ **Automated quality gates** - Linting, building, and testing
-- ✅ **Manual approval gate** - Human review before production deployment  
-- ✅ **Data persistence** - news data and generated images survive deployments
-- ✅ **Environment variable management** via Azure App Service settings
-- ✅ **Node.js 22** runtime on Windows App Service Plan
-- ✅ **Static file serving** for React build and generated images
-- ✅ **Health monitoring** with diagnostic endpoints
-
-#### Required Azure App Service Settings:
-```env
-NODE_ENV=production
-GROK_API_KEY=your_actual_grok_api_key
-NEWS_API_KEY=your_actual_news_api_key
-WEBSITE_NODE_DEFAULT_VERSION=~22
-```
-
-#### GitHub Secrets Required:
-- `GROK_API_KEY` - Your X.AI Grok API key
-- `NEWS_API_KEY` - Your NewsAPI.org key
-- Azure deployment credentials (auto-configured)
-
-### Local Development
-```bash
-npm run dev  # Starts both React frontend (3000) and Express backend (3001)
-```
-
-### Local Production Build
-```bash
-npm run build  # Builds optimized React app
-npm start      # Serves built app via Express server (port 3001)
-```
-
-### Key Architecture Notes:
-- **Single-server deployment**: Both frontend and backend served from Node.js Express server
-- **No CORS issues**: React build served as static files from the same origin
-- **Persistent storage**: `/data` folder preserved between deployments (`clean: false`)
-- **Image serving**: Generated images served directly from `/data/generated-images/`
-
-## 🔧 Customization
-
-### News Source Configuration
-
-**Enable/Disable Source Filtering:**
-```javascript
-// In server/jobs/fetchNews.js
-const USE_SOURCE_FILTER = false; // Set to true to limit to specific sources
-```
-
-**Modify Positive Keywords:**
-```javascript
-const POSITIVE_KEYWORDS = [
-  'breakthrough', 'cure', 'save', 'rescue', 'hero', 'amazing', 'incredible',
-  'inspiring', 'hope', 'success', 'achievement', 'discovery', 'innovation'
-  // Add your own keywords here
-];
-```
-
-**Adjust Processing Limits:**
-```javascript
-// Process up to 50 articles (adjust for API cost vs coverage balance)
-for (let i = 0; i < Math.min(articles.length, 50); i++) {
-```
-
-### Styling and UI
-
-All styles are in `client/src/App.css`. The design uses:
-- CSS custom properties for easy theming
-- Flexbox and Grid for responsive layouts  
-- Modern CSS features like `backdrop-filter` for glassmorphism
-- Smooth transitions and hover effects
-
-### Algorithm Tuning
-
-**Sentiment Threshold:**
-```javascript
-// Skip articles with very low sentiment scores
-if (sentimentScore < 40) { // Adjust threshold (0-100)
-  continue;
-}
-```
-
-**Awesome Index Formula:**
-```javascript
-// Customize the ranking calculation
-const awesomeIndex = Math.max(50, Math.min(100, 
-  baseSentimentScore + Math.min(10, positiveKeywordCount * 2)
-));
-```
-
-### Adding Features
-
-The modular structure makes it easy to add:
-- News categories
-- Search functionality  
-- Social sharing
-- Email subscriptions
-- Comments system
-
-## 🤖 How the Algorithm Works
-
-The application uses a sophisticated multi-step process to find and rank the most uplifting news stories:
-
-### Step 1: News Article Fetching
-- Uses **NewsAPI** to query articles from 100+ diverse sources (NewsAPI source filter disabled)
-- Filters by date range and 50+ positive keywords (breakthrough, cure, hope, success, etc.)
-- Processes up to 100 articles per day, limited to 50 for API cost management
-- Sources include: BBC, CNN, The Verge, Gizmodo, IGN, Hackaday, and many more
-
-### Step 2: Multi-Stage Filtering
-- **Keyword Filter**: Eliminates articles with zero positive keywords
-- **Sentiment Threshold**: Removes articles scoring below 40/100 in positivity (effectively filtering out commercial content)
-- **Commercial Content Filter**: AI-powered detection automatically scores product sales, shopping deals, and promotional content below threshold
-- **Quality Check**: Filters out removed/placeholder content from NewsAPI
-
-### Step 3: AI-Powered Analysis
-- **Enhanced Sentiment Analysis**: Grok-3-latest analyzes each article's positivity (0-100 scale) with specialized anti-commercial filtering
-- **Commercial Content Detection**: Automatically scores product sales, deals, and promotional content very low (0-20) to filter out non-inspiring commercial articles
-- **Genuine Content Prioritization**: Prioritizes authentic human interest stories, scientific breakthroughs, community help, and inspiring achievements (80-100 scoring)
-- **Charity Exception**: Maintains high scores for charity auctions and fundraising content even when prices are mentioned
-- **Smart Summarization**: Generates concise, uplifting summaries highlighting inspiring aspects
-- **Robust Error Handling**: 3-retry system with fallback scores (50) for reliability
-
-### Step 4: Intelligent Ranking
-- **Awesome Index Formula**: `sentiment_score + min(keyword_count × 2, 10)`
-- Base score from sentiment analysis (50-100 range, ensuring minimum positivity)
-- Keyword boost for articles mentioning multiple positive themes (max 10 bonus points)
-- Final scores capped at 100 for consistency
-
-### Step 5: Duplicate Story Detection
-- **Generic Text Similarity**: Advanced fuzzy string matching using 12 different similarity algorithms
-- **No Hardcoded Keywords**: Purely generic approach that works for any news content (health, sports, politics, etc.)
-- **Multi-Method Analysis**: Combines ratio, partial ratio, token sort, and token set matching on titles, summaries, and combined text
-- **Optimal Threshold**: Uses threshold of 70 (determined through rigorous testing achieving 100% precision and recall)
-- **Smart Selection**: Keeps the highest awesome_index story from each duplicate group
-- **Performance**: Tested on real data with perfect duplicate detection and zero false positives
-
-### Step 6: Content Enhancement & Selection
-- Sorts by awesome_index in descending order
-- Removes duplicate stories using generic fuzzy matching algorithm
-- Selects top 10 most inspiring unique stories (or all if fewer than 10 qualify)
-- Generates relevant AI images using Grok's image generation based on story content
-- Preserves authentic source URLs for credibility
-
-### API Integration Benefits
-- **NewsAPI**: Provides authentic, timestamped articles from diverse global sources
-- **Enhanced Grok-3-latest**: Latest model with specialized prompts for accurate sentiment analysis, creative summarization, and commercial content filtering
-- **Grok-2-image**: AI-generated images tailored to each story's content and theme
-- **Generic Duplicate Detection**: Fuzzy string matching algorithm with 100% accuracy on test data
-- **Combined Power**: Real news authenticity + AI intelligence + commercial filtering + duplicate prevention = optimized genuine positivity
-
-### Performance Metrics
-Recent performance (June 2025 data):
-- **Articles Processed**: 50-100 per day from NewsAPI
-- **Commercial Filtering Success**: ~95% of sales/promotional articles automatically filtered out
 - **Content Quality**: Awesome indices ranging from 52-91 (improved distribution with commercial filtering)
 - **Content Diversity**: Community service, scientific discoveries, education, technology breakthroughs, environmental progress
 - **Source Variety**: 20+ different news outlets and platforms with quality-focused filtering
