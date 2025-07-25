@@ -1,0 +1,2 @@
+# This file ensures the generated-images directory is preserved in git
+# while ignoring the actual generated image files

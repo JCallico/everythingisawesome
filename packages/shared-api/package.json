@@ -1,0 +1,14 @@
+{
+  "name": "@everythingisawesome/shared-api",
+  "version": "1.0.0",
+  "description": "Shared API utilities for Everything Is Awesome project",
+  "main": "index.js",
+  "module": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["api", "shared", "utils"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}
