@@ -19,7 +19,7 @@
   "scripts": {
     "start": "NODE_OPTIONS='--no-deprecation' react-scripts start",
     "start:with-warnings": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",
