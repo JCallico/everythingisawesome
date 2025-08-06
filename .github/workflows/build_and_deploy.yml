@@ -404,29 +404,41 @@ jobs:
           package: .
           clean: false
 
-      - name: 'Install production dependencies on Azure'
+      - name: 'Configure Azure for automatic dependency installation'
         shell: bash
         run: |
-          echo "📦 Installing production dependencies directly on Azure..."
+          echo "📦 Configuring Azure to automatically install dependencies..."
           # Find the resource group
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
           echo "Found resource group: $RESOURCE_GROUP"
           
-          # Get publishing credentials for Kudu API
-          echo "� Getting publishing credentials..."
-          PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles --name everythingisawesome --resource-group "$RESOURCE_GROUP" --query "[?publishMethod=='MSDeploy'] | [0]" -o json)
-          KUDU_USERNAME=$(echo $PUBLISH_PROFILE | jq -r '.userName')
-          KUDU_PASSWORD=$(echo $PUBLISH_PROFILE | jq -r '.userPWD')
+          # Enable automatic build during deployment
+          echo "🔧 Enabling SCM_DO_BUILD_DURING_DEPLOYMENT..."
+          az webapp config appsettings set \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
+              NPM_CONFIG_PRODUCTION=true \
+              WEBSITE_NPM_DEFAULT_VERSION=latest
           
-          # Execute npm install via Kudu API
-          echo "🔧 Running npm install --production via Kudu API..."
-          curl -X POST \
-            -u "$KUDU_USERNAME:$KUDU_PASSWORD" \
-            -H "Content-Type: application/json" \
-            -d '{"command":"cd C:\\home\\site\\wwwroot && npm install --production --no-optional --prefer-offline --no-audit --no-fund", "dir":"C:\\home\\site\\wwwroot"}' \
-            "https://everythingisawesome.scm.azurewebsites.net/api/command"
+          # Restart the app to apply settings
+          echo "� Restarting app to apply build settings..."
+          az webapp restart \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP"
           
-          echo "✅ Production dependencies installation initiated on Azure"
+          # Wait a moment for restart
+          echo "⏳ Waiting for restart to complete..."
+          sleep 10
+          
+          # Trigger a deployment sync to force npm install
+          echo "🚀 Triggering deployment sync to run npm install..."
+          az webapp deployment source sync \
+            --name everythingisawesome \
+            --resource-group "$RESOURCE_GROUP" || echo "⚠️ Sync command not available, continuing..."
+          
+          echo "✅ Azure configured for automatic dependency installation"
 
       - name: 'Verify Deployment Success'
         shell: bash
@@ -468,8 +480,6 @@ jobs:
             --settings \
               WEBSITE_NODE_DEFAULT_VERSION=~22 \
               WEBSITE_RUN_FROM_PACKAGE=0 \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
-              NPM_CONFIG_PRODUCTION=true \
               NODE_ENV=production \
               WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
             
