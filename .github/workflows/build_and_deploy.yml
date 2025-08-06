@@ -195,11 +195,33 @@ jobs:
           
           echo "✅ Production dependencies installed successfully for deployment package"
       
+      - name: Prepare deployment package
+        shell: bash
+        run: |
+          echo "📦 Preparing deployment package with build files..."
+          
+          # Verify build files exist
+          if [ -d "client/build" ]; then
+            echo "✅ Client build directory found"
+            echo "Build files: $(ls -la client/build/ | wc -l) items"
+          else
+            echo "❌ Client build directory not found!"
+            exit 1
+          fi
+          
+          # List contents for verification
+          echo "Contents of client/build:"
+          ls -la client/build/
+          
+          echo "✅ Deployment package ready"
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
+          # Ensure build files are included even if in .gitignore
+          retention-days: 1
 
       - name: 'Build Summary'
         if: always()
