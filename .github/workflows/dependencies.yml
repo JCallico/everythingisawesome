@@ -27,25 +27,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --reporter=append-only
 
       - name: Run security audit
         run: |
-          echo "🔍 Running security audit..."
-          npm audit --audit-level=high --json > audit-results.json || true
+          echo "🔍 Running security audit with pnpm..."
+          pnpm audit --audit-level=high --json > audit-results.json || true
           
           # Check if there are any high/critical vulnerabilities
-          VULNERABILITIES=$(cat audit-results.json | jq -r '.metadata.vulnerabilities | .high + .critical')
+          VULNERABILITIES=$(cat audit-results.json | jq -r '.metadata.vulnerabilities | .high + .critical // 0')
           
           echo "Found $VULNERABILITIES high/critical vulnerabilities"
           
           if [ "$VULNERABILITIES" -gt 0 ]; then
             echo "⚠️ Security vulnerabilities found!"
-            npm audit --audit-level=high
-            echo "Please run 'npm audit fix' to resolve these issues"
+            pnpm audit --audit-level=high
+            echo "Please run 'pnpm audit --fix' to resolve these issues"
           else
             echo "✅ No high/critical security vulnerabilities found"
           fi
@@ -53,14 +58,14 @@ jobs:
       - name: Check client dependencies
         run: |
           cd client
-          npm ci
-          npm audit --audit-level=high || true
+          pnpm install --reporter=append-only
+          pnpm audit --audit-level=high || true
 
       - name: Check mobile dependencies
         run: |
           cd mobile
-          npm ci
-          npm audit --audit-level=high || true
+          pnpm install --reporter=append-only
+          pnpm audit --audit-level=high || true
 
       - name: Upload audit results
         uses: actions/upload-artifact@v4
@@ -82,26 +87,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --reporter=append-only
 
       - name: Check for outdated packages
         run: |
-          echo "📦 Checking for outdated packages..."
+          echo "📦 Checking for outdated packages with pnpm..."
           
           echo "## Root dependencies" >> outdated-report.md
-          npm outdated --json > root-outdated.json || true
+          pnpm outdated --format=json > root-outdated.json || true
           
           echo "## Client dependencies" >> outdated-report.md
           cd client
-          npm outdated --json > ../client-outdated.json || true
+          pnpm outdated --format=json > ../client-outdated.json || true
           cd ..
           
           echo "## Mobile dependencies" >> outdated-report.md
           cd mobile
-          npm outdated --json > ../mobile-outdated.json || true
+          pnpm outdated --format=json > ../mobile-outdated.json || true
           cd ..
 
       - name: Generate update report
@@ -150,17 +160,17 @@ jobs:
               
               Automated dependency scan found updates available for the following packages:
               
-              ${rootOutdated ? '## Root Project\n```\nnpm outdated\n```\n' : ''}
-              ${clientOutdated ? '## Client Application\n```\ncd client && npm outdated\n```\n' : ''}
-              ${mobileOutdated ? '## Mobile Application\n```\ncd mobile && npm outdated\n```\n' : ''}
+              ${rootOutdated ? '## Root Project\n```\npnpm outdated\n```\n' : ''}
+              ${clientOutdated ? '## Client Application\n```\ncd client && pnpm outdated\n```\n' : ''}
+              ${mobileOutdated ? '## Mobile Application\n```\ncd mobile && pnpm outdated\n```\n' : ''}
               
               ## 🔧 Recommended Actions
               
               1. Review the outdated packages
               2. Test updates in a development environment
-              3. Update packages with: \`npm update\`
+              3. Update packages with: \`pnpm update\`
               4. Run tests to ensure compatibility
-              5. Update package-lock.json files
+              5. Update pnpm-lock.yaml files
               
               ## 🛡️ Security Notes
               

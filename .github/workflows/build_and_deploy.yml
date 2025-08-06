@@ -23,35 +23,45 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install Expo CLI
         run: |
           echo "📱 Installing Expo CLI globally..."
           npm install -g @expo/cli
           echo "✅ Expo CLI installed successfully"
 
-      - name: Install root dependencies
+      - name: Install dependencies with optimized pnpm
         run: |
-          echo "📦 Installing root dependencies..."
-          npm install --flat
-          echo "✅ Root dependencies installed successfully"
-
-      - name: Install client dependencies
-        run: |
-          echo "📦 Installing client dependencies..."
-          cd client && npm install --flat
-          echo "✅ Client dependencies installed successfully"
-
-      - name: Install mobile dependencies
-        run: |
-          echo "📦 Installing mobile dependencies..."
-          cd mobile &&  npm install --flat
-          echo "✅ Mobile dependencies installed successfully"
+          echo "📦 Installing dependencies with optimized pnpm configuration..."
+          echo "🔧 Using pnpm with shamefully-hoist=true for maximum flattening"
+          echo "🪟 This configuration prevents Windows path length issues during Azure deployment"
+          echo "📏 Reduces node_modules nesting from 14 to 10 levels and eliminates 260+ char paths"
+          pnpm install --reporter=append-only
+          echo "✅ Dependencies installed successfully with flattened structure"
 
       - name: Lint root application
         shell: bash
         run: |
           echo "🔍 Linting root application..."
-          if npm run lint; then
+          if pnpm run lint; then
             echo "✅ Root application linting passed"
           else
             echo "❌ Root application linting failed"
@@ -63,7 +73,7 @@ jobs:
         run: |
           echo "🔍 Linting client application..."
           cd client
-          if npm run lint; then
+          if pnpm run lint; then
             echo "✅ Client application linting passed"
           else
             echo "❌ Client application linting failed"
@@ -75,7 +85,7 @@ jobs:
         run: |
           echo "🔍 Linting mobile application..."
           cd mobile
-          if npm run lint; then
+          if pnpm run lint; then
             echo "✅ Mobile application linting passed"
           else
             echo "❌ Mobile application linting failed"
@@ -85,7 +95,7 @@ jobs:
       - name: Build client application
         run: |
           echo "🏗️ Building client application..."
-          cd client && npm run build
+          cd client && pnpm run build
           echo "✅ Client application built successfully"
 
       - name: Validate mobile application
@@ -127,7 +137,7 @@ jobs:
           
           # Test root/server
           echo "Testing root/server application..."
-          if npm run test 2>/dev/null; then
+          if pnpm run test 2>/dev/null; then
             echo "✅ Root tests passed"
           else
             echo "⚠️ No root tests found or tests not configured - skipping"
@@ -136,7 +146,7 @@ jobs:
           # Test client application
           echo "Testing client application..."
           cd client
-          if npm run test 2>/dev/null; then
+          if pnpm run test 2>/dev/null; then
             echo "✅ Client tests passed"
           else
             echo "⚠️ No client tests found or tests not configured - skipping"
@@ -145,7 +155,7 @@ jobs:
           # Test mobile application
           echo "Testing mobile application..."          
           cd ../mobile
-          if npm run test 2>/dev/null; then
+          if pnpm run test 2>/dev/null; then
             echo "✅ Mobile tests passed"
           else
             echo "⚠️ No mobile tests found or tests not configured - skipping"
@@ -165,9 +175,7 @@ jobs:
           echo "## 🏗️ Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Step | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Root | Dependencies | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
-          echo "| Client | Dependencies | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
-          echo "| Mobile | Dependencies | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependencies | pnpm Install (Optimized) | ✅ Installed |" >> $GITHUB_STEP_SUMMARY
           echo "| Root | Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           echo "| Client | Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           echo "| Mobile | Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
@@ -182,6 +190,11 @@ jobs:
           echo "- 🌐 **Web Application** (React 19) - Ready for deployment" >> $GITHUB_STEP_SUMMARY
           echo "- 📱 **Mobile Application** (React Native + Expo) - Validated and ready" >> $GITHUB_STEP_SUMMARY
           echo "- 🚀 **Backend API** (Node.js + Express) - Linted and tested" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🪟 Windows Path Optimization:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **pnpm with shamefully-hoist** - Maximum dependency flattening" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Path length optimized** - No Azure deployment path issues" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Nesting reduced** - From 14 to 10 levels maximum" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

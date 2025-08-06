@@ -18,6 +18,7 @@
     "build:mobile": "cd mobile && npm run prebuild",
     "start": "node app.js",
     "install-all": "npm install && npm run install:shared && cd client && npm install && cd ../mobile && npm install",
+    "install-all:pnpm": "pnpm install --recursive",
     "install:shared": "cd packages/shared-api && npm install",
     "install:client": "npm run install:shared && cd client && npm install",
     "install:mobile": "npm run install:shared && cd mobile && npm install",

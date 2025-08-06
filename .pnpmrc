@@ -1,0 +1,42 @@
+# pnpm workspace configuration optimized for Windows path length limitations
+# This creates the flattest possible structure to avoid Azure deployment issues
+
+# Use hard links when possible to save space and reduce paths
+store-dir=~/.pnpm-store
+
+# Disable strict peer dependencies to allow more flattening
+strict-peer-dependencies=false
+
+# Use the global store to avoid duplication
+shared-workspace-lockfile=true
+
+# Optimize for Windows compatibility - disable symlinks completely
+symlink=false
+prefer-frozen-lockfile=true
+
+# CRITICAL: Enable shamefully-hoist for maximum flattening
+# This moves dependencies to the root node_modules, reducing nesting
+shamefully-hoist=true
+
+# Hoist all patterns to flatten structure as much as possible
+hoist-pattern[]=*
+hoist-pattern[]=@*/*
+
+# Use shorter virtual store directory name
+virtual-store-dir=.p
+
+# Performance optimizations
+registry=https://registry.npmjs.org/
+network-concurrency=16
+child-concurrency=5
+
+# Additional flattening options
+modules-dir=node_modules
+package-import-method=copy
+dedupe-peer-dependents=true
+
+# Reduce dependency resolution strictness for better flattening
+resolution-mode=lowest-direct
+
+# Enable legacy peer deps behavior for more aggressive flattening
+legacy-peer-deps=true
