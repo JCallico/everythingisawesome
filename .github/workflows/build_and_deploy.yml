@@ -423,7 +423,7 @@ jobs:
           curl -X POST \
             -u "$KUDU_USERNAME:$KUDU_PASSWORD" \
             -H "Content-Type: application/json" \
-            -d '{"command":"cd D:\\home\\site\\wwwroot && npm install --production --no-optional --prefer-offline --no-audit --no-fund", "dir":"D:\\home\\site\\wwwroot"}' \
+            -d '{"command":"cd C:\\home\\site\\wwwroot && npm install --production --no-optional --prefer-offline --no-audit --no-fund", "dir":"C:\\home\\site\\wwwroot"}' \
             "https://everythingisawesome.scm.azurewebsites.net/api/command"
           
           echo "✅ Production dependencies installation initiated on Azure"
