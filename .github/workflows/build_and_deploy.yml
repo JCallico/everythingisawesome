@@ -174,16 +174,17 @@ jobs:
           rm -rf node_modules client/node_modules mobile/node_modules
           
           echo "📥 Installing root dependencies..."
-          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          npm install --omit=dev --omit=optional --prefer-offline --no-audit --no-fund
           
           echo "📥 Installing client dependencies..."
           cd client
-          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          npm install --omit=dev --omit=optional --prefer-offline --no-audit --no-fund
           cd ..
           
-          echo "📥 Installing mobile dependencies..."
+          echo "📥 Installing mobile dependencies (with conflict resolution)..."
           cd mobile
-          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          # Use legacy peer deps to resolve React version conflicts for deployment
+          npm install --omit=dev --omit=optional --legacy-peer-deps --prefer-offline --no-audit --no-fund
           cd ..
           
           # Verify installations
