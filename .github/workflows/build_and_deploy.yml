@@ -382,10 +382,6 @@ jobs:
           echo "✅ Artifacts downloaded successfully"
       
       - name: Login to Azure
-        run: |
-          echo "🔐 Logging into Azure..."
-        
-      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2D34B457FC84DBD932B2B893BCAB313 }}
@@ -407,6 +403,30 @@ jobs:
           slot-name: 'Production'
           package: .
           clean: false
+
+      - name: 'Install production dependencies on Azure'
+        shell: bash
+        run: |
+          echo "📦 Installing production dependencies directly on Azure..."
+          # Find the resource group
+          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
+          echo "Found resource group: $RESOURCE_GROUP"
+          
+          # Get publishing credentials for Kudu API
+          echo "� Getting publishing credentials..."
+          PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles --name everythingisawesome --resource-group "$RESOURCE_GROUP" --query "[?publishMethod=='MSDeploy'] | [0]" -o json)
+          KUDU_USERNAME=$(echo $PUBLISH_PROFILE | jq -r '.userName')
+          KUDU_PASSWORD=$(echo $PUBLISH_PROFILE | jq -r '.userPWD')
+          
+          # Execute npm install via Kudu API
+          echo "🔧 Running npm install --production via Kudu API..."
+          curl -X POST \
+            -u "$KUDU_USERNAME:$KUDU_PASSWORD" \
+            -H "Content-Type: application/json" \
+            -d '{"command":"cd D:\\home\\site\\wwwroot && npm install --production --no-optional --prefer-offline --no-audit --no-fund", "dir":"D:\\home\\site\\wwwroot"}' \
+            "https://everythingisawesome.scm.azurewebsites.net/api/command"
+          
+          echo "✅ Production dependencies installation initiated on Azure"
 
       - name: 'Verify Deployment Success'
         shell: bash
@@ -449,7 +469,8 @@ jobs:
               WEBSITE_NODE_DEFAULT_VERSION=~22 \
               WEBSITE_RUN_FROM_PACKAGE=0 \
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
-              IISNODE_yml="iisnode.yml" \
+              NPM_CONFIG_PRODUCTION=true \
+              NODE_ENV=production \
               WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
             
           echo "✅ Node.js runtime configured successfully"
