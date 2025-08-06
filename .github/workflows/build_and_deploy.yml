@@ -163,6 +163,37 @@ jobs:
           
           echo "✅ Test step completed"
       
+      - name: Install production dependencies for deployment
+        shell: bash
+        run: |
+          echo "📦 Installing production dependencies for Azure deployment..."
+          echo "🔧 Using npm to ensure maximum compatibility with Azure Windows App Service"
+          
+          # Clean any existing node_modules to start fresh
+          echo "🧹 Cleaning existing node_modules..."
+          rm -rf node_modules client/node_modules mobile/node_modules
+          
+          echo "📥 Installing root dependencies..."
+          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          
+          echo "📥 Installing client dependencies..."
+          cd client
+          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          cd ..
+          
+          echo "📥 Installing mobile dependencies..."
+          cd mobile
+          npm install --production --no-optional --prefer-offline --no-audit --no-fund
+          cd ..
+          
+          # Verify installations
+          echo "✅ Verifying installations..."
+          echo "Root node_modules size: $(du -sh node_modules 2>/dev/null || echo 'Not found')"
+          echo "Client node_modules size: $(du -sh client/node_modules 2>/dev/null || echo 'Not found')"
+          echo "Mobile node_modules size: $(du -sh mobile/node_modules 2>/dev/null || echo 'Not found')"
+          
+          echo "✅ Production dependencies installed successfully for deployment package"
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -404,42 +435,6 @@ jobs:
           package: .
           clean: false
 
-      - name: 'Configure Azure for automatic dependency installation'
-        shell: bash
-        run: |
-          echo "📦 Configuring Azure to automatically install dependencies..."
-          # Find the resource group
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          echo "Found resource group: $RESOURCE_GROUP"
-          
-          # Enable automatic build during deployment
-          echo "🔧 Enabling SCM_DO_BUILD_DURING_DEPLOYMENT..."
-          az webapp config appsettings set \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --settings \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=true \
-              NPM_CONFIG_PRODUCTION=true \
-              WEBSITE_NPM_DEFAULT_VERSION=latest
-          
-          # Restart the app to apply settings
-          echo "� Restarting app to apply build settings..."
-          az webapp restart \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP"
-          
-          # Wait a moment for restart
-          echo "⏳ Waiting for restart to complete..."
-          sleep 10
-          
-          # Trigger a deployment sync to force npm install
-          echo "🚀 Triggering deployment sync to run npm install..."
-          az webapp deployment source sync \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" || echo "⚠️ Sync command not available, continuing..."
-          
-          echo "✅ Azure configured for automatic dependency installation"
-
       - name: 'Verify Deployment Success'
         shell: bash
         run: |
@@ -456,6 +451,25 @@ jobs:
             echo "❌ Web app is not in running state: $STATUS"
             exit 1
           fi
+          
+          # Verify deployment package structure (without modifying anything)
+          echo "📦 Verifying deployment package structure..."
+          if [ -f "app.js" ]; then
+            echo "✅ app.js found"
+          else
+            echo "❌ app.js not found - deployment may be incomplete"
+            exit 1
+          fi
+          
+          if [ -d "node_modules" ]; then
+            echo "✅ node_modules directory found (from build phase)"
+            echo "Dependencies size: $(du -sh node_modules 2>/dev/null || echo 'Could not determine size')"
+          else
+            echo "❌ node_modules not found - build artifact may be incomplete"
+            exit 1
+          fi
+          
+          echo "✅ Deployment verification completed - using pre-built dependencies"
 
       - name: 'Configure Node.js Runtime'
         shell: bash
