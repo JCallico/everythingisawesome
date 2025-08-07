@@ -163,38 +163,6 @@ jobs:
           
           echo "✅ Test step completed"
       
-      - name: Install production dependencies for deployment
-        shell: bash
-        run: |
-          echo "📦 Installing production dependencies for Azure deployment..."
-          echo "🔧 Using npm to ensure maximum compatibility with Azure Windows App Service"
-          
-          # Clean any existing node_modules to start fresh
-          echo "🧹 Cleaning existing node_modules..."
-          rm -rf node_modules client/node_modules mobile/node_modules
-          
-          echo "📥 Installing root dependencies..."
-          npm install --omit=dev --omit=optional --prefer-offline --no-audit --no-fund
-          
-          echo "📥 Installing client dependencies..."
-          cd client
-          npm install --omit=dev --omit=optional --prefer-offline --no-audit --no-fund
-          cd ..
-          
-          echo "📥 Installing mobile dependencies (with conflict resolution)..."
-          cd mobile
-          # Use legacy peer deps to resolve React version conflicts for deployment
-          npm install --omit=dev --omit=optional --legacy-peer-deps --prefer-offline --no-audit --no-fund
-          cd ..
-          
-          # Verify installations
-          echo "✅ Verifying installations..."
-          echo "Root node_modules size: $(du -sh node_modules 2>/dev/null || echo 'Not found')"
-          echo "Client node_modules size: $(du -sh client/node_modules 2>/dev/null || echo 'Not found')"
-          echo "Mobile node_modules size: $(du -sh mobile/node_modules 2>/dev/null || echo 'Not found')"
-          
-          echo "✅ Production dependencies installed successfully for deployment package"
-      
       - name: Prepare deployment package
         shell: bash
         run: |
@@ -249,6 +217,11 @@ jobs:
           echo "- ✅ **pnpm with shamefully-hoist** - Maximum dependency flattening" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Path length optimized** - No Azure deployment path issues" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Nesting reduced** - From 14 to 10 levels maximum" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚡ Azure SCM Deployment:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔧 **SCM_DO_BUILD_DURING_DEPLOYMENT=true** - Azure handles npm install automatically" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 **postinstall script** - Installs client & mobile dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚀 **Optimized workflow** - No duplicate dependency installation" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -538,15 +511,18 @@ jobs:
           
           echo "Found resource group: $RESOURCE_GROUP"
           
-          # Set application settings
-          echo "Setting environment variables..."
+          # Set application settings including SCM build configuration
+          echo "Setting environment variables and build configuration..."
           az webapp config appsettings set \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
               NODE_ENV=production \
               GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
-              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}"
+              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=true
+              
+          echo "✅ SCM_DO_BUILD_DURING_DEPLOYMENT=true - Azure will automatically run npm install during deployment"
               
           # Force restart to apply all changes
           echo "Restarting web app to apply changes..."
