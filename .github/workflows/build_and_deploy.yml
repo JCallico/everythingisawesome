@@ -57,6 +57,15 @@ jobs:
           pnpm install --reporter=append-only
           echo "✅ Dependencies installed successfully with flattened structure"
 
+      - name: Install client and mobile dependencies
+        run: |
+          echo "📦 Installing client dependencies for build and lint..."
+          npm install --prefix client --no-audit --no-fund
+          echo "✅ Client dependencies installed"
+          echo "📦 Installing mobile dependencies for build and lint..."
+          npm install --prefix mobile --no-audit --no-fund
+          echo "✅ Mobile dependencies installed"
+
       - name: Lint root application
         shell: bash
         run: |

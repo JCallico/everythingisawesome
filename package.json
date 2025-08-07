@@ -6,9 +6,7 @@
   "description": "A website displaying optimistic, feel-good news stories",
   "main": "app.js",
   "scripts": {
-    "postinstall": "npm install --prefix client && npm install --prefix mobile",
     "install-deps": "pnpm install --recursive",
-    "install-azure": "npm install",
     "add": "pnpm add",
     "remove": "pnpm remove",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
