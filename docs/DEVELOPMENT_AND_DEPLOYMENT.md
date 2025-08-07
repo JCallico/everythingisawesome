@@ -219,6 +219,68 @@ import { formatDate } from '@everythingisawesome/shared-utils';
 
 ## 🔧 Environment Configuration
 
+### Flexible Storage Architecture
+
+The application supports both local file system and Azure Blob Storage through a unified file system abstraction:
+
+### Local File System (Default)
+- **Development Mode**: Files stored in `/data` directory
+- **Automatic Detection**: Used when Azure Storage credentials are not provided
+- **No Setup Required**: Works out of the box for local development
+
+### Azure Blob Storage (Production)
+- **Cloud Storage**: Files stored in Azure Blob Storage containers
+- **Automatic Detection**: Enabled when all Azure Storage credentials are provided
+- **Seamless Migration**: Same API, different storage backend
+
+### Smart Configuration Detection
+The system automatically determines which storage to use:
+
+```javascript
+// Automatic detection logic
+if (AZURE_STORAGE_ACCOUNT_NAME && AZURE_STORAGE_ACCOUNT_KEY && AZURE_STORAGE_CONTAINER_NAME) {
+  // Use Azure Blob Storage
+  AZURE_STORAGE_ENABLED = true
+} else {
+  // Use local file system
+  AZURE_STORAGE_ENABLED = false
+}
+```
+
+### Setting Up Azure Blob Storage
+
+**1. Create Azure Storage Account:**
+```bash
+# Using Azure CLI
+az storage account create --name mystorageaccount --resource-group myresourcegroup --location eastus --sku Standard_LRS
+```
+
+**2. Get Connection Information:**
+```bash
+# Get account key
+az storage account keys list --account-name mystorageaccount --resource-group myresourcegroup
+```
+
+**3. Configure Environment Variables:**
+```env
+# In .env for local development
+AZURE_STORAGE_ACCOUNT_NAME=mystorageaccount
+AZURE_STORAGE_ACCOUNT_KEY=your_account_key_here
+AZURE_STORAGE_CONTAINER_NAME=data
+```
+
+**4. GitHub Secrets for Production:**
+- Go to Repository → Settings → Secrets and variables → Actions
+- Add the three Azure Storage secrets
+- Deployment will automatically detect and configure Azure Blob Storage
+
+### File System Abstraction Benefits
+- **Zero Code Changes**: Application logic remains the same
+- **Environment-Based**: Automatically adapts to available storage
+- **Graceful Fallback**: Falls back to local storage if Azure isn't configured
+- **Performance**: Same performance characteristics for both storage types
+- **Testing**: Easy to test both storage modes
+
 ### Required Environment Variables
 Create a `.env` file in the root directory:
 
@@ -247,6 +309,16 @@ PORT=3001
 
 # Optional - API limits (cost management)
 MAX_ARTICLES_TO_PROCESS=50
+
+# Azure Blob Storage Configuration (Optional)
+# If all three Azure Storage variables are provided, the system will automatically 
+# enable Azure Blob Storage. If any are missing, local file system will be used.
+# AZURE_STORAGE_ACCOUNT_NAME=your_storage_account_name
+# AZURE_STORAGE_ACCOUNT_KEY=your_storage_account_key
+# AZURE_STORAGE_CONTAINER_NAME=your_container_name
+# 
+# Note: AZURE_STORAGE_ENABLED is automatically determined based on whether 
+# the above three variables are configured.
 ```
 
 ### API Key Setup
@@ -331,6 +403,13 @@ GROK_SUMMARY_MAX_TOKENS=100
 GROK_IMAGE_PROMPT_MAX_TOKENS=150
 NEWS_API_KEY=your_actual_news_api_key
 WEBSITE_NODE_DEFAULT_VERSION=~22
+
+# Azure Blob Storage (automatically configured via GitHub Actions)
+# These are set by the deployment pipeline based on GitHub secrets
+AZURE_STORAGE_ENABLED=true (if secrets are configured, false otherwise)
+AZURE_STORAGE_ACCOUNT_NAME=configured_from_github_secrets
+AZURE_STORAGE_ACCOUNT_KEY=configured_from_github_secrets
+AZURE_STORAGE_CONTAINER_NAME=configured_from_github_secrets
 ```
 
 ### GitHub Secrets Configuration
@@ -340,7 +419,12 @@ Configure these in GitHub Repository → Settings → Secrets:
 - `NEWS_API_KEY` - Your NewsAPI.org key
 - `AZURE_WEBAPP_PUBLISH_PROFILE` - Azure deployment profile (auto-configured)
 
-**Note:** GROK_MODEL, GROK_IMAGE_MODEL, and the max tokens settings (GROK_SENTIMENT_MAX_TOKENS, GROK_SUMMARY_MAX_TOKENS, GROK_IMAGE_PROMPT_MAX_TOKENS) are configured in the deployment workflow with default values and can be customized in Azure App Service settings if needed.
+**Optional Azure Blob Storage Secrets:**
+- `AZURE_STORAGE_ACCOUNT_NAME` - Azure Storage account name
+- `AZURE_STORAGE_ACCOUNT_KEY` - Azure Storage account key
+- `AZURE_STORAGE_CONTAINER_NAME` - Container name for data storage
+
+**Note:** The deployment pipeline automatically detects if all three Azure Storage secrets are configured and enables Azure Blob Storage accordingly. If any secrets are missing, the system falls back to local file system storage.
 
 ## 🔄 CI/CD Pipeline
 
@@ -406,6 +490,8 @@ The project uses GitHub Actions for comprehensive CI/CD with manual approval gat
 - ✅ **Rollback Capability:** Previous versions maintained for quick rollback
 - ✅ **Environment Variables:** Secure configuration management
 - ✅ **Monitoring:** Application health and performance tracking
+- ✅ **Smart Storage Detection:** Automatically configures Azure Blob Storage if secrets are provided
+- ✅ **Graceful Fallback:** Falls back to local file system if Azure Storage isn't configured
 
 ## 🔍 Troubleshooting
 
@@ -451,6 +537,10 @@ npm run install-all
 # Check package linking
 ls -la node_modules/@everythingisawesome/
 ```
+
+**5. Azure Storage Configuration:**
+
+The file system abstraction automatically detects and configures the appropriate storage backend based on your environment variables. Check your application logs during startup to verify which storage system is being used.
 
 ### Deployment Troubleshooting
 

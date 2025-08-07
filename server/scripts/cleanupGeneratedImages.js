@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import path from 'path';
+import { createFileSystem } from '../filesystem/FileSystemFactory.js';
+import { fileURLToPath } from 'url';
 
-// Configuration
-const DATA_DIR = path.join(__dirname, '../../data');
-const IMAGES_DIR = path.join(__dirname, '../../data/generated-images');
+// ES module equivalents
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Initialize file system abstraction
+const fileSystem = createFileSystem();
 
 /**
- * Get all JSON files from the data directory
+ * Get all JSON files from the data directory using file system abstraction
  */
-function getDataFiles() {
+async function getDataFiles() {
   try {
-    const files = fs.readdirSync(DATA_DIR);
+    const files = await fileSystem.listFiles();
     return files
-      .filter(file => file.endsWith('.json'))
-      .map(file => path.join(DATA_DIR, file));
+      .filter(file => file.name.endsWith('.json'))
+      .map(file => file.name);
   } catch (error) {
     console.error('Error reading data directory:', error.message);
     return [];
@@ -23,17 +27,17 @@ function getDataFiles() {
 }
 
 /**
- * Extract all image references from news data files
+ * Extract all image references from news data files using file system abstraction
  */
-function getReferencedImages() {
+async function getReferencedImages() {
   const referencedImages = new Set();
-  const dataFiles = getDataFiles();
+  const dataFiles = await getDataFiles();
     
   console.log(`Scanning ${dataFiles.length} data files for image references...`);
     
-  for (const filePath of dataFiles) {
+  for (const fileName of dataFiles) {
     try {
-      const content = fs.readFileSync(filePath, 'utf8');
+      const content = await fileSystem.read(fileName);
       const data = JSON.parse(content);
             
       if (data.stories && Array.isArray(data.stories)) {
@@ -46,7 +50,7 @@ function getReferencedImages() {
         }
       }
     } catch (error) {
-      console.error(`Error processing file ${filePath}:`, error.message);
+      console.error(`Error processing file ${fileName}:`, error.message);
     }
   }
     
@@ -55,18 +59,20 @@ function getReferencedImages() {
 }
 
 /**
- * Get all image files from the generated-images directory
+ * Get all image files from the generated-images directory using file system abstraction
  */
-function getAllGeneratedImages() {
+async function getAllGeneratedImages() {
   try {
-    const files = fs.readdirSync(IMAGES_DIR);
-    return files.filter(file => 
-      file.toLowerCase().endsWith('.png') || 
-            file.toLowerCase().endsWith('.jpg') || 
-            file.toLowerCase().endsWith('.jpeg') ||
-            file.toLowerCase().endsWith('.gif') ||
-            file.toLowerCase().endsWith('.webp')
-    );
+    const files = await fileSystem.listFiles('generated-images');
+    return files
+      .filter(file => 
+        file.name.toLowerCase().endsWith('.png') || 
+        file.name.toLowerCase().endsWith('.jpg') || 
+        file.name.toLowerCase().endsWith('.jpeg') ||
+        file.name.toLowerCase().endsWith('.gif') ||
+        file.name.toLowerCase().endsWith('.webp')
+      )
+      .map(file => file.name);
   } catch (error) {
     console.error('Error reading images directory:', error.message);
     return [];
@@ -74,11 +80,11 @@ function getAllGeneratedImages() {
 }
 
 /**
- * Find unused images (excluding fallback images)
+ * Find unused images (excluding fallback images) using file system abstraction
  */
-function findUnusedImages() {
-  const referencedImages = getReferencedImages();
-  const allImages = getAllGeneratedImages();
+async function findUnusedImages() {
+  const referencedImages = await getReferencedImages();
+  const allImages = await getAllGeneratedImages();
     
   console.log(`Total images in generated-images directory: ${allImages.length}`);
     
@@ -101,16 +107,16 @@ function findUnusedImages() {
 }
 
 /**
- * Delete unused images
+ * Delete unused images using file system abstraction
  */
-function deleteUnusedImages(imagesToDelete) {
+async function deleteUnusedImages(imagesToDelete) {
   let deletedCount = 0;
   let errors = 0;
     
   for (const image of imagesToDelete) {
-    const imagePath = path.join(IMAGES_DIR, image);
+    const imagePath = `generated-images/${image}`;
     try {
-      fs.unlinkSync(imagePath);
+      await fileSystem.delete(imagePath);
       console.log(`✓ Deleted: ${image}`);
       deletedCount++;
     } catch (error) {
@@ -129,16 +135,18 @@ function deleteUnusedImages(imagesToDelete) {
 }
 
 /**
- * Calculate total size of files
+ * Calculate total size of files using file system abstraction
  */
-function calculateTotalSize(imageFiles) {
+async function calculateTotalSize(imageFiles) {
   let totalSize = 0;
     
   for (const image of imageFiles) {
     try {
-      const imagePath = path.join(IMAGES_DIR, image);
-      const stats = fs.statSync(imagePath);
-      totalSize += stats.size;
+      const files = await fileSystem.listFiles('generated-images');
+      const fileInfo = files.find(f => f.name === image);
+      if (fileInfo) {
+        totalSize += fileInfo.size;
+      }
     } catch (error) {
       console.warn(`Warning: Could not access file ${image}:`, error.message);
       // Continue with next file
@@ -162,9 +170,9 @@ function formatBytes(bytes) {
 }
 
 /**
- * Main function
+ * Main cleanup function using file system abstraction
  */
-function main() {
+async function cleanupUnusedImages() {
   const args = process.argv.slice(2);
   const whatIf = args.includes('--what-if') || args.includes('-w');
     
@@ -178,50 +186,70 @@ function main() {
     console.log('⚠️  DELETION MODE: Files will be permanently deleted\n');
   }
     
-  // Check if directories exist
-  if (!fs.existsSync(DATA_DIR)) {
-    console.error(`Data directory not found: ${DATA_DIR}`);
+  try {
+    // Find unused images
+    const unusedImages = await findUnusedImages();
+    
+    if (unusedImages.length === 0) {
+      console.log('\n🎉 No unused images found. Nothing to clean up!');
+      return;
+    }
+    
+    // Calculate sizes
+    const totalSize = await calculateTotalSize(unusedImages);
+    const formattedSize = formatBytes(totalSize);
+    
+    console.log(`\n📋 Found ${unusedImages.length} unused images (${formattedSize}):`);
+    
+    // Show first few images as examples
+    const displayImages = unusedImages.slice(0, 10);
+    for (const image of displayImages) {
+      console.log(`  - ${image}`);
+    }
+    
+    if (unusedImages.length > 10) {
+      console.log(`  ... and ${unusedImages.length - 10} more images`);
+    }
+    
+    if (whatIf) {
+      console.log(`\n💡 Run without --what-if to delete these ${unusedImages.length} unused images (${formattedSize})`);
+    } else {
+      console.log(`\n🗑️  Deleting ${unusedImages.length} unused images...`);
+      const result = await deleteUnusedImages(unusedImages);
+      
+      if (result.deleted > 0) {
+        console.log(`\n✅ Successfully cleaned up ${result.deleted} unused images!`);
+        if (result.errors === 0) {
+          console.log(`💾 Freed up approximately ${formattedSize} of disk space`);
+        }
+      }
+      
+      if (result.errors > 0) {
+        console.log(`\n⚠️  ${result.errors} errors occurred during cleanup`);
+        process.exit(1);
+      }
+    }
+  } catch (error) {
+    console.error('❌ Fatal error during cleanup:', error.message);
     process.exit(1);
   }
-    
-  if (!fs.existsSync(IMAGES_DIR)) {
-    console.error(`Images directory not found: ${IMAGES_DIR}`);
-    process.exit(1);
-  }
-    
-  // Find unused images
-  const unusedImages = findUnusedImages();
-    
-  if (unusedImages.length === 0) {
-    console.log('\n🎉 No unused images found. Nothing to clean up!');
-    return;
-  }
-    
-  // Calculate space that would be freed
-  const totalSize = calculateTotalSize(unusedImages);
-  console.log(`\nSpace that would be freed: ${formatBytes(totalSize)}`);
-    
-  if (whatIf) {
-    console.log('\n📋 Images that would be deleted:');
-    console.log('-'.repeat(40));
-    unusedImages.forEach((image, index) => {
-      console.log(`${index + 1}. ${image}`);
+}
+
+// Run the script if called directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log('🧹 Generated Images Cleanup Tool');
+  console.log('Usage: node cleanupGeneratedImages.js [--what-if|-w]');
+  console.log('');
+  
+  cleanupUnusedImages()
+    .then(() => {
+      console.log('\n✨ Cleanup script completed!');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('💥 Script failed:', error.message);
+      process.exit(1);
     });
-    console.log('\n💡 Run without --what-if to actually delete these files');
-  } else {
-    console.log('\n🗑️  Deleting unused images...');
-    console.log('-'.repeat(40));
-    deleteUnusedImages(unusedImages);
-  }
 }
 
-// Run the script
-if (require.main === module) {
-  main();
-}
-
-module.exports = {
-  getReferencedImages,
-  findUnusedImages,
-  deleteUnusedImages
-};
+export { cleanupUnusedImages, findUnusedImages, getReferencedImages };

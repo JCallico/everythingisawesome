@@ -70,15 +70,20 @@ This monorepo contains four main components:
 
 ### Cloud & DevOps
 - **Azure Web App** - Production hosting (Windows App Service Plan)
+- **Azure Blob Storage** - Scalable cloud file storage with automatic fallback
+- **File System Abstraction** - Unified storage API supporting local and cloud storage
 - **GitHub Actions** - CI/CD pipeline automation
 - **IISNode** - Node.js integration for Windows App Service
 - **Azure CLI** - Infrastructure management and deployment
 
 ### Data & Storage
+- **Flexible Storage Architecture** - Supports both local file system and Azure Blob Storage
+- **Automatic Storage Detection** - Intelligently selects storage backend based on configuration
+- **File System Abstraction** - Unified API for seamless storage migration
 - **JSON File System** - Lightweight data persistence
-- **Static File Serving** - Express.js static middleware
-- **Image Storage** - Organized file system structure
-- **Data Persistence** - Deployment-safe data retention
+- **Static File Serving** - Express.js static middleware with cloud storage support
+- **Image Storage** - Organized file system structure with Azure integration
+- **Data Persistence** - Deployment-safe data retention across storage backends
 
 ### Development Tools
 - **concurrently** - Run multiple npm scripts simultaneously
@@ -99,6 +104,8 @@ This monorepo contains four main components:
 - **Smart Navigation**: Browse between different days with intuitive controls
 - **Automated Collection**: Daily processing with robust error handling and source diversity
 - **Azure Cloud Deployment**: Production-ready deployment on Azure Web App with CI/CD
+- **Flexible Storage Architecture**: Seamlessly supports local file system and Azure Blob Storage
+- **Intelligent Storage Detection**: Automatically configures optimal storage backend based on environment
 - **Persistent Data Storage**: Generated images and news data persist between deployments
 - **Source Flexibility**: Optional filtering by reputable sources (currently disabled for maximum diversity)
 
@@ -141,6 +148,12 @@ npm run install-all
 # - GROK_SENTIMENT_MAX_TOKENS=10 (optional - has default, use 200 for grok-4)
 # - GROK_SUMMARY_MAX_TOKENS=100 (optional - has default, use 250 for grok-4)
 # - GROK_IMAGE_PROMPT_MAX_TOKENS=150 (optional - has default, use 300 for grok-4)
+#
+# For Azure Blob Storage (optional - local file system used by default):
+# - AZURE_STORAGE_ENABLED=true (set to enable Azure Blob Storage)
+# - AZURE_STORAGE_ACCOUNT_NAME=your_storage_account_name
+# - AZURE_STORAGE_ACCOUNT_KEY=your_storage_account_key
+# - AZURE_STORAGE_CONTAINER_NAME=your_container_name
 ```
 
 ### Development Commands
@@ -198,7 +211,11 @@ everythingisawesome/
 │   ├── jobs/              # Scheduled tasks
 │   ├── routes/            # API routes
 │   ├── scripts/           # Utility scripts
-│   └── utils/             # Server utilities
+│   ├── utils/             # Server utilities
+│   └── filesystem/        # File system abstraction layer
+│       ├── FileSystemFactory.js      # Storage system selector
+│       ├── LocalFileSystem.js        # Local file operations
+│       └── AzureBlobFileSystem.js    # Azure Blob Storage operations
 │
 ├── shared/                 # Shared Libraries
 │   ├── api.js             # Platform-agnostic API layer
@@ -457,6 +474,51 @@ cron.schedule('0 6 * * *', () => {
 ```
 
 **Note**: Automated scheduling is currently disabled to avoid unnecessary API costs during development.
+
+## 💾 Storage Configuration
+
+### Flexible Storage Options
+
+The application supports two storage backends that are automatically detected:
+
+**Local File System (Default):**
+- Stores files in the `/data` directory
+- No additional setup required
+- Ideal for development and testing
+
+**Azure Blob Storage (Production):**
+- Stores files in Azure Blob Storage containers
+- Automatic detection based on environment variables
+- Ideal for production and scalable deployments
+
+### Enabling Azure Blob Storage
+
+**For Local Development:**
+Add these variables to your `.env` file:
+```env
+AZURE_STORAGE_ACCOUNT_NAME=your_storage_account_name
+AZURE_STORAGE_ACCOUNT_KEY=your_storage_account_key
+AZURE_STORAGE_CONTAINER_NAME=your_container_name
+```
+
+**For Production (GitHub Actions):**
+Add these as GitHub repository secrets:
+- `AZURE_STORAGE_ACCOUNT_NAME`
+- `AZURE_STORAGE_ACCOUNT_KEY`
+- `AZURE_STORAGE_CONTAINER_NAME`
+
+The deployment pipeline automatically detects these secrets and enables Azure Blob Storage.
+
+### Testing Storage Configuration
+
+The file system abstraction automatically detects the appropriate storage backend based on your environment configuration.
+
+### Storage Migration
+
+The file system abstraction allows seamless migration between storage backends:
+- **Zero Code Changes**: Same application logic for both storage types
+- **Automatic Detection**: System selects appropriate storage based on configuration
+- **Graceful Fallback**: Uses local storage if Azure isn't configured
 - **Content Quality**: Awesome indices ranging from 52-91 (improved distribution with commercial filtering)
 - **Content Diversity**: Community service, scientific discoveries, education, technology breakthroughs, environmental progress
 - **Source Variety**: 20+ different news outlets and platforms with quality-focused filtering

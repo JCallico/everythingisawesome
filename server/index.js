@@ -3,10 +3,14 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { createFileSystem } from './filesystem/FileSystemFactory.js';
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Initialize file system abstraction  
+const fileSystem = createFileSystem();
 
 // Try to load cron, but don't fail if it's missing
 let cron;
@@ -38,75 +42,105 @@ async function startServer() {
   const staticPath = path.join(__dirname, '../client/build');
   if (fs.existsSync(staticPath)) {
     app.use(express.static(staticPath));
-    console.log('Static files configured:', staticPath);
+    console.log('[0] Static files configured:', staticPath);
   } else {
-    console.error('Static files directory not found:', staticPath);
+    console.error('[0] Static files directory not found:', staticPath);
   }
 
-  // Ensure data directory exists
-  const dataDir = path.join(__dirname, '../data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-    console.log('Created data directory');
+  // File system configuration logging
+  const fileSystemType = fileSystem.constructor.name;
+  if (fileSystemType === 'AzureBlobFileSystem') {
+    console.log('[0] File system configured: Azure Blob Storage');
+    console.log('    Storage Account:', process.env.AZURE_STORAGE_ACCOUNT_NAME || 'Not configured');
+    console.log('    Container Name:', process.env.AZURE_STORAGE_CONTAINER_NAME || 'Not configured');
+    console.log('[0] Images path configured: Azure Blob Storage (generated-images container path)');
+  } else {
+    console.log('[0] File system configured:', fileSystem.getBasePath());
+    console.log('[0] Images path configured:', fileSystem.getImagesPath());
   }
 
-  // Ensure generated-images directory exists
-  const generatedImagesDir = path.join(__dirname, '../data/generated-images');
-  if (!fs.existsSync(generatedImagesDir)) {
-    fs.mkdirSync(generatedImagesDir, { recursive: true });
-    console.log('Created generated-images directory');
-  }
-
-  // Serve generated images from data folder (for images created by fetchNews job)
-  const generatedImagesPath = path.join(__dirname, '../data/generated-images');
-  app.use('/generated-images', express.static(generatedImagesPath));
-  console.log('Generated images route configured:', generatedImagesPath);
+  // Serve generated images from file system abstraction
+  app.get('/generated-images/:filename', async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const imagePath = `generated-images/${filename}`;
+      
+      // Check if image exists
+      const exists = await fileSystem.exists(imagePath);
+      if (!exists) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      // Get the image data
+      const imageData = await fileSystem.read(imagePath, null); // null encoding for binary data
+      
+      // Set appropriate content type based on file extension
+      const ext = path.extname(filename).toLowerCase();
+      const contentTypes = {
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp'
+      };
+      
+      const contentType = contentTypes[ext] || 'image/png';
+      res.set('Content-Type', contentType);
+      res.set('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+      
+      res.send(imageData);
+    } catch (error) {
+      console.error('Error serving image:', error);
+      res.status(500).json({ error: 'Failed to serve image' });
+    }
+  });
+  console.log('[0] Generated images route configured (using file system abstraction)');
+  
+  // Log storage configuration summary
+  const storageType = fileSystem.constructor.name === 'AzureBlobFileSystem' ? 'Azure Blob Storage' : 'Local File System';
+  console.log(`[0] ✅ Storage backend: ${storageType}`);
 
   // Health check endpoint
-  app.get('/health', (req, res) => {
-    const dataExists = fs.existsSync(dataDir);
-    const generatedImagesExists = fs.existsSync(generatedImagesDir);
-  
-    // Count JSON files and images
-    let jsonFileCount = 0;
-    let imageFileCount = 0;
-  
+  app.get('/health', async (req, res) => {
     try {
-      if (dataExists) {
-        const files = fs.readdirSync(dataDir);
-        jsonFileCount = files.filter(file => file.endsWith('.json')).length;
-      }
-    
-      if (generatedImagesExists) {
-        const images = fs.readdirSync(generatedImagesDir);
-        const imagePattern = /\.(png|jpg|jpeg|gif)$/i;
-        imageFileCount = images.filter(file => imagePattern.test(file)).length;
-      }
+      // Count JSON files and images using file system abstraction
+      const files = await fileSystem.listFiles();
+      const jsonFileCount = files.filter(file => file.name.endsWith('.json')).length;
+      
+      const imageFiles = await fileSystem.listFiles('generated-images');
+      const imagePattern = /\.(png|jpg|jpeg|gif)$/i;
+      const imageFileCount = imageFiles.filter(file => imagePattern.test(file.name)).length;
+      
+      const health = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        server: {
+          node_version: process.version,
+          port: PORT,
+          env: process.env.NODE_ENV || 'development'
+        },
+        data: {
+          file_system_type: fileSystem.constructor.name,
+          base_path: fileSystem.getBasePath(),
+          images_path: fileSystem.getImagesPath(),
+          json_files: jsonFileCount,
+          image_files: imageFileCount
+        },
+        routes: {
+          news_api: true,
+          static_files: fs.existsSync(staticPath)
+        }
+      };
+      
+      res.json(health);
     } catch (error) {
-      console.error('Error reading directories for health check:', error);
+      console.error('Error in health check:', error);
+      res.status(500).json({
+        status: 'error',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
     }
-  
-    const health = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      server: {
-        node_version: process.version,
-        port: PORT,
-        env: process.env.NODE_ENV || 'development'
-      },
-      data: {
-        folder_exists: dataExists,
-        json_files: jsonFileCount,
-        generated_images_folder: generatedImagesExists,
-        image_files: imageFileCount
-      },
-      routes: {
-        news_api: true,
-        static_files: fs.existsSync(staticPath)
-      }
-    };
-  
-    res.json(health);
   });
 
   // Try to load news routes

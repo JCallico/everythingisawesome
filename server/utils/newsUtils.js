@@ -1,23 +1,15 @@
-import fs from 'fs-extra';
-import path from 'path';
 import moment from 'moment';
-import { fileURLToPath } from 'url';
+import { createFileSystem } from '../filesystem/FileSystemFactory.js';
 
-// Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_DIR = path.join(__dirname, '../../data');
-
-// Ensure data directory exists
-fs.ensureDirSync(DATA_DIR);
+// Initialize file system abstraction
+const fileSystem = createFileSystem();
 
 const getAvailableDates = async () => {
   try {
-    const files = await fs.readdir(DATA_DIR);
+    const files = await fileSystem.listFiles();
     const jsonFiles = files
-      .filter(file => file.endsWith('.json'))
-      .map(file => file.replace('.json', ''))
+      .filter(file => file.name.endsWith('.json'))
+      .map(file => file.name.replace('.json', ''))
       .sort()
       .reverse(); // Most recent first
     
@@ -30,14 +22,15 @@ const getAvailableDates = async () => {
 
 const getNewsByDate = async (date) => {
   try {
-    const filePath = path.join(DATA_DIR, `${date}.json`);
-    const exists = await fs.pathExists(filePath);
+    const filePath = `${date}.json`;
+    const exists = await fileSystem.exists(filePath);
     
     if (!exists) {
       return null;
     }
     
-    const data = await fs.readJson(filePath);
+    const content = await fileSystem.read(filePath);
+    const data = JSON.parse(content);
     return data;
   } catch (error) {
     console.error(`Error reading news for date ${date}:`, error);
@@ -62,8 +55,8 @@ const getLatestNews = async () => {
 
 const saveNewsByDate = async (date, newsData) => {
   try {
-    const filePath = path.join(DATA_DIR, `${date}.json`);
-    await fs.writeJson(filePath, newsData, { spaces: 2 });
+    const filePath = `${date}.json`;
+    await fileSystem.write(filePath, JSON.stringify(newsData, null, 2));
     console.log(`News saved for date: ${date}`);
     return true;
   } catch (error) {

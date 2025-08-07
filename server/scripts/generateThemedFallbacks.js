@@ -1,7 +1,10 @@
 require('dotenv').config();
 const axios = require('axios');
-const fs = require('fs-extra');
 const path = require('path');
+const { createFileSystem } = require('../filesystem/FileSystemFactory.js');
+
+// Initialize file system abstraction
+const fileSystem = createFileSystem();
 
 /**
  * Generate themed fallback images using Grok API
@@ -111,15 +114,11 @@ const generateFallbackImage = async (theme, themeData) => {
     if (response.data.data && response.data.data.length > 0) {
       const base64Image = response.data.data[0].b64_json;
       
-      // Create images directory if it doesn't exist
-      const imagesDir = path.join(__dirname, '../../data/generated-images');
-      await fs.ensureDir(imagesDir);
-      
-      // Save as themed fallback image
+      // Save as themed fallback image using file system abstraction
       const filename = `fallback-${theme}.png`;
-      const filepath = path.join(imagesDir, filename);
+      const filepath = `generated-images/${filename}`;
       const imageBuffer = Buffer.from(base64Image, 'base64');
-      await fs.writeFile(filepath, imageBuffer);
+      await fileSystem.write(filepath, imageBuffer);
       
       console.log(`   ✅ ${themeData.name} fallback image saved: ${filename}`);
       return true;
@@ -142,10 +141,6 @@ const generateAllFallbackImages = async () => {
     console.log('This script will generate themed fallback images using Grok API');
     console.log('Only missing fallback images will be generated...\n');
 
-    // Create images directory if it doesn't exist
-    const imagesDir = path.join(__dirname, '../../data/generated-images');
-    await fs.ensureDir(imagesDir);
-
     let successCount = 0;
     let skippedCount = 0;
     const totalCount = Object.keys(THEMES).length;
@@ -155,9 +150,9 @@ const generateAllFallbackImages = async () => {
     const themesToGenerate = [];
     for (const [theme, themeData] of Object.entries(THEMES)) {
       const filename = `fallback-${theme}.png`;
-      const filepath = path.join(imagesDir, filename);
+      const filepath = `generated-images/${filename}`;
       
-      if (await fs.pathExists(filepath)) {
+      if (await fileSystem.exists(filepath)) {
         console.log(`✅ ${themeData.name} fallback image already exists: ${filename}`);
         skippedCount++;
       } else {
