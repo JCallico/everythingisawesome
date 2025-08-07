@@ -37,6 +37,8 @@
     "setup": "pnpm install && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Add your NEWS_API_KEY to the .env file' && echo '3. Optional: Customize GROK_MODEL and token limits (defaults provided for grok-3)' && echo '4. For grok-4: uncomment grok-4 token values in .env and set GROK_MODEL=grok-4-latest' && echo '5. Run \"npm run generate-themed-fallbacks\" to create the themed fallback images' && echo '6. Run \"npm run dev\" for web + server' && echo '7. Run \"npm run dev:mobile\" for mobile + server' && echo '8. Run \"npm run dev:all\" for web + mobile + server' && echo '9. Visit http://localhost:3000 for web or use Expo app for mobile'"
   },
   "dependencies": {
+    "@azure/identity": "4.11.1",
+    "@azure/storage-blob": "12.28.0",
     "axios": "^1.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",

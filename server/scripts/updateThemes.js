@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-const fs = require('fs-extra');
-const path = require('path');
+const { createFileSystem } = require('../filesystem/FileSystemFactory.js');
+
+// Initialize file system abstraction
+const fileSystem = createFileSystem();
 
 // Unified theme dictionary with keywords for each theme (same as fetchNews.js)
 const THEME_KEYWORDS = {
@@ -42,15 +44,16 @@ const detectStoryTheme = (story) => {
 };
 
 // Function to update a single data file
-const updateDataFile = async (filePath, forceUpdate = false) => {
+const updateDataFile = async (fileName, forceUpdate = false) => {
   try {
-    console.log(`Processing: ${path.basename(filePath)}`);
+    console.log(`Processing: ${fileName}`);
     
     // Read the existing data
-    const data = await fs.readJson(filePath);
+    const content = await fileSystem.read(fileName);
+    const data = JSON.parse(content);
     
     if (!data.stories || !Array.isArray(data.stories)) {
-      console.log(`  ⚠️  No stories array found in ${path.basename(filePath)}`);
+      console.log(`  ⚠️  No stories array found in ${fileName}`);
       return false;
     }
     
@@ -79,13 +82,13 @@ const updateDataFile = async (filePath, forceUpdate = false) => {
     });
     
     // Save the updated data back to file
-    await fs.writeJson(filePath, data, { spaces: 2 });
+    await fileSystem.write(fileName, JSON.stringify(data, null, 2));
     
     console.log(`  ✅ Updated ${updatedCount} stories, skipped ${skippedCount} (already had themes)`);
     return true;
     
   } catch (error) {
-    console.error(`  ❌ Error processing ${path.basename(filePath)}:`, error.message);
+    console.error(`  ❌ Error processing ${fileName}:`, error.message);
     return false;
   }
 };
@@ -99,18 +102,9 @@ const updateAllThemes = async (forceUpdate = false) => {
       console.log('🔄 Force update mode: Will update all themes regardless of existing values\n');
     }
     
-    // Get the data directory path
-    const dataDir = path.join(__dirname, '../../data');
-    
-    // Check if data directory exists
-    if (!await fs.pathExists(dataDir)) {
-      console.error('❌ Data directory not found:', dataDir);
-      process.exit(1);
-    }
-    
-    // Find all JSON files in the data directory
-    const files = await fs.readdir(dataDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    // Find all JSON files using file system abstraction
+    const files = await fileSystem.listFiles();
+    const jsonFiles = files.filter(file => file.name.endsWith('.json'));
     
     if (jsonFiles.length === 0) {
       console.log('📂 No JSON files found in data directory');
@@ -124,8 +118,7 @@ const updateAllThemes = async (forceUpdate = false) => {
     
     // Process each file
     for (const jsonFile of jsonFiles) {
-      const filePath = path.join(dataDir, jsonFile);
-      const success = await updateDataFile(filePath, forceUpdate);
+      const success = await updateDataFile(jsonFile.name, forceUpdate);
       
       if (success) {
         successCount++;

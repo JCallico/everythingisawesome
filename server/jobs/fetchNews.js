@@ -1,16 +1,17 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+
+// Load .env from root directory
+dotenv.config({ path: path.join(process.cwd(), '../.env') });
+
 import axios from 'axios';
 import moment from 'moment';
 import { saveNewsByDate, formatDateForFilename, getPreviousDate } from '../utils/newsUtils.js';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createFileSystem } from '../filesystem/FileSystemFactory.js';
 import * as fuzzball from 'fuzzball';
 
-// Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Initialize file system abstraction
+const fileSystem = createFileSystem();
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const NEWSAPI_URL = 'https://newsapi.org/v2/everything';
@@ -378,18 +379,14 @@ const createBasicImagePrompt = (story) => {
 // Save base64 image data to file
 const saveBase64Image = async (base64Data, storyIndex) => {
   try {
-    // Create images directory if it doesn't exist
-    const imagesDir = path.join(__dirname, '../../data/generated-images');
-    await fs.ensureDir(imagesDir);
-    
     // Generate unique filename
     const timestamp = Date.now();
     const filename = `story-${storyIndex + 1}-${timestamp}.png`;
-    const filepath = path.join(imagesDir, filename);
+    const filepath = `generated-images/${filename}`;
     
     // Convert base64 to buffer and save
     const imageBuffer = Buffer.from(base64Data, 'base64');
-    await fs.writeFile(filepath, imageBuffer);
+    await fileSystem.write(filepath, imageBuffer);
     
     // Return the public URL path
     return `/generated-images/${filename}`;

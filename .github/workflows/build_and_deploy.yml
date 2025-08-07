@@ -54,7 +54,8 @@ jobs:
           echo "🔧 Using pnpm with shamefully-hoist=true for maximum flattening"
           echo "🪟 This configuration prevents Windows path length issues during Azure deployment"
           echo "📏 Reduces node_modules nesting from 14 to 10 levels and eliminates 260+ char paths"
-          pnpm install --reporter=append-only
+          echo "🔄 Updating lockfile to match package.json changes..."
+          pnpm install --no-frozen-lockfile --reporter=append-only
           echo "✅ Dependencies installed successfully with flattened structure"
 
       - name: Install client and mobile dependencies
@@ -519,8 +520,18 @@ jobs:
           
           echo "Found resource group: $RESOURCE_GROUP"
           
-          # Set application settings including SCM build configuration
+          # Set application settings including SCM build configuration and Azure Storage
           echo "Setting environment variables and build configuration..."
+          
+          # Check if Azure Storage secrets are configured
+          if [[ -n "${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" && -n "${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" && -n "${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" ]]; then
+            echo "✅ Azure Storage secrets detected - enabling Azure Blob Storage"
+            AZURE_STORAGE_ENABLED="true"
+          else
+            echo "⚠️ Azure Storage secrets not configured - using local file system"
+            AZURE_STORAGE_ENABLED="false"
+          fi
+          
           az webapp config appsettings set \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
@@ -533,6 +544,10 @@ jobs:
               GROK_SUMMARY_MAX_TOKENS=100 \
               GROK_IMAGE_PROMPT_MAX_TOKENS=150 \
               NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
+              AZURE_STORAGE_ENABLED="$AZURE_STORAGE_ENABLED" \
+              AZURE_STORAGE_ACCOUNT_NAME="${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" \
+              AZURE_STORAGE_ACCOUNT_KEY="${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" \
+              AZURE_STORAGE_CONTAINER_NAME="${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" \
               SCM_DO_BUILD_DURING_DEPLOYMENT=true
               
           echo "✅ SCM_DO_BUILD_DURING_DEPLOYMENT=true - Azure will automatically run npm install during deployment"
@@ -552,12 +567,12 @@ jobs:
           # Find the resource group
           RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
           
-          # Check current app settings
+          # Check current app settings including Azure Storage
           echo "Current app settings:"
           az webapp config appsettings list \
             --name everythingisawesome \
             --resource-group "$RESOURCE_GROUP" \
-            --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE']" \
+            --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE' || name=='AZURE_STORAGE_ENABLED' || name=='AZURE_STORAGE_ACCOUNT_NAME' || name=='AZURE_STORAGE_CONTAINER_NAME']" \
             -o table
             
           # Check startup command
