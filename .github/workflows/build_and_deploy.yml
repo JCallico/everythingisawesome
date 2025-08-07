@@ -187,7 +187,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: |
+            .
+            !node_modules
+            !client/node_modules
+            !mobile/node_modules
+            !packages/*/node_modules
           # Ensure build files are included even if in .gitignore
           retention-days: 1
 
