@@ -203,6 +203,8 @@ This is a cross-platform monorepo for "Everything Is Awesome" - a positive news 
 
 ### Required Environment Variables
 - `GROK_API_KEY` - For AI analysis
+- `GROK_MODEL` - AI text analysis model (defaults to grok-3-latest)
+- `GROK_IMAGE_MODEL` - AI image generation model (defaults to grok-2-image)
 - `NEWS_API_KEY` - For news fetching
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (defaults to 3001)

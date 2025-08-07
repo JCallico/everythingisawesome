@@ -227,6 +227,10 @@ Create a `.env` file in the root directory:
 GROK_API_KEY=your_grok_api_key_here
 NEWS_API_KEY=your_news_api_key_here
 
+# AI Model Configuration (optional - defaults provided)
+GROK_MODEL=grok-3-latest
+GROK_IMAGE_MODEL=grok-2-image
+
 # Optional - Development settings
 NODE_ENV=development
 PORT=3001
@@ -242,7 +246,12 @@ MAX_ARTICLES_TO_PROCESS=50
    - Generate API key
    - Add to `.env` as `GROK_API_KEY`
 
-2. **NewsAPI Key:**
+2. **AI Model Configuration:**
+   - `GROK_MODEL` - Text analysis model (default: grok-3-latest)
+   - `GROK_IMAGE_MODEL` - Image generation model (default: grok-2-image)
+   - These can be updated when newer models become available
+
+3. **NewsAPI Key:**
    - Sign up at [newsapi.org](https://newsapi.org)
    - Get free API key (100 requests/day)
    - Add to `.env` as `NEWS_API_KEY`
@@ -302,6 +311,8 @@ Configure these in Azure Portal → App Service → Configuration:
 ```env
 NODE_ENV=production
 GROK_API_KEY=your_actual_grok_api_key
+GROK_MODEL=grok-3-latest
+GROK_IMAGE_MODEL=grok-2-image
 NEWS_API_KEY=your_actual_news_api_key
 WEBSITE_NODE_DEFAULT_VERSION=~22
 ```
@@ -312,6 +323,8 @@ Configure these in GitHub Repository → Settings → Secrets:
 - `GROK_API_KEY` - Your X.AI Grok API key
 - `NEWS_API_KEY` - Your NewsAPI.org key
 - `AZURE_WEBAPP_PUBLISH_PROFILE` - Azure deployment profile (auto-configured)
+
+**Note:** GROK_MODEL and GROK_IMAGE_MODEL are configured in the deployment workflow with default values and can be customized in Azure App Service settings if needed.
 
 ## 🔄 CI/CD Pipeline
 

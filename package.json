@@ -34,7 +34,7 @@
     "generate-themed-fallbacks": "node server/scripts/generateThemedFallbacks.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "setup": "pnpm install && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Add your NEWS_API_KEY to the .env file' && echo '3. Run \"npm run generate-themed-fallbacks\" to create the themed fallback images' && echo '4. Run \"npm run dev\" for web + server' && echo '5. Run \"npm run dev:mobile\" for mobile + server' && echo '6. Run \"npm run dev:all\" for web + mobile + server' && echo '7. Visit http://localhost:3000 for web or use Expo app for mobile'"
+    "setup": "pnpm install && echo '\\n✅ Setup complete! Don\\'t forget to:' && echo '1. Add your GROK_API_KEY to the .env file' && echo '2. Add your NEWS_API_KEY to the .env file' && echo '3. Optional: Customize GROK_MODEL and GROK_IMAGE_MODEL (defaults provided)' && echo '4. Run \"npm run generate-themed-fallbacks\" to create the themed fallback images' && echo '5. Run \"npm run dev\" for web + server' && echo '6. Run \"npm run dev:mobile\" for mobile + server' && echo '7. Run \"npm run dev:all\" for web + mobile + server' && echo '8. Visit http://localhost:3000 for web or use Expo app for mobile'"
   },
   "dependencies": {
     "axios": "^1.10.0",

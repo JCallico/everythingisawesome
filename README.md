@@ -136,6 +136,8 @@ npm run install-all
 # Copy .env.example to .env and add your API keys:
 # - GROK_API_KEY=your_grok_api_key
 # - NEWS_API_KEY=your_news_api_key
+# - GROK_MODEL=grok-3-latest (optional - has default)
+# - GROK_IMAGE_MODEL=grok-2-image (optional - has default)
 ```
 
 ### Development Commands

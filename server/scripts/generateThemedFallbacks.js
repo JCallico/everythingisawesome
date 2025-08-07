@@ -96,7 +96,7 @@ const generateFallbackImage = async (theme, themeData) => {
     console.log(`   Using prompt: "${themeData.prompt}"`);
 
     const response = await axios.post('https://api.x.ai/v1/images/generations', {
-      model: 'grok-2-image',
+      model: process.env.GROK_IMAGE_MODEL || 'grok-2-image',
       prompt: themeData.prompt,
       n: 1,
       response_format: 'b64_json'

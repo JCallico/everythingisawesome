@@ -136,7 +136,7 @@ Article text: "${articleText.substring(0, 1000)}"
 Respond with only a number between 0-100 representing the positivity score.`;
 
     const response = await axios.post(GROK_API_URL, {
-      model: 'grok-3-latest',
+      model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
       max_tokens: 10
@@ -188,7 +188,7 @@ Article: "${articleText.substring(0, 1000)}"
 Focus on the positive impact, hope, and inspiring elements. Keep it under 200 characters.`;
 
     const response = await axios.post(GROK_API_URL, {
-      model: 'grok-3-latest',
+      model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 100
@@ -254,7 +254,7 @@ const generateStoryImage = async (story, storyIndex) => {
     // Try Grok image generation with grok-2-image
     try {
       const response = await axios.post('https://api.x.ai/v1/images/generations', {
-        model: 'grok-2-image',
+        model: process.env.GROK_IMAGE_MODEL || 'grok-2-image',
         prompt: imagePrompt,
         n: 1,
         response_format: 'b64_json'
@@ -317,7 +317,7 @@ Create a visual description that includes:
 Respond with only the image generation prompt (max 300 characters).`;
 
     const response = await axios.post(GROK_API_URL, {
-      model: 'grok-3-latest',
+      model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 150
