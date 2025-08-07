@@ -209,25 +209,25 @@ export class AzureBlobFileSystem {
   }
 
   // Synchronous operations (compatibility - these will be async internally)
-  existsSync(filePath) {
+  existsSync(_filePath) {
     // Note: This is not truly synchronous but needed for compatibility
     console.warn('existsSync is not truly synchronous with Azure Blob Storage');
     return false;
   }
 
-  readdirSync(dirPath = '') {
+  readdirSync(_dirPath = '') {
     // Note: This is not truly synchronous but needed for compatibility
     console.warn('readdirSync is not truly synchronous with Azure Blob Storage');
     return [];
   }
 
-  mkdirSync(dirPath, options = {}) {
+  mkdirSync(_dirPath, _options = {}) {
     // Note: This is not truly synchronous but needed for compatibility
     console.warn('mkdirSync is not truly synchronous with Azure Blob Storage');
     return;
   }
 
-  ensureDirSync(dirPath) {
+  ensureDirSync(_dirPath) {
     // Note: This is not truly synchronous but needed for compatibility
     console.warn('ensureDirSync is not truly synchronous with Azure Blob Storage');
     return;

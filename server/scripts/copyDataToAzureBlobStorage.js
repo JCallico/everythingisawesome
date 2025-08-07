@@ -241,18 +241,18 @@ class DataSyncToAzure {
       
       if (result.success) {
         switch (result.action) {
-          case 'Uploading':
-            results.uploaded++;
-            break;
-          case 'Updating':
-            results.updated++;
-            break;
-          case 'Overwriting':
-            results.overwritten++;
-            break;
-          case 'Skipped':
-            results.skipped++;
-            break;
+        case 'Uploading':
+          results.uploaded++;
+          break;
+        case 'Updating':
+          results.updated++;
+          break;
+        case 'Overwriting':
+          results.overwritten++;
+          break;
+        case 'Skipped':
+          results.skipped++;
+          break;
         }
       } else {
         results.failed++;

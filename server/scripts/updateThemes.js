@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const path = require('path');
 const { createFileSystem } = require('../filesystem/FileSystemFactory.js');
 
 // Initialize file system abstraction
