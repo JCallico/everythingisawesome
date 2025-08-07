@@ -462,15 +462,9 @@ jobs:
             exit 1
           fi
           
-          if [ -d "node_modules" ]; then
-            echo "✅ node_modules directory found (from build phase)"
-            echo "Dependencies size: $(du -sh node_modules 2>/dev/null || echo 'Could not determine size')"
-          else
-            echo "❌ node_modules not found - build artifact may be incomplete"
-            exit 1
-          fi
-          
-          echo "✅ Deployment verification completed - using pre-built dependencies"
+          # With SCM_DO_BUILD_DURING_DEPLOYMENT=true, Azure will install dependencies automatically
+          echo "📦 Dependencies will be installed by Azure SCM during deployment"
+          echo "✅ Deployment verification completed - Azure will handle dependency installation"
 
       - name: 'Configure Node.js Runtime'
         shell: bash
