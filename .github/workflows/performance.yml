@@ -37,19 +37,45 @@ jobs:
           echo "🏥 Checking application health..."
           
           # Check if the application is responding
-          if curl -f -s -o /dev/null -w "%{http_code}" $APP_URL; then
-            echo "✅ Application is responding"
+          STATUS_CODE=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL)
+          if [ "$STATUS_CODE" = "200" ]; then
+            echo "✅ Application is responding (HTTP $STATUS_CODE)"
           else
-            echo "❌ Application is not responding"
+            echo "❌ Application is not responding (HTTP $STATUS_CODE)"
             exit 1
           fi
           
-          # Check API endpoints
-          if curl -f -s -o /dev/null $APP_URL/api/news; then
-            echo "✅ API endpoints are responding"
+          # Check health endpoint
+          HEALTH_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/health)
+          if [ "$HEALTH_STATUS" = "200" ]; then
+            echo "✅ Health endpoint is responding (HTTP $HEALTH_STATUS)"
           else
-            echo "❌ API endpoints are not responding"
+            echo "⚠️ Health endpoint returned HTTP $HEALTH_STATUS"
+          fi
+          
+          # Check API endpoints (use correct endpoint paths)
+          API_LATEST_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/api/news/latest)
+          if [ "$API_LATEST_STATUS" = "200" ]; then
+            echo "✅ API endpoints are responding (HTTP $API_LATEST_STATUS)"
+          else
+            echo "❌ API endpoints are not responding (HTTP $API_LATEST_STATUS)"
             exit 1
+          fi
+          
+          # Check additional API endpoints
+          API_DATES_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/api/news/dates)
+          if [ "$API_DATES_STATUS" = "200" ]; then
+            echo "✅ News dates API is responding (HTTP $API_DATES_STATUS)"
+          else
+            echo "⚠️ News dates API returned HTTP $API_DATES_STATUS"
+          fi
+          
+          # Check if React app is properly loaded
+          REACT_CONTENT=$(curl -s $APP_URL | grep -i "Everything is Awesome" || echo "")
+          if [ -n "$REACT_CONTENT" ]; then
+            echo "✅ React application is properly loaded"
+          else
+            echo "⚠️ React application may not be properly loaded"
           fi
 
       - name: Performance test
@@ -75,9 +101,16 @@ jobs:
           
           # Application status
           STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL)
+          HEALTH_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/health)
+          API_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/api/news/latest)
+          API_DATES_STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" $APP_URL/api/news/dates)
+          
           echo "| Component | Status | Response Code |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Web App | ✅ Healthy | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web App | $([ "$STATUS" = "200" ] && echo "✅ Healthy" || echo "❌ Unhealthy") | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Health Endpoint | $([ "$HEALTH_STATUS" = "200" ] && echo "✅ Healthy" || echo "❌ Unhealthy") | $HEALTH_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| News API (Latest) | $([ "$API_STATUS" = "200" ] && echo "✅ Healthy" || echo "❌ Unhealthy") | $API_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| News API (Dates) | $([ "$API_DATES_STATUS" = "200" ] && echo "✅ Healthy" || echo "❌ Unhealthy") | $API_DATES_STATUS |" >> $GITHUB_STEP_SUMMARY
           
           # Performance metrics
           RESPONSE_TIME=$(curl -o /dev/null -s -w "%{time_total}" $APP_URL)
