@@ -205,6 +205,9 @@ This is a cross-platform monorepo for "Everything Is Awesome" - a positive news 
 - `GROK_API_KEY` - For AI analysis
 - `GROK_MODEL` - AI text analysis model (defaults to grok-3-latest)
 - `GROK_IMAGE_MODEL` - AI image generation model (defaults to grok-2-image)
+- `GROK_SENTIMENT_MAX_TOKENS` - Max tokens for sentiment analysis (10 for grok-3, 200 for grok-4)
+- `GROK_SUMMARY_MAX_TOKENS` - Max tokens for summary generation (100 for grok-3, 250 for grok-4)
+- `GROK_IMAGE_PROMPT_MAX_TOKENS` - Max tokens for image prompt creation (150 for grok-3, 300 for grok-4)
 - `NEWS_API_KEY` - For news fetching
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (defaults to 3001)

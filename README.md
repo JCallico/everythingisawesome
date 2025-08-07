@@ -138,6 +138,9 @@ npm run install-all
 # - NEWS_API_KEY=your_news_api_key
 # - GROK_MODEL=grok-3-latest (optional - has default)
 # - GROK_IMAGE_MODEL=grok-2-image (optional - has default)
+# - GROK_SENTIMENT_MAX_TOKENS=10 (optional - has default, use 200 for grok-4)
+# - GROK_SUMMARY_MAX_TOKENS=100 (optional - has default, use 250 for grok-4)
+# - GROK_IMAGE_PROMPT_MAX_TOKENS=150 (optional - has default, use 300 for grok-4)
 ```
 
 ### Development Commands

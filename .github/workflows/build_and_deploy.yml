@@ -529,6 +529,9 @@ jobs:
               GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
               GROK_MODEL=grok-3-latest \
               GROK_IMAGE_MODEL=grok-2-image \
+              GROK_SENTIMENT_MAX_TOKENS=10 \
+              GROK_SUMMARY_MAX_TOKENS=100 \
+              GROK_IMAGE_PROMPT_MAX_TOKENS=150 \
               NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
               SCM_DO_BUILD_DURING_DEPLOYMENT=true
               

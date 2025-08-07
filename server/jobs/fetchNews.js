@@ -139,7 +139,7 @@ Respond with only a number between 0-100 representing the positivity score.`;
       model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
-      max_tokens: 10
+      max_tokens: parseInt(process.env.GROK_SENTIMENT_MAX_TOKENS) || 10
     }, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -191,7 +191,7 @@ Focus on the positive impact, hope, and inspiring elements. Keep it under 200 ch
       model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 100
+      max_tokens: parseInt(process.env.GROK_SUMMARY_MAX_TOKENS) || 100
     }, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -320,7 +320,7 @@ Respond with only the image generation prompt (max 300 characters).`;
       model: process.env.GROK_MODEL || 'grok-3-latest',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 150
+      max_tokens: parseInt(process.env.GROK_IMAGE_PROMPT_MAX_TOKENS) || 150
     }, {
       headers: {
         'Authorization': `Bearer ${grokApiKey}`,

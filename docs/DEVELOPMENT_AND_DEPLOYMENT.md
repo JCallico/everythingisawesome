@@ -231,6 +231,16 @@ NEWS_API_KEY=your_news_api_key_here
 GROK_MODEL=grok-3-latest
 GROK_IMAGE_MODEL=grok-2-image
 
+# Max Tokens Configuration (Grok-3 optimized values)
+GROK_SENTIMENT_MAX_TOKENS=10
+GROK_SUMMARY_MAX_TOKENS=100
+GROK_IMAGE_PROMPT_MAX_TOKENS=150
+
+# For Grok-4, uncomment and use these values instead:
+# GROK_SENTIMENT_MAX_TOKENS=200
+# GROK_SUMMARY_MAX_TOKENS=250
+# GROK_IMAGE_PROMPT_MAX_TOKENS=300
+
 # Optional - Development settings
 NODE_ENV=development
 PORT=3001
@@ -249,7 +259,10 @@ MAX_ARTICLES_TO_PROCESS=50
 2. **AI Model Configuration:**
    - `GROK_MODEL` - Text analysis model (default: grok-3-latest)
    - `GROK_IMAGE_MODEL` - Image generation model (default: grok-2-image)
-   - These can be updated when newer models become available
+   - `GROK_SENTIMENT_MAX_TOKENS` - Max tokens for sentiment analysis (default: 10 for grok-3, 200 for grok-4)
+   - `GROK_SUMMARY_MAX_TOKENS` - Max tokens for summary generation (default: 100 for grok-3, 250 for grok-4)
+   - `GROK_IMAGE_PROMPT_MAX_TOKENS` - Max tokens for image prompt creation (default: 150 for grok-3, 300 for grok-4)
+   - These can be updated when newer models become available or when switching between grok-3 and grok-4
 
 3. **NewsAPI Key:**
    - Sign up at [newsapi.org](https://newsapi.org)
@@ -313,6 +326,9 @@ NODE_ENV=production
 GROK_API_KEY=your_actual_grok_api_key
 GROK_MODEL=grok-3-latest
 GROK_IMAGE_MODEL=grok-2-image
+GROK_SENTIMENT_MAX_TOKENS=10
+GROK_SUMMARY_MAX_TOKENS=100
+GROK_IMAGE_PROMPT_MAX_TOKENS=150
 NEWS_API_KEY=your_actual_news_api_key
 WEBSITE_NODE_DEFAULT_VERSION=~22
 ```
@@ -324,7 +340,7 @@ Configure these in GitHub Repository → Settings → Secrets:
 - `NEWS_API_KEY` - Your NewsAPI.org key
 - `AZURE_WEBAPP_PUBLISH_PROFILE` - Azure deployment profile (auto-configured)
 
-**Note:** GROK_MODEL and GROK_IMAGE_MODEL are configured in the deployment workflow with default values and can be customized in Azure App Service settings if needed.
+**Note:** GROK_MODEL, GROK_IMAGE_MODEL, and the max tokens settings (GROK_SENTIMENT_MAX_TOKENS, GROK_SUMMARY_MAX_TOKENS, GROK_IMAGE_PROMPT_MAX_TOKENS) are configured in the deployment workflow with default values and can be customized in Azure App Service settings if needed.
 
 ## 🔄 CI/CD Pipeline
 
