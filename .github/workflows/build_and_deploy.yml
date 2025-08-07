@@ -54,7 +54,8 @@ jobs:
           echo "🔧 Using pnpm with shamefully-hoist=true for maximum flattening"
           echo "🪟 This configuration prevents Windows path length issues during Azure deployment"
           echo "📏 Reduces node_modules nesting from 14 to 10 levels and eliminates 260+ char paths"
-          pnpm install --reporter=append-only
+          echo "🔄 Updating lockfile to match package.json changes..."
+          pnpm install --no-frozen-lockfile --reporter=append-only
           echo "✅ Dependencies installed successfully with flattened structure"
 
       - name: Install client and mobile dependencies
