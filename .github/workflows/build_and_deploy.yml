@@ -63,7 +63,7 @@ jobs:
           npm install --prefix client --no-audit --no-fund
           echo "✅ Client dependencies installed"
           echo "📦 Installing mobile dependencies for build and lint..."
-          npm install --prefix mobile --no-audit --no-fund
+          npm install --prefix mobile --no-audit --no-fund --legacy-peer-deps
           echo "✅ Mobile dependencies installed"
 
       - name: Lint root application
