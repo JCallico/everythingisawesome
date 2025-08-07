@@ -1,1 +1,2 @@
-nodeProcessCommandLine: "C:\Program Files (x86)\nodejs\22.14.0\node.exe"
+# Azure App Service will automatically use the Node.js version specified in WEBSITE_NODE_DEFAULT_VERSION
+# No explicit nodeProcessCommandLine needed - let Azure handle Node.js version selection
