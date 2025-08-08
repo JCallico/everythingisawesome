@@ -538,18 +538,16 @@ body.theme-default {
   max-height: 450px; /* Increased from 300px to allow more image visibility on desktop */
   overflow: hidden;
   flex-shrink: 0;
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
 
 .story-image {
-  width: 100%;
-  height: 100%;
+  width: 120%; /* Reasonable size for precise panning */
+  height: 120%;
   object-fit: cover;
-  object-position: center; /* Center the image instead of showing only top portion */
-  transition: transform 0.8s ease;
-}
-
-.story-container:hover .story-image {
-  transform: scale(1.05);
+  object-position: center;
+  transition: transform 8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .image-overlay {
@@ -559,6 +557,7 @@ body.theme-default {
   right: 0;
   bottom: 0;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
 }
 
 /* Story content */
