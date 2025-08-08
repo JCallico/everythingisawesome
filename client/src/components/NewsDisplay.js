@@ -64,6 +64,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
       
       // Extract current position from transform matrix
       if (transform && transform !== 'none') {
+        // eslint-disable-next-line no-undef
         const matrix = new DOMMatrix(transform);
         setImagePosition({ x: matrix.m41, y: matrix.m42 });
       }
@@ -87,21 +88,6 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
     return story.theme || 'hope'; // Fallback to 'hope' if somehow missing
   };
 
-  // Check if image is cropped and determine panning direction
-  const checkImageCropping = useCallback(() => {
-    if (!imageRef.current || !containerRef.current || !imageNaturalSize.width) return;
-
-    const container = containerRef.current;
-    const containerAspectRatio = container.offsetWidth / container.offsetHeight;
-    const imageAspectRatio = imageNaturalSize.width / imageNaturalSize.height;
-
-    // Determine what type of cropping is happening
-    const aspectRatioDiff = Math.abs(containerAspectRatio - imageAspectRatio);
-    const isCropped = aspectRatioDiff > 0.05;
-    
-    setImageCropped(isCropped);
-  }, [imageNaturalSize]);
-
   // Handle image load to get natural dimensions and calculate offsets
   const handleImageLoad = useCallback(() => {
     if (imageRef.current) {
@@ -115,10 +101,11 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
     }
   }, []);
 
-  // Set up resize observer to recalculate offsets when container size changes
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Set up ResizeObserver to handle container size changes
+    // eslint-disable-next-line no-undef
     resizeObserverRef.current = new ResizeObserver(() => {
       // Debounce the calculation to avoid excessive calls during resize
       setTimeout(() => {
