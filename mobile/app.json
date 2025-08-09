@@ -32,9 +32,9 @@
     },
     "extra": {
       "apiBaseUrlDev": "http://192.168.101.120:3001/api",
-      "apiBaseUrlProd": "https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/api",
+      "apiBaseUrlProd": "https://everythingisawesome.news/api",
       "imageBaseUrlDev": "http://192.168.101.120:3001",
-      "imageBaseUrlProd": "https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net"
+      "imageBaseUrlProd": "https://everythingisawesome.news"
     }
   }
 }

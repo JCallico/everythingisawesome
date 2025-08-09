@@ -381,7 +381,7 @@ cd server && npm test    # Server tests
 
 ### Azure Cloud Deployment
 
-**Live Application:** [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+**Live Application:** [https://everythingisawesome.news/](https://everythingisawesome.news/)
 
 ### Deployment Architecture
 - **Platform:** Azure Web App (Windows App Service Plan)

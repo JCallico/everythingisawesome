@@ -2,7 +2,7 @@
 
 A beautiful cross-platform application displaying optimistic, feel-good news stories that restore hope in humanity. This project fetches real news articles, analyzes them with AI for sentiment and positivity, then presents the most uplifting stories with an engaging user interface.
 
-**🚀 Live Demo**: [https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/](https://everythingisawesome-e0e3cycwcwezceem.canadaeast-01.azurewebsites.net/)
+**🚀 Live Demo**: [https://everythingisawesome.news/](https://everythingisawesome.news/)
 
 ## 📱 Cross-Platform Architecture
 
