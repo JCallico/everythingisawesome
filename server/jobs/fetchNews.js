@@ -1,17 +1,59 @@
-import dotenv from 'dotenv';
 import path from 'path';
 
-// Load .env from root directory
-dotenv.config({ path: path.join(process.cwd(), '../.env') });
+// Debug environment information
+console.log('🔍 Environment Debug Info:');
+console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
+console.log(`   Platform: ${process.platform}`);
+console.log(`   Working Directory: ${process.cwd()}`);
+
+// Load .env from root directory (only in development)
+// Skip dotenv loading in Azure App Service production environment
+const isAzureProduction = process.env.WEBSITE_SITE_NAME || process.env.APPSETTING_WEBSITE_SITE_NAME;
+if (!isAzureProduction && process.env.NODE_ENV !== 'production') {
+  console.log('📝 Loading .env file for local development');
+  // Use dynamic import but don't await at top level
+  import('dotenv').then(dotenv => {
+    dotenv.config({ path: path.join(process.cwd(), '../.env') });
+  }).catch(err => {
+    console.log('📝 Could not load dotenv:', err.message);
+  });
+} else {
+  console.log('🔧 Using Azure Application Settings (skipping .env file)');
+}
+
+// Check if critical environment variables are available
+console.log('🔑 Environment Variables Check:');
+console.log(`   GROK_API_KEY: ${process.env.GROK_API_KEY ? 'SET' : 'MISSING'}`);
+console.log(`   NEWS_API_KEY: ${process.env.NEWS_API_KEY ? 'SET' : 'MISSING'}`);
+
+// Exit early if critical variables are missing
+if (!process.env.GROK_API_KEY || !process.env.NEWS_API_KEY) {
+  console.error('❌ Critical environment variables missing. Cannot proceed.');
+  console.error('💡 In Azure: Configure these in Application Settings');
+  console.error('💡 Locally: Add these to your .env file');
+  process.exit(1);
+}
+
+console.log('✅ Starting news fetch process...');
 
 import axios from 'axios';
+console.log('📦 Loaded axios');
+
 import moment from 'moment';
+console.log('📦 Loaded moment');
+
 import { saveNewsByDate, formatDateForFilename, getPreviousDate } from '../utils/newsUtils.js';
+console.log('📦 Loaded newsUtils');
+
 import { createFileSystem } from '../filesystem/FileSystemFactory.js';
+console.log('📦 Loaded FileSystemFactory');
+
 import * as fuzzball from 'fuzzball';
+console.log('📦 Loaded fuzzball');
 
 // Initialize file system abstraction
 const fileSystem = createFileSystem();
+console.log('📦 Initialized file system');
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const NEWSAPI_URL = 'https://newsapi.org/v2/everything';
@@ -711,7 +753,24 @@ const fetchDailyNews = async (targetDate = null) => {
 };
 
 // Allow manual execution (ES module equivalent of require.main === module)
-if (import.meta.url === `file://${process.argv[1]}`) {
+console.log('🔍 Checking execution condition...');
+console.log(`   import.meta.url: ${import.meta.url}`);
+console.log(`   process.argv[1]: ${process.argv[1]}`);
+
+// Normalize paths for Windows compatibility
+const normalizeFileUrl = (url) => {
+  return url.replace(/^file:\/+/, 'file:///').replace(/\\/g, '/');
+};
+
+const currentFileUrl = normalizeFileUrl(import.meta.url);
+const expectedFileUrl = normalizeFileUrl(`file://${process.argv[1]}`);
+
+console.log(`   Normalized current: ${currentFileUrl}`);
+console.log(`   Normalized expected: ${expectedFileUrl}`);
+console.log(`   Match: ${currentFileUrl === expectedFileUrl}`);
+
+if (currentFileUrl === expectedFileUrl) {
+  console.log('✅ Manual execution detected!');
   console.log('Manually fetching daily news...');
   
   // Check for command line argument for target date
@@ -720,6 +779,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`Fetching news for specific date: ${targetDate}`);
   }
   
+  console.log('🚀 Starting fetchDailyNews...');
   fetchDailyNews(targetDate).then(success => {
     if (success) {
       console.log('News fetch completed successfully');
@@ -727,7 +787,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.log('News fetch failed');
     }
     process.exit(success ? 0 : 1);
+  }).catch(error => {
+    console.error('Fatal error in fetchDailyNews:', error);
+    process.exit(1);
   });
+} else {
+  console.log('📝 Script loaded as module, not executing directly');
 }
 
 export { fetchDailyNews };
