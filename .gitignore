@@ -21,6 +21,10 @@ mobile/*.p12
 mobile/*.mobileprovision
 mobile/web-build/
 
+# Expo managed workflow - ignore native projects
+mobile/android/
+mobile/ios/
+
 # React Native
 mobile/ios/build/
 mobile/android/build/
