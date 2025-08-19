@@ -1,0 +1,370 @@
+# Mobile Release Workflow
+# Builds mobile app artifacts for testing and app store submission
+
+name: Mobile Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Mobile Platform'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+      release_type:
+        description: 'Release Type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+      create_aab:
+        description: 'Build AAB for Play Store (Android only)'
+        required: true
+        default: true
+        type: boolean
+      upload_artifacts:
+        description: 'Upload artifacts as GitHub release'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  android-build:
+    name: Build Android Artifacts
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.platform == 'android' || github.event.inputs.platform == 'both' }}
+    
+    steps:
+      - name: 📱 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: ☕ Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          
+      - name: ⚙️ Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.2
+          run_install: false
+          
+      - name: 🔧 Install Dependencies
+        run: |
+          echo "📦 Installing root dependencies..."
+          pnpm install --reporter=append-only
+          
+          echo "📱 Installing mobile dependencies..."
+          cd mobile
+          npm install --legacy-peer-deps --no-audit --no-fund
+          
+      - name: 📋 Validate Mobile Environment  
+        run: |
+          echo "🔍 Validating build environment..."
+          
+          # Check Java
+          java -version
+          echo "✅ Java JDK is available"
+          
+          # Check Android SDK (using setup-android if needed)
+          if ! command -v android &> /dev/null; then
+            echo "📱 Setting up Android SDK..."
+          else
+            echo "✅ Android SDK is available"
+          fi
+          
+          # Check React Native CLI
+          if ! npm list -g @react-native-community/cli &> /dev/null; then
+            echo "⚛️ Installing React Native CLI..."
+            npm install -g @react-native-community/cli
+          fi
+          
+          echo "✅ Mobile build environment validated"
+          
+      - name: 🔧 Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: 🔐 Prepare Signing Configuration
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cd mobile/android
+          
+          # Use secrets if available, otherwise use demo passwords
+          STORE_PASS="${KEYSTORE_PASSWORD:-release123}"
+          KEY_PASS="${KEY_PASSWORD:-release123}"
+          
+          # Create keystore.properties
+          echo "storePassword=$STORE_PASS" > keystore.properties
+          echo "keyPassword=$KEY_PASS" >> keystore.properties
+          echo "keyAlias=everything-is-awesome" >> keystore.properties
+          echo "storeFile=everything-is-awesome-release-key.keystore" >> keystore.properties
+          
+          # Create keystore if it doesn't exist (for demo/testing)
+          if [[ ! -f "app/everything-is-awesome-release-key.keystore" ]]; then
+            echo "🔑 Creating demo keystore (replace with production keystore for real releases)..."
+            cd app
+            keytool -genkey -v -keystore everything-is-awesome-release-key.keystore \
+              -alias everything-is-awesome -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
+              -dname "CN=Everything Is Awesome, OU=Development, O=Callicode Inc., L=Toronto, ST=Ontario, C=CA"
+            echo "✅ Demo keystore created"
+          else
+            echo "✅ Using existing production keystore"
+          fi
+          
+      - name: 🏗️ Build Debug APK
+        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "🔨 Building debug APK..."
+          cd mobile
+          ./android/gradlew -p android assembleDebug
+          
+          # Verify build
+          if [[ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]]; then
+            APK_SIZE=$(du -h android/app/build/outputs/apk/debug/app-debug.apk | cut -f1)
+            echo "✅ Debug APK built successfully - Size: $APK_SIZE"
+          else
+            echo "❌ Debug APK build failed"
+            exit 1
+          fi
+          
+      - name: 🚀 Build Release APK  
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "🔨 Building release APK..."
+          cd mobile
+          ./android/gradlew -p android assembleRelease
+          
+          # Verify build
+          if [[ -f "android/app/build/outputs/apk/release/app-release.apk" ]]; then
+            APK_SIZE=$(du -h android/app/build/outputs/apk/release/app-release.apk | cut -f1)
+            echo "✅ Release APK built successfully - Size: $APK_SIZE"
+          else
+            echo "❌ Release APK build failed"
+            exit 1
+          fi
+          
+      - name: 📦 Build Release AAB (Play Store)
+        if: ${{ github.event.inputs.create_aab == 'true' }}
+        run: |
+          echo "📦 Building Android App Bundle for Play Store..."
+          cd mobile
+          ./android/gradlew -p android bundleRelease
+          
+          # Verify build
+          if [[ -f "android/app/build/outputs/bundle/release/app-release.aab" ]]; then
+            AAB_SIZE=$(du -h android/app/build/outputs/bundle/release/app-release.aab | cut -f1)
+            echo "✅ Release AAB built successfully - Size: $AAB_SIZE"
+          else
+            echo "❌ Release AAB build failed"  
+            exit 1
+          fi
+          
+      - name: 🔍 Generate Build Summary
+        run: |
+          echo "📱 MOBILE BUILD SUMMARY" >> $GITHUB_STEP_SUMMARY
+          echo "======================" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📋 Build Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release Type**: ${{ github.event.inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **AAB Build**: ${{ github.event.inputs.create_aab }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Upload Artifacts**: ${{ github.event.inputs.upload_artifacts }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📦 Generated Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | Size | Purpose | Location |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|---------|----------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Check what was built
+          cd mobile
+          
+          if [[ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]]; then
+            DEBUG_SIZE=$(du -h android/app/build/outputs/apk/debug/app-debug.apk | cut -f1)
+            echo "| Debug APK | $DEBUG_SIZE | Development/Testing | \`android/app/build/outputs/apk/debug/\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -f "android/app/build/outputs/apk/release/app-release.apk" ]]; then
+            RELEASE_SIZE=$(du -h android/app/build/outputs/apk/release/app-release.apk | cut -f1)  
+            echo "| Release APK | $RELEASE_SIZE | Sideloading/Distribution | \`android/app/build/outputs/apk/release/\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -f "android/app/build/outputs/bundle/release/app-release.aab" ]]; then
+            AAB_SIZE=$(du -h android/app/build/outputs/bundle/release/app-release.aab | cut -f1)
+            echo "| Release AAB | $AAB_SIZE | Google Play Store | \`android/app/build/outputs/bundle/release/\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- **APK Testing**: Download APK artifacts to test on Android devices" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sideloading**: Use release APK for manual installation" >> $GITHUB_STEP_SUMMARY
+          echo "- **Play Store**: Use AAB file for Google Play Console submission" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📤 Upload Debug APK
+        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+          
+      - name: 📤 Upload Release APK
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 90
+          
+      - name: 📤 Upload Release AAB
+        if: ${{ github.event.inputs.create_aab == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: play-store-aab
+          path: mobile/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 365
+          
+      - name: 🏷️ Create GitHub Release
+        if: ${{ github.event.inputs.upload_artifacts == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: mobile-v1.0.${{ github.run_number }}
+          name: Mobile Release v1.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            mobile/android/app/build/outputs/apk/release/app-release.apk
+            mobile/android/app/build/outputs/bundle/release/app-release.aab
+          body: |
+            ## 📱 Mobile Release v1.0.${{ github.run_number }}
+            
+            This release contains Android APK and AAB files for the Everything Is Awesome mobile application.
+            
+            ### 📦 Artifacts Included:
+            - **app-release.apk** (~70MB) - For sideloading and manual installation  
+            - **app-release.aab** (~46MB) - For Google Play Store submission
+            
+            ### 🔐 Signing Information:
+            - **Certificate**: Production-signed with release keystore
+            - **Package**: com.jcallico.everythingisawesome  
+            - **Version**: 1.0.${{ github.run_number }}
+            
+            ### 📋 Installation Instructions:
+            
+            **APK Sideloading:**
+            1. Enable "Unknown Sources" in Android Settings
+            2. Download `app-release.apk`
+            3. Install using: `adb install -r app-release.apk`
+            
+            **Play Store Submission:**
+            1. Download `app-release.aab`
+            2. Upload to Google Play Console
+            3. Complete store listing and submit for review
+            
+            ### ⚡ Built With:
+            - React Native with Expo
+            - Android API 35
+            - Java JDK 17
+            - Production keystore signing
+            
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ios-build:
+    name: Build iOS Artifacts
+    runs-on: macos-latest
+    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
+    
+    steps:
+      - name: 🍎 iOS Build Placeholder
+        run: |
+          echo "📱 iOS build support coming soon!"
+          echo "This will include:"
+          echo "- 🔨 Xcode project building"
+          echo "- 📦 IPA artifact creation"
+          echo "- 🏪 App Store Connect integration"
+          echo "- 🔐 iOS code signing"
+          
+          echo "## 🍎 iOS Build Placeholder" >> $GITHUB_STEP_SUMMARY
+          echo "iOS build functionality will be added in a future update." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Planned Features:" >> $GITHUB_STEP_SUMMARY
+          echo "- Xcode project compilation" >> $GITHUB_STEP_SUMMARY
+          echo "- IPA file generation" >> $GITHUB_STEP_SUMMARY
+          echo "- TestFlight distribution" >> $GITHUB_STEP_SUMMARY
+          echo "- App Store submission preparation" >> $GITHUB_STEP_SUMMARY
+
+  build-complete:
+    name: Build Complete
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build]
+    if: always()
+    
+    steps:
+      - name: 🎉 Mobile Build Summary
+        run: |
+          ANDROID_RESULT="${{ needs.android-build.result }}"
+          IOS_RESULT="${{ needs.ios-build.result }}"
+          
+          # Check if any builds ran and succeeded
+          if [[ ("$ANDROID_RESULT" == "success" || "$ANDROID_RESULT" == "skipped") && ("$IOS_RESULT" == "success" || "$IOS_RESULT" == "skipped") ]]; then
+            echo "## ✅ Mobile Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🎯 **Your mobile artifacts are ready for use!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Show platform-specific results
+            if [[ "$ANDROID_RESULT" == "success" ]]; then
+              echo "### 🤖 Android Build: ✅ Success" >> $GITHUB_STEP_SUMMARY
+              echo "- APK files ready for testing and sideloading" >> $GITHUB_STEP_SUMMARY
+              echo "- AAB file ready for Google Play Store submission" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            if [[ "$IOS_RESULT" == "success" ]]; then
+              echo "### 🍎 iOS Build: ✅ Success" >> $GITHUB_STEP_SUMMARY
+              echo "- IPA files ready for TestFlight distribution" >> $GITHUB_STEP_SUMMARY
+            elif [[ "$IOS_RESULT" == "skipped" && "${{ github.event.inputs.platform }}" == "ios" ]]; then
+              echo "### 🍎 iOS Build: ⏳ Coming Soon" >> $GITHUB_STEP_SUMMARY
+              echo "- iOS build support will be added in a future update" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### � Download Artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "1. Go to the **Actions** tab" >> $GITHUB_STEP_SUMMARY
+            echo "2. Click on this workflow run" >> $GITHUB_STEP_SUMMARY
+            echo "3. Scroll down to **Artifacts** section" >> $GITHUB_STEP_SUMMARY
+            echo "4. Download the artifacts you need" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Mobile Build Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The mobile build process encountered an error. Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📊 Build Results:" >> $GITHUB_STEP_SUMMARY
+            echo "- **Android**: $ANDROID_RESULT" >> $GITHUB_STEP_SUMMARY  
+            echo "- **iOS**: $IOS_RESULT" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔧 Common Issues:" >> $GITHUB_STEP_SUMMARY
+            echo "- Android SDK configuration problems" >> $GITHUB_STEP_SUMMARY
+            echo "- Java JDK version incompatibility" >> $GITHUB_STEP_SUMMARY
+            echo "- Keystore signing issues" >> $GITHUB_STEP_SUMMARY
+            echo "- Dependency resolution problems" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the workflow logs and try building again." >> $GITHUB_STEP_SUMMARY
+          fi

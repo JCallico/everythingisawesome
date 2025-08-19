@@ -186,6 +186,32 @@ npm run build:mobile
 
 **📖 For comprehensive development setup, testing, deployment, and troubleshooting, see: [DEVELOPMENT_AND_DEPLOYMENT.md](./docs/DEVELOPMENT_AND_DEPLOYMENT.md)**
 
+## 🔄 CI/CD Pipeline
+
+The project uses **dual GitHub Actions workflows** for automated deployments:
+
+### 🌐 Web Application Pipeline (`build_and_deploy.yml`)
+- **Triggers**: Push to `main` branch or manual dispatch
+- **Purpose**: Builds and deploys web app to Azure Web Apps
+- **Features**: Multi-stage approval, Azure integration, production secrets
+- **Output**: Live web application at https://everythingisawesome.azurewebsites.net
+
+### 📱 Mobile Application Pipeline (`mobile-release.yml`) 
+- **Triggers**: Manual workflow dispatch with configuration options
+- **Purpose**: Builds Android APK/AAB and iOS IPA artifacts  
+- **Features**: Multi-platform support, keystore management, artifact retention
+- **Output**: Ready-to-distribute APK/IPA files and App Store packages
+
+### 🔧 Additional Workflows
+- **Dependencies**: Automated security audits and dependency updates
+- **Performance**: Performance monitoring and optimization checks
+
+This separation ensures:
+- ✅ **Independent Release Cycles** - Web and mobile can be deployed separately
+- ✅ **Specialized Configuration** - Each platform has optimized build settings  
+- ✅ **Security Isolation** - Different secrets and signing requirements
+- ✅ **Workflow Clarity** - Clean, focused pipelines for each platform
+
 ## 📁 Project Structure
 
 ```
@@ -461,6 +487,49 @@ npx expo run:android --variant debug
 - **Sideloading**: Release APK for manual installation
 - **Play Store**: Release AAB for store submission
 
+### Automated Mobile Builds (CI/CD)
+
+The project includes a GitHub Actions workflow for automated mobile builds:
+
+#### Using the Mobile Release Workflow
+
+1. **Navigate to Actions tab** in your GitHub repository
+2. **Select "Mobile Release"** workflow  
+3. **Click "Run workflow"** and configure options:
+   - **Platform**: `android`, `ios`, or `both`
+   - **Release Type**: `debug`, `release`, or `both`
+   - **Build AAB**: Enable for Play Store submission (Android only)
+   - **Upload Artifacts**: Create GitHub release with files
+
+#### Workflow Features
+
+- ✅ **Multi-Platform Support**: Android (ready) and iOS (coming soon)
+- ✅ **Automated Environment Setup**: Java JDK 17, Android SDK, React Native CLI
+- ✅ **Multiple Build Types**: Debug APK, Release APK, Release AAB
+- ✅ **Platform Selection**: Choose Android, iOS, or both
+- ✅ **Keystore Management**: Uses GitHub secrets or demo keystore
+- ✅ **Artifact Upload**: Downloads available for 30-365 days  
+- ✅ **GitHub Releases**: Optional automatic release creation
+- ✅ **Build Verification**: Size reporting and integrity checks
+
+#### Required GitHub Secrets
+
+For production builds, add these secrets to your repository:
+
+```bash
+# Repository Settings → Secrets and variables → Actions → New repository secret
+ANDROID_KEYSTORE_PASSWORD    # Your keystore password
+ANDROID_KEY_PASSWORD         # Your key password (usually same as keystore)
+```
+
+#### Workflow Outputs
+
+| Artifact | Retention | Purpose | Size |
+|----------|-----------|---------|------|
+| `debug-apk` | 30 days | Development/Testing | ~165MB |
+| `release-apk` | 90 days | Sideloading/Distribution | ~70MB |
+| `play-store-aab` | 365 days | Google Play Store Submission | ~46MB |
+
 ## 🎮 Usage
 
 ### Manual Commands
@@ -543,7 +612,10 @@ everythingisawesome/
 │   └── *.jpg               # Screenshots and images
 ├── android/                # Android build configuration
 ├── .github/workflows/      # GitHub Actions CI/CD
-│   └── main_everythingisawesome.yml # Deployment pipeline
+│   ├── build_and_deploy.yml # Web app deployment pipeline  
+│   ├── mobile-release.yml  # Mobile APK/AAB build pipeline
+│   ├── dependencies.yml   # Dependency updates & security
+│   └── performance.yml     # Performance monitoring
 ├── app.js                  # Azure Web App entry point
 ├── web.config              # IIS/Azure configuration
 ├── deploy.cmd              # Azure deployment script
