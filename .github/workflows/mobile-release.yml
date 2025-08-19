@@ -80,11 +80,15 @@ jobs:
           java -version
           echo "✅ Java JDK is available"
           
-          # Check Android SDK (using setup-android if needed)
-          if ! command -v android &> /dev/null; then
-            echo "📱 Setting up Android SDK..."
+          # Check Watchman (important for React Native builds)
+          if command -v watchman &> /dev/null; then
+            echo "📱 Checking Watchman status..."
+            watchman version
+            echo "✅ Watchman is available and working"
           else
-            echo "✅ Android SDK is available"
+            echo "⚠️ Watchman not found - installing..."
+            # On Ubuntu, we can use apt or install from source if needed
+            sudo apt-get update && sudo apt-get install -y watchman || echo "⚠️ Watchman install failed, builds may be slower"
           fi
           
           # Check React Native CLI
@@ -98,6 +102,13 @@ jobs:
       - name: 🔧 Setup Android SDK
         uses: android-actions/setup-android@v3
         
+      - name: 🏗️ Generate Android Project
+        run: |
+          cd mobile
+          echo "📱 Generating native Android project..."
+          npx expo prebuild --platform android --clean
+          echo "✅ Android project generated successfully"
+          
       - name: 🔐 Prepare Signing Configuration
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -133,7 +144,15 @@ jobs:
         run: |
           echo "🔨 Building debug APK..."
           cd mobile
-          ./android/gradlew -p android assembleDebug
+          
+          # Pre-build verification (matching README steps)
+          echo "📋 Pre-build verification..."
+          if command -v watchman &> /dev/null; then
+            watchman version || echo "⚠️ Watchman check failed, continuing anyway"
+          fi
+          
+          # Build debug APK using Expo (matches README alternative method)
+          npx expo run:android --variant debug --no-install --no-bundler
           
           # Verify build
           if [[ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]]; then
@@ -149,6 +168,14 @@ jobs:
         run: |
           echo "🔨 Building release APK..."
           cd mobile
+          
+          # Pre-build verification (matching README steps)
+          echo "📋 Pre-build verification..."
+          if command -v watchman &> /dev/null; then
+            watchman version || echo "⚠️ Watchman check failed, continuing anyway"
+          fi
+          
+          # Build production APK with embedded bundle (matches README exactly)
           ./android/gradlew -p android assembleRelease
           
           # Verify build
