@@ -151,8 +151,8 @@ jobs:
             watchman version || echo "⚠️ Watchman check failed, continuing anyway"
           fi
           
-          # Build debug APK using Expo (matches README alternative method)
-          npx expo run:android --variant debug --no-install --no-bundler
+          # Build debug APK using Gradle (CI-friendly approach)
+          ./android/gradlew -p android assembleDebug
           
           # Verify build
           if [[ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]]; then
