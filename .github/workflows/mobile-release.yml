@@ -66,7 +66,7 @@ jobs:
       - name: 🔧 Install Dependencies
         run: |
           echo "📦 Installing root dependencies..."
-          pnpm install --reporter=append-only
+          pnpm install --no-frozen-lockfile --reporter=append-only
           
           echo "📱 Installing mobile dependencies..."
           cd mobile
