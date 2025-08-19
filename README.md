@@ -369,6 +369,98 @@ Ensure you have the following installed (no need to reinstall if already availab
 - **Permission issues**: Fix with `sudo chown -R $(whoami) ~/Library/LaunchAgents/`
 - **Device not detected**: Check USB debugging is enabled and accept computer authorization on device
 
+### Building Play Store Release (AAB)
+
+For Google Play Store submission, you need to build a properly signed Android App Bundle (AAB):
+
+#### Production Keystore Setup
+
+1. **Generate production keystore** (one-time setup):
+   ```bash
+   cd mobile/android/app
+   keytool -genkey -v -keystore everything-is-awesome-release-key.keystore \
+     -alias everything-is-awesome -keyalg RSA -keysize 2048 -validity 10000 \
+     -storepass YOUR_STORE_PASSWORD -keypass YOUR_KEY_PASSWORD \
+     -dname "CN=Your Name, OU=Your Unit, O=Your Org, L=Your City, ST=Your State, C=Your Country"
+   ```
+
+2. **Create keystore properties file**:
+   ```bash
+   # Create: mobile/android/keystore.properties
+   echo "storePassword=YOUR_STORE_PASSWORD
+   keyPassword=YOUR_KEY_PASSWORD
+   keyAlias=everything-is-awesome
+   storeFile=everything-is-awesome-release-key.keystore" > mobile/android/keystore.properties
+   ```
+
+3. **Secure your credentials**:
+   - Keep `keystore.properties` and `*.keystore` files secure and backed up
+   - These files are automatically added to `.gitignore`
+   - ⚠️ **Critical**: You need the exact same keystore for all future app updates!
+
+#### Build AAB for Play Store
+
+```bash
+cd mobile
+
+# Build the Android App Bundle (AAB) for Play Store submission
+./android/gradlew -p android bundleRelease
+
+# Output location: android/app/build/outputs/bundle/release/app-release.aab (~46MB)
+```
+
+#### Release Artifact Details
+
+- **File**: `mobile/android/app/build/outputs/bundle/release/app-release.aab`
+- **Size**: ~46MB (optimized for Play Store distribution)
+- **Format**: Android App Bundle (AAB) - required for Google Play Store
+- **Signing**: Production-signed with your release keystore
+- **Optimization**: Google Play will generate optimized APKs for different devices
+
+#### Play Store Submission Checklist
+
+- ✅ **AAB file**: Use `app-release.aab` for upload
+- ✅ **Signing certificate**: SHA-256 fingerprint available via:
+  ```bash
+  keytool -list -v -keystore mobile/android/app/everything-is-awesome-release-key.keystore \
+    -alias everything-is-awesome -storepass YOUR_PASSWORD
+  ```
+  - Current development keystore SHA-256: `12:FA:F7:3C:B7:05:8F:B8:0C:95:42:86:67:42:2A:05:64:9B:E2:E8:AD:5A:2A:A7:62:F0:7C:20:4A:9B:30:AD`
+- ✅ **Version info**: Update `versionCode` and `versionName` in `android/app/build.gradle`
+- ✅ **App metadata**: Prepare app description, screenshots, and store listing
+- ✅ **Testing**: Verify the app works correctly before submission
+
+#### Security Notes
+
+- **Keystore backup**: Store your keystore and properties files securely
+- **Password strength**: Use strong passwords for production keystores
+- **Version control**: Keystore files are excluded from Git for security
+- **Certificate validity**: Generated certificates are valid for 27+ years
+
+#### Quick Reference
+
+**Common Build Commands**:
+```bash
+# Development APK (requires Metro)
+npx expo run:android --variant debug
+
+# Standalone APK (no Metro required)  
+./android/gradlew -p android assembleRelease
+
+# Play Store AAB (production)
+./android/gradlew -p android bundleRelease
+```
+
+**File Locations**:
+- Debug APK: `android/app/build/outputs/apk/debug/app-debug.apk` (~165MB)
+- Release APK: `android/app/build/outputs/apk/release/app-release.apk` (~70MB)
+- Release AAB: `android/app/build/outputs/bundle/release/app-release.aab` (~46MB)
+
+**Distribution Methods**:
+- **Development/Testing**: Debug APK or Expo app
+- **Sideloading**: Release APK for manual installation
+- **Play Store**: Release AAB for store submission
+
 ## 🎮 Usage
 
 ### Manual Commands
