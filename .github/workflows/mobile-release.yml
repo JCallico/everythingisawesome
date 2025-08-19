@@ -103,22 +103,22 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          cd mobile/android
+          cd mobile
           
           # Use secrets if available, otherwise use demo passwords
           STORE_PASS="${KEYSTORE_PASSWORD:-release123}"
           KEY_PASS="${KEY_PASSWORD:-release123}"
           
-          # Create keystore.properties
-          echo "storePassword=$STORE_PASS" > keystore.properties
-          echo "keyPassword=$KEY_PASS" >> keystore.properties
-          echo "keyAlias=everything-is-awesome" >> keystore.properties
-          echo "storeFile=everything-is-awesome-release-key.keystore" >> keystore.properties
+          # Create keystore.properties in the android directory
+          echo "storePassword=$STORE_PASS" > android/keystore.properties
+          echo "keyPassword=$KEY_PASS" >> android/keystore.properties
+          echo "keyAlias=everything-is-awesome" >> android/keystore.properties
+          echo "storeFile=everything-is-awesome-release-key.keystore" >> android/keystore.properties
           
           # Create keystore if it doesn't exist (for demo/testing)
-          if [[ ! -f "app/everything-is-awesome-release-key.keystore" ]]; then
+          if [[ ! -f "android/app/everything-is-awesome-release-key.keystore" ]]; then
             echo "🔑 Creating demo keystore (replace with production keystore for real releases)..."
-            cd app
+            cd android/app
             keytool -genkey -v -keystore everything-is-awesome-release-key.keystore \
               -alias everything-is-awesome -keyalg RSA -keysize 2048 -validity 10000 \
               -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
