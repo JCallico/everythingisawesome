@@ -279,7 +279,7 @@ jobs:
           files: |
             mobile/android/app/build/outputs/apk/release/app-release.apk
             mobile/android/app/build/outputs/bundle/release/app-release.aab
-            mobile/ios/build/ipa/EverythingIsAwesome.ipa
+            mobile/ios/build/ipa/*.ipa
           body: |
             ## 📱 Mobile Release v1.0.${{ github.run_number }}
             
@@ -389,6 +389,35 @@ jobs:
           cd mobile
           echo "🍎 Generating native iOS project..."
           npx expo prebuild --platform ios --clean
+          
+          # Verify iOS project structure
+          echo "📋 Verifying iOS project structure..."
+          if [[ -d "ios" ]]; then
+            echo "✅ iOS directory created"
+            ls -la ios/
+          else
+            echo "❌ iOS directory not found"
+            exit 1
+          fi
+          
+          # Check for workspace file
+          if [[ -f "ios/EverythingIsAwesome.xcworkspace/contents.xcworkspacedata" ]]; then
+            echo "✅ Xcode workspace found: EverythingIsAwesome.xcworkspace"
+          elif [[ -f "ios/mobile.xcworkspace/contents.xcworkspacedata" ]]; then
+            echo "✅ Xcode workspace found: mobile.xcworkspace"
+            echo "WORKSPACE_NAME=mobile" >> $GITHUB_ENV
+          else
+            echo "🔍 Searching for any .xcworkspace files..."
+            find ios/ -name "*.xcworkspace" -type d || echo "No workspace files found"
+            echo "❌ No valid Xcode workspace found"
+            exit 1
+          fi
+          
+          # Set default workspace name if not already set
+          if [[ -z "$WORKSPACE_NAME" ]]; then
+            echo "WORKSPACE_NAME=EverythingIsAwesome" >> $GITHUB_ENV
+          fi
+          
           echo "✅ iOS project generated successfully"
           
       - name: 📦 Install iOS Dependencies
@@ -469,20 +498,30 @@ jobs:
           echo "🔨 Building iOS Debug configuration..."
           cd mobile
           
+          # Verify workspace exists
+          WORKSPACE_PATH="ios/${WORKSPACE_NAME}.xcworkspace"
+          if [[ ! -d "$WORKSPACE_PATH" ]]; then
+            echo "❌ Workspace not found at: $WORKSPACE_PATH"
+            echo "🔍 Available files in ios/:"
+            ls -la ios/
+            exit 1
+          fi
+          
           # Build Debug for iOS Simulator (matches documentation)
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
+          xcodebuild -workspace "$WORKSPACE_PATH" \
+            -scheme "$WORKSPACE_NAME" \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
             -derivedDataPath ios/build \
             clean build
             
           # Verify build
-          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app" ]]; then
-            APP_SIZE=$(du -sh ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
+            APP_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
             echo "✅ Debug build completed successfully - Size: $APP_SIZE"
           else
-            echo "❌ Debug build failed"
+            echo "❌ Debug build failed - checking build products..."
+            ls -la ios/build/Build/Products/Debug-iphonesimulator/ || echo "Debug build directory not found"
             exit 1
           fi
           
@@ -492,20 +531,30 @@ jobs:
           echo "🚀 Building iOS Release configuration..."
           cd mobile
           
+          # Verify workspace exists
+          WORKSPACE_PATH="ios/${WORKSPACE_NAME}.xcworkspace"
+          if [[ ! -d "$WORKSPACE_PATH" ]]; then
+            echo "❌ Workspace not found at: $WORKSPACE_PATH"
+            echo "🔍 Available files in ios/:"
+            ls -la ios/
+            exit 1
+          fi
+          
           # Build Release for iOS Simulator (standalone app, no Metro required)
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
+          xcodebuild -workspace "$WORKSPACE_PATH" \
+            -scheme "$WORKSPACE_NAME" \
             -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
             -derivedDataPath ios/build \
             clean build
             
           # Verify build
-          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app" ]]; then
-            APP_SIZE=$(du -sh ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
+            APP_SIZE=$(du -sh "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
             echo "✅ Release build completed successfully - Size: $APP_SIZE"
           else
-            echo "❌ Release build failed"
+            echo "❌ Release build failed - checking build products..."
+            ls -la ios/build/Build/Products/Release-iphonesimulator/ || echo "Release build directory not found"
             exit 1
           fi
           
@@ -515,20 +564,28 @@ jobs:
           echo "📦 Creating Xcode archive for distribution..."
           cd mobile
           
+          # Verify workspace exists
+          WORKSPACE_PATH="ios/${WORKSPACE_NAME}.xcworkspace"
+          if [[ ! -d "$WORKSPACE_PATH" ]]; then
+            echo "❌ Workspace not found at: $WORKSPACE_PATH"
+            exit 1
+          fi
+          
           # Create archive for App Store distribution
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
+          xcodebuild -workspace "$WORKSPACE_PATH" \
+            -scheme "$WORKSPACE_NAME" \
             -configuration Release \
             -destination generic/platform=iOS \
-            -archivePath ios/build/EverythingIsAwesome.xcarchive \
+            -archivePath "ios/build/${WORKSPACE_NAME}.xcarchive" \
             archive
             
           # Verify archive
-          if [[ -d "ios/build/EverythingIsAwesome.xcarchive" ]]; then
-            ARCHIVE_SIZE=$(du -sh ios/build/EverythingIsAwesome.xcarchive | cut -f1)
+          if [[ -d "ios/build/${WORKSPACE_NAME}.xcarchive" ]]; then
+            ARCHIVE_SIZE=$(du -sh "ios/build/${WORKSPACE_NAME}.xcarchive" | cut -f1)
             echo "✅ Archive created successfully - Size: $ARCHIVE_SIZE"
           else
-            echo "❌ Archive creation failed"
+            echo "❌ Archive creation failed - checking build directory..."
+            ls -la ios/build/ || echo "Build directory not found"
             exit 1
           fi
           
@@ -540,16 +597,17 @@ jobs:
           
           # Export IPA using archive
           xcodebuild -exportArchive \
-            -archivePath ios/build/EverythingIsAwesome.xcarchive \
+            -archivePath "ios/build/${WORKSPACE_NAME}.xcarchive" \
             -exportOptionsPlist ios/ExportOptions.plist \
             -exportPath ios/build/ipa/
             
           # Verify IPA export
-          if [[ -f "ios/build/ipa/EverythingIsAwesome.ipa" ]]; then
-            IPA_SIZE=$(du -sh ios/build/ipa/EverythingIsAwesome.ipa | cut -f1)
+          if [[ -f "ios/build/ipa/${WORKSPACE_NAME}.ipa" ]]; then
+            IPA_SIZE=$(du -sh "ios/build/ipa/${WORKSPACE_NAME}.ipa" | cut -f1)
             echo "✅ IPA exported successfully - Size: $IPA_SIZE"
           else
-            echo "❌ IPA export failed"
+            echo "❌ IPA export failed - checking export directory..."
+            ls -la ios/build/ipa/ || echo "IPA export directory not found"
             exit 1
           fi
           
@@ -573,24 +631,24 @@ jobs:
           # Check what was built
           cd mobile
           
-          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app" ]]; then
-            DEBUG_SIZE=$(du -sh ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
+            DEBUG_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
             echo "| Debug App | $DEBUG_SIZE | Development/Testing | \`ios/build/Build/Products/Debug-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app" ]]; then
-            RELEASE_SIZE=$(du -sh ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app | cut -f1)  
+          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
+            RELEASE_SIZE=$(du -sh "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)  
             echo "| Release App | $RELEASE_SIZE | Standalone Distribution | \`ios/build/Build/Products/Release-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [[ -d "ios/build/EverythingIsAwesome.xcarchive" ]]; then
-            ARCHIVE_SIZE=$(du -sh ios/build/EverythingIsAwesome.xcarchive | cut -f1)
-            echo "| Xcode Archive | $ARCHIVE_SIZE | App Store Distribution | \`ios/build/EverythingIsAwesome.xcarchive\` |" >> $GITHUB_STEP_SUMMARY
+          if [[ -d "ios/build/${WORKSPACE_NAME}.xcarchive" ]]; then
+            ARCHIVE_SIZE=$(du -sh "ios/build/${WORKSPACE_NAME}.xcarchive" | cut -f1)
+            echo "| Xcode Archive | $ARCHIVE_SIZE | App Store Distribution | \`ios/build/${WORKSPACE_NAME}.xcarchive\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [[ -f "ios/build/ipa/EverythingIsAwesome.ipa" ]]; then
-            IPA_SIZE=$(du -sh ios/build/ipa/EverythingIsAwesome.ipa | cut -f1)
-            echo "| IPA Package | $IPA_SIZE | TestFlight/App Store | \`ios/build/ipa/EverythingIsAwesome.ipa\` |" >> $GITHUB_STEP_SUMMARY
+          if [[ -f "ios/build/ipa/${WORKSPACE_NAME}.ipa" ]]; then
+            IPA_SIZE=$(du -sh "ios/build/ipa/${WORKSPACE_NAME}.ipa" | cut -f1)
+            echo "| IPA Package | $IPA_SIZE | TestFlight/App Store | \`ios/build/ipa/${WORKSPACE_NAME}.ipa\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -605,7 +663,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-debug-app
-          path: mobile/ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app
+          path: mobile/ios/build/Build/Products/Debug-iphonesimulator/${{ env.WORKSPACE_NAME }}.app
           retention-days: 30
           
       - name: 📤 Upload Release App
@@ -613,7 +671,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-release-app
-          path: mobile/ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app
+          path: mobile/ios/build/Build/Products/Release-iphonesimulator/${{ env.WORKSPACE_NAME }}.app
           retention-days: 90
           
       - name: 📤 Upload Xcode Archive
@@ -621,7 +679,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-archive
-          path: mobile/ios/build/EverythingIsAwesome.xcarchive
+          path: mobile/ios/build/${{ env.WORKSPACE_NAME }}.xcarchive
           retention-days: 90
           
       - name: 📤 Upload IPA Package
@@ -629,7 +687,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: mobile/ios/build/ipa/EverythingIsAwesome.ipa
+          path: mobile/ios/build/ipa/${{ env.WORKSPACE_NAME }}.ipa
           retention-days: 365
 
   build-complete:
