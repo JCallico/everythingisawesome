@@ -551,23 +551,69 @@ jobs:
           
           echo "📱 Building with iOS SDK: $IOS_SDK_VERSION"
           
-          # Build Debug for iOS (generic platform - no simulator required)
-          xcodebuild -workspace "$WORKSPACE_PATH" \
+          # Try different destination approaches for iOS build
+          echo "🔍 Testing iOS build destinations..."
+          
+          # First try: Use SDK version explicitly in destination
+          echo "Attempt 1: Using explicit SDK in destination"
+          if xcodebuild -workspace "$WORKSPACE_PATH" \
             -scheme "$WORKSPACE_NAME" \
             -configuration Debug \
-            -destination 'generic/platform=iOS' \
+            -destination "platform=iOS,OS=$IOS_SDK_VERSION" \
             -derivedDataPath ios/build \
-            clean build
+            clean build 2>/dev/null; then
+            echo "✅ Build succeeded with explicit SDK destination"
+          else
+            echo "❌ Explicit SDK destination failed, trying generic iOS"
             
-          # Verify build
+            # Second try: Generic iOS platform
+            if xcodebuild -workspace "$WORKSPACE_PATH" \
+              -scheme "$WORKSPACE_NAME" \
+              -configuration Debug \
+              -destination 'generic/platform=iOS' \
+              -derivedDataPath ios/build \
+              clean build 2>/dev/null; then
+              echo "✅ Build succeeded with generic iOS platform"
+            else
+              echo "❌ Generic iOS failed, trying simulator fallback"
+              
+              # Third try: iOS Simulator (if available)
+              if xcodebuild -workspace "$WORKSPACE_PATH" \
+                -scheme "$WORKSPACE_NAME" \
+                -configuration Debug \
+                -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+                -derivedDataPath ios/build \
+                clean build 2>/dev/null; then
+                echo "✅ Build succeeded with iOS Simulator"
+              else
+                echo "❌ All iOS build approaches failed"
+                echo "📋 This indicates iOS development is not fully supported on this runner"
+                return 1
+              fi
+            fi
+          fi
+          
+          # Verify iOS Debug build (check multiple possible locations)
+          IOS_BUILD_FOUND=false
           if [[ -d "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" ]]; then
             APP_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" | cut -f1)
-            echo "✅ Debug build completed successfully - Size: $APP_SIZE"
+            echo "✅ iOS Debug build found in iphoneos directory - Size: $APP_SIZE"
+            IOS_BUILD_FOUND=true
+          elif [[ -d "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
+            APP_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
+            echo "✅ iOS Debug build found in simulator directory - Size: $APP_SIZE"
+            IOS_BUILD_FOUND=true
           else
-            echo "❌ Debug build failed - checking build products..."
-            ls -la ios/build/Build/Products/Debug-iphoneos/ || echo "Debug build directory not found"
-            # Also check if it might be in iphonesimulator directory
-            ls -la ios/build/Build/Products/Debug-iphonesimulator/ || echo "Simulator build directory also not found"
+            echo "❌ iOS Debug build not found in expected locations"
+            echo "🔍 Checking all build products..."
+            find ios/build/Build/Products -name "*.app" 2>/dev/null || echo "No .app files found"
+            ls -la ios/build/Build/Products/ 2>/dev/null || echo "Build products directory not found"
+          fi
+          
+          if [[ "$IOS_BUILD_FOUND" == "false" ]]; then
+            echo "❌ iOS Debug build verification failed"
+            return 1
+          fi
             exit 1
           fi
           
