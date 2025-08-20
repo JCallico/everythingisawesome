@@ -29,6 +29,11 @@ on:
         required: true
         default: false
         type: boolean
+      force_ios_setup:
+        description: 'Force iOS platform/runtime installation (may download >8GB)'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   android-build:
@@ -395,12 +400,34 @@ jobs:
           
       - name: 📥 Install iOS Platform
         if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
+        timeout-minutes: 8
+        env:
+          FORCE_IOS_SETUP: ${{ github.event.inputs.force_ios_setup }}
         run: |
           echo "📥 Setting up iOS platform and SDKs..."
           
           # Check current available platforms
           echo "📱 Current available platforms:"
           xcodebuild -showsdks
+          
+          # Quick exit: if both iphoneos and iphonesimulator SDKs are present and iOS runtimes are listed, skip heavy installs
+          HAS_IPHONEOS=$(xcodebuild -showsdks 2>/dev/null | grep -c "iphoneos" || true)
+          HAS_SIMSDK=$(xcodebuild -showsdks 2>/dev/null | grep -c "iphonesimulator" || true)
+          HAS_IOS_RUNTIME=$(xcrun simctl list runtimes 2>/dev/null | grep -c "^iOS" || true)
+          if [[ "${FORCE_IOS_SETUP}" != "true" && "${HAS_IPHONEOS}" -gt 0 && "${HAS_SIMSDK}" -gt 0 && "${HAS_IOS_RUNTIME}" -gt 0 ]]; then
+            echo "✅ iOS SDKs and runtimes already available, skipping platform download"
+            # Export the latest iOS SDK version
+            AVAILABLE_IOS_SDK=$(xcodebuild -showsdks | grep "iphoneos" | tail -1 | sed 's/.*iphoneos/iphoneos/')
+            echo "IOS_SDK_VERSION=$AVAILABLE_IOS_SDK" >> $GITHUB_ENV
+            echo "✅ iOS platform setup complete"
+            exit 0
+          else
+            if [[ "${FORCE_IOS_SETUP}" == "true" ]]; then
+              echo "⚠️ Forcing iOS setup as requested (this may download several GB)"
+            else
+              echo "ℹ️ Proceeding with setup because required SDKs/runtimes were not fully detected"
+            fi
+          fi
           
           # Try to install iOS platform with enhanced methods
           echo "📥 Attempting to install iOS platform..."
