@@ -365,21 +365,34 @@ jobs:
           
       - name: 📥 Install iOS Platform
         run: |
-          echo "📥 Installing iOS platform and SDKs..."
+          echo "📥 Setting up iOS platform and SDKs..."
           
           # Check current available platforms
           echo "📱 Current available platforms:"
           xcodebuild -showsdks
           
-          # Install iOS platform
-          echo "📥 Downloading and installing iOS platform..."
-          xcodebuild -downloadPlatform iOS || echo "Platform download completed or already available"
+          # Try to install iOS platform
+          echo "📥 Attempting to install iOS platform..."
+          xcodebuild -downloadPlatform iOS || echo "Platform download completed or failed, continuing..."
           
-          # Check platforms after installation
+          # Also try to install with specific version if available
+          xcodebuild -downloadPlatform iOS -version latest || echo "Latest version download completed or failed, continuing..."
+          
+          # Check platforms after installation attempts
           echo "📱 Available platforms after installation:"
           xcodebuild -showsdks
           
-          echo "✅ iOS platform installation complete"
+          # Extract available iOS SDK version and set environment variable
+          AVAILABLE_IOS_SDK=$(xcodebuild -showsdks | grep "iphoneos" | tail -1 | sed 's/.*iphoneos/iphoneos/')
+          if [[ -n "$AVAILABLE_IOS_SDK" ]]; then
+            echo "📱 Found iOS SDK: $AVAILABLE_IOS_SDK"
+            echo "IOS_SDK_VERSION=$AVAILABLE_IOS_SDK" >> $GITHUB_ENV
+          else
+            echo "⚠️ No iOS SDK found"
+            echo "IOS_SDK_VERSION=" >> $GITHUB_ENV
+          fi
+          
+          echo "✅ iOS platform setup complete"
           
       - name: 🍎 Setup iOS Development Environment
         run: |
@@ -526,6 +539,18 @@ jobs:
             exit 1
           fi
           
+          # Check if iOS SDK is available before building
+          if [[ -z "$IOS_SDK_VERSION" ]]; then
+            echo "❌ No iOS SDK available, cannot build iOS app"
+            echo "📋 This likely means:"
+            echo "   - iOS SDK is not installed on this runner"
+            echo "   - GitHub Actions runner doesn't support iOS development"
+            echo "   - Consider using a different build approach"
+            exit 1
+          fi
+          
+          echo "📱 Building with iOS SDK: $IOS_SDK_VERSION"
+          
           # Build Debug for iOS (generic platform - no simulator required)
           xcodebuild -workspace "$WORKSPACE_PATH" \
             -scheme "$WORKSPACE_NAME" \
@@ -560,6 +585,14 @@ jobs:
             ls -la ios/
             exit 1
           fi
+          
+          # Check if iOS SDK is available before building
+          if [[ -z "$IOS_SDK_VERSION" ]]; then
+            echo "❌ No iOS SDK available, cannot build iOS release app"
+            exit 1
+          fi
+          
+          echo "📱 Building Release with iOS SDK: $IOS_SDK_VERSION"
           
           # Build Release for iOS (generic platform - no simulator required)
           xcodebuild -workspace "$WORKSPACE_PATH" \
