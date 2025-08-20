@@ -371,12 +371,42 @@ jobs:
           echo "📱 Current available platforms:"
           xcodebuild -showsdks
           
-          # Try to install iOS platform
+          # Try to install iOS platform with enhanced methods
           echo "📥 Attempting to install iOS platform..."
-          xcodebuild -downloadPlatform iOS || echo "Platform download completed or failed, continuing..."
           
-          # Also try to install with specific version if available
-          xcodebuild -downloadPlatform iOS -version latest || echo "Latest version download completed or failed, continuing..."
+          # Method 1: Standard platform download
+          if xcodebuild -downloadPlatform iOS -verbose 2>&1; then
+            echo "✅ Standard iOS platform download succeeded"
+          else
+            echo "❌ Standard platform download failed, trying alternatives..."
+            
+            # Method 2: Try specific iOS version  
+            if xcodebuild -downloadPlatform iOS -version 18.0 2>&1; then
+              echo "✅ iOS 18.0 platform download succeeded"
+            else
+              echo "❌ iOS 18.0 download failed, trying simulator runtime..."
+              
+              # Method 3: Install iOS Simulator Runtime
+              if xcrun simctl runtime list available 2>&1 | grep "iOS 18.0"; then
+                echo "📥 Installing iOS 18.0 simulator runtime..."
+                xcrun simctl runtime download "iOS 18.0" || echo "Runtime download attempted"
+              fi
+              
+              # Method 4: Try alternative installation approaches
+              echo "🔧 Trying alternative installation methods..."
+              
+              # Accept licenses that might be blocking installation
+              sudo xcodebuild -license accept 2>/dev/null || echo "License acceptance attempted"
+              
+              # Try forcing platform installation
+              xcodebuild -downloadPlatform iOS -force || echo "Force download attempted"
+            fi
+          fi
+          
+          # Verify simulator availability after installation attempts
+          echo "🔍 Checking iOS Simulator availability:"
+          xcrun simctl list devices available | grep iPhone || echo "No iPhone simulators found"
+          xcrun simctl list runtimes | grep iOS || echo "No iOS runtimes found"
           
           # Check platforms after installation attempts
           echo "📱 Available platforms after installation:"
@@ -557,6 +587,28 @@ jobs:
           # Show available destinations first
           echo "📋 Available build destinations:"
           xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null || echo "Could not query destinations"
+          
+          # If no iOS destinations are available, try creating a simulator
+          if ! xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null | grep -q "platform:iOS"; then
+            echo "🔧 No iOS destinations found, attempting to create iOS simulator..."
+            
+            # List available device types
+            xcrun simctl list devicetypes | grep iPhone || echo "No iPhone device types found"
+            
+            # Try to create an iPhone 15 simulator if iOS runtime is available
+            if xcrun simctl list runtimes | grep -q "iOS"; then
+              IOS_RUNTIME=$(xcrun simctl list runtimes | grep "iOS" | tail -1 | awk '{print $NF}')
+              echo "📱 Creating iPhone 15 simulator with runtime: $IOS_RUNTIME"
+              
+              xcrun simctl create "iPhone 15" "com.apple.CoreSimulator.SimDeviceType.iPhone-15" "$IOS_RUNTIME" || echo "Simulator creation failed"
+              
+              # Verify simulator was created
+              echo "📋 Available simulators after creation:"
+              xcrun simctl list devices | grep iPhone || echo "No iPhone simulators found"
+            else
+              echo "❌ No iOS runtimes available for simulator creation"
+            fi
+          fi
           
           # First try: Use SDK version explicitly in destination
           echo "Attempt 1: Using explicit SDK in destination"
