@@ -508,21 +508,23 @@ jobs:
             exit 1
           fi
           
-          # Build Debug for iOS Simulator (matches documentation)
+          # Build Debug for iOS (generic platform - no simulator required)
           xcodebuild -workspace "$WORKSPACE_PATH" \
             -scheme "$WORKSPACE_NAME" \
             -configuration Debug \
-            -destination 'platform=iOS Simulator' \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath ios/build \
             clean build
             
           # Verify build
-          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
-            APP_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
+          if [[ -d "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" ]]; then
+            APP_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" | cut -f1)
             echo "✅ Debug build completed successfully - Size: $APP_SIZE"
           else
             echo "❌ Debug build failed - checking build products..."
-            ls -la ios/build/Build/Products/Debug-iphonesimulator/ || echo "Debug build directory not found"
+            ls -la ios/build/Build/Products/Debug-iphoneos/ || echo "Debug build directory not found"
+            # Also check if it might be in iphonesimulator directory
+            ls -la ios/build/Build/Products/Debug-iphonesimulator/ || echo "Simulator build directory also not found"
             exit 1
           fi
           
@@ -541,21 +543,23 @@ jobs:
             exit 1
           fi
           
-          # Build Release for iOS Simulator (standalone app, no Metro required)
+          # Build Release for iOS (generic platform - no simulator required)
           xcodebuild -workspace "$WORKSPACE_PATH" \
             -scheme "$WORKSPACE_NAME" \
             -configuration Release \
-            -destination 'platform=iOS Simulator' \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath ios/build \
             clean build
             
           # Verify build
-          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
-            APP_SIZE=$(du -sh "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
+          if [[ -d "ios/build/Build/Products/Release-iphoneos/${WORKSPACE_NAME}.app" ]]; then
+            APP_SIZE=$(du -sh "ios/build/Build/Products/Release-iphoneos/${WORKSPACE_NAME}.app" | cut -f1)
             echo "✅ Release build completed successfully - Size: $APP_SIZE"
           else
             echo "❌ Release build failed - checking build products..."
-            ls -la ios/build/Build/Products/Release-iphonesimulator/ || echo "Release build directory not found"
+            ls -la ios/build/Build/Products/Release-iphoneos/ || echo "Release build directory not found"
+            # Also check if it might be in iphonesimulator directory
+            ls -la ios/build/Build/Products/Release-iphonesimulator/ || echo "Simulator build directory also not found"
             exit 1
           fi
           
@@ -633,14 +637,14 @@ jobs:
           # Check what was built
           cd mobile
           
-          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
-            DEBUG_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)
-            echo "| Debug App | $DEBUG_SIZE | Development/Testing | \`ios/build/Build/Products/Debug-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
+          if [[ -d "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" ]]; then
+            DEBUG_SIZE=$(du -sh "ios/build/Build/Products/Debug-iphoneos/${WORKSPACE_NAME}.app" | cut -f1)
+            echo "| Debug App | $DEBUG_SIZE | Development/Testing | \`ios/build/Build/Products/Debug-iphoneos/\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" ]]; then
-            RELEASE_SIZE=$(du -sh "ios/build/Build/Products/Release-iphonesimulator/${WORKSPACE_NAME}.app" | cut -f1)  
-            echo "| Release App | $RELEASE_SIZE | Standalone Distribution | \`ios/build/Build/Products/Release-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
+          if [[ -d "ios/build/Build/Products/Release-iphoneos/${WORKSPACE_NAME}.app" ]]; then
+            RELEASE_SIZE=$(du -sh "ios/build/Build/Products/Release-iphoneos/${WORKSPACE_NAME}.app" | cut -f1)  
+            echo "| Release App | $RELEASE_SIZE | Standalone Distribution | \`ios/build/Build/Products/Release-iphoneos/\` |" >> $GITHUB_STEP_SUMMARY
           fi
           
           if [[ -d "ios/build/${WORKSPACE_NAME}.xcarchive" ]]; then
@@ -666,7 +670,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-debug-app
-          path: mobile/ios/build/Build/Products/Debug-iphonesimulator/${{ env.WORKSPACE_NAME }}.app
+          path: mobile/ios/build/Build/Products/Debug-iphoneos/${{ env.WORKSPACE_NAME }}.app
           retention-days: 30
           
       - name: 📤 Upload Release App
@@ -674,7 +678,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-release-app
-          path: mobile/ios/build/Build/Products/Release-iphonesimulator/${{ env.WORKSPACE_NAME }}.app
+          path: mobile/ios/build/Build/Products/Release-iphoneos/${{ env.WORKSPACE_NAME }}.app
           retention-days: 90
           
       - name: 📤 Upload Xcode Archive
