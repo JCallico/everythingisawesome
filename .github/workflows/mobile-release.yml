@@ -29,6 +29,20 @@ on:
         required: true
         default: false
         type: boolean
+      use_eas:
+        description: 'Use Expo EAS Cloud Build for iOS (recommended)'
+        required: true
+        default: true
+        type: boolean
+      eas_profile:
+        description: 'EAS build profile (defined in eas.json)'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - development
+          - preview
+          - production
       force_ios_setup:
         description: 'Force iOS platform/runtime installation (may download >8GB)'
         required: true
@@ -341,7 +355,65 @@ jobs:
   ios-build:
     name: Build iOS Artifacts
     runs-on: macos-latest
-    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
+  if: ${{ (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both') && github.event.inputs.use_eas != 'true' }}
+  ios-eas-build:
+    name: Build iOS with EAS
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both') && github.event.inputs.use_eas == 'true' }}
+    env:
+      EAS_NO_VCS: 1
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install Expo/EAS CLIs
+        run: |
+          npm i -g expo eas-cli
+          expo --version
+          eas --version
+
+      - name: 🔧 Install Dependencies
+        run: |
+          pnpm install --no-frozen-lockfile --reporter=append-only
+          cd mobile
+          npm install --legacy-peer-deps --no-audit --no-fund
+
+      - name: 🔐 Configure EAS Profile
+        run: |
+          echo "Using EAS profile: ${{ github.event.inputs.eas_profile }}"
+
+      - name: 🚀 Start EAS iOS Build
+        working-directory: mobile
+        run: |
+          eas build --platform ios --non-interactive --profile "${{ github.event.inputs.eas_profile }}" --local=false --no-wait
+
+      - name: 🔗 Fetch Latest Build URL
+        id: eas_status
+        working-directory: mobile
+        run: |
+          URL=$(eas build:list --json --limit 1 | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);console.log(j[0]?.artifacts?.buildUrl||'')})")
+          echo "build_url=$URL" >> $GITHUB_OUTPUT
+          if [[ -n "$URL" ]]; then
+            echo "🔗 Build URL: $URL"
+          else
+            echo "⚠️ Could not retrieve build URL yet (build likely in progress)."
+          fi
+
+      - name: 📣 EAS Build Info
+        run: |
+          echo "### 🍎 EAS iOS Build Triggered" >> $GITHUB_STEP_SUMMARY
+          echo "- Profile: ${{ github.event.inputs.eas_profile }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dashboard: https://expo.dev/accounts (check your project/builds)" >> $GITHUB_STEP_SUMMARY
+          if [[ -n "${{ steps.eas_status.outputs.build_url }}" ]]; then
+            echo "- Latest Build: ${{ steps.eas_status.outputs.build_url }}" >> $GITHUB_STEP_SUMMARY
+          fi
     
     steps:
       - name: 🍎 Checkout Repository
@@ -971,14 +1043,21 @@ jobs:
   build-complete:
     name: Build Complete
     runs-on: ubuntu-latest
-    needs: [android-build, ios-build]
-    if: always()
+  needs: [android-build, ios-build, ios-eas-build]
+  if: always()
     
     steps:
       - name: 🎉 Mobile Build Summary
         run: |
           ANDROID_RESULT="${{ needs.android-build.result }}"
-          IOS_RESULT="${{ needs.ios-build.result }}"
+          IOS_RESULT_NATIVE="${{ needs.ios-build.result }}"
+          IOS_RESULT_EAS="${{ needs.ios-eas-build.result }}"
+          # Prefer EAS result if enabled
+          if [[ -n "$IOS_RESULT_EAS" && "$IOS_RESULT_EAS" != "skipped" ]]; then
+            IOS_RESULT="$IOS_RESULT_EAS"
+          else
+            IOS_RESULT="$IOS_RESULT_NATIVE"
+          fi
           
           # Check if any builds ran and succeeded
           if [[ ("$ANDROID_RESULT" == "success" || "$ANDROID_RESULT" == "skipped") && ("$IOS_RESULT" == "success" || "$IOS_RESULT" == "skipped") ]]; then
