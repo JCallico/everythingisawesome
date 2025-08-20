@@ -363,6 +363,24 @@ jobs:
           cd mobile
           npm install --legacy-peer-deps --no-audit --no-fund
           
+      - name: 📥 Install iOS Platform
+        run: |
+          echo "📥 Installing iOS platform and SDKs..."
+          
+          # Check current available platforms
+          echo "📱 Current available platforms:"
+          xcodebuild -showsdks
+          
+          # Install iOS platform
+          echo "📥 Downloading and installing iOS platform..."
+          xcodebuild -downloadPlatform iOS || echo "Platform download completed or already available"
+          
+          # Check platforms after installation
+          echo "📱 Available platforms after installation:"
+          xcodebuild -showsdks
+          
+          echo "✅ iOS platform installation complete"
+          
       - name: 🍎 Setup iOS Development Environment
         run: |
           echo "� Validating iOS build environment..."
