@@ -341,20 +341,50 @@ jobs:
     steps:
       - name: 🍎 Checkout Repository
         uses: actions/checkout@v4
+      
+      - name: 🛡️ iOS Preflight Guard
+        id: preflight
+        run: |
+          echo "🔍 Preflight: checking iOS support on runner..."
+          xcodebuild -version || true
+          echo "📋 Checking available iOS SDKs and runtimes..."
+          SDK_COUNT=$(xcodebuild -showsdks 2>/dev/null | grep -c "iphoneos" || true)
+          RUNTIME_COUNT=$(xcrun simctl list runtimes 2>/dev/null | grep -c "^iOS" || true)
+          if [[ "${SDK_COUNT}" -gt 0 || "${RUNTIME_COUNT}" -gt 0 ]]; then
+            echo "ios_supported=true" >> $GITHUB_OUTPUT
+            echo "✅ iOS indicators detected (SDKs or runtimes present)"
+          else
+            echo "ios_supported=false" >> $GITHUB_OUTPUT
+            echo "❌ No iOS SDKs or runtimes detected on this runner"
+          fi
+      
+      - name: ℹ️ Skip iOS build (no eligible destinations)
+        if: ${{ steps.preflight.outputs.ios_supported != 'true' }}
+        run: |
+          echo "🚫 Skipping iOS job early: runner lacks iOS SDKs/runtimes."
+          echo "### 🍎 iOS build skipped" >> $GITHUB_STEP_SUMMARY
+          echo "- Reason: No iOS SDKs or runtimes available on GitHub-hosted macOS runner" >> $GITHUB_STEP_SUMMARY
+          echo "- Next steps:" >> $GITHUB_STEP_SUMMARY
+          echo "  - Use a self-hosted macOS runner with Xcode + iOS platform installed" >> $GITHUB_STEP_SUMMARY
+          echo "  - Or use a CI service that supports iOS (e.g., Codemagic, Bitrise)" >> $GITHUB_STEP_SUMMARY
+          echo "  - Local builds continue to work with Xcode" >> $GITHUB_STEP_SUMMARY
         
       - name: ⚙️ Setup Node.js 22
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           
       - name: 📦 Setup pnpm
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         uses: pnpm/action-setup@v4
         with:
           version: 10.12.2
           run_install: false
           
       - name: 🔧 Install Dependencies
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           echo "📦 Installing root dependencies..."
           pnpm install --no-frozen-lockfile --reporter=append-only
@@ -364,6 +394,7 @@ jobs:
           npm install --legacy-peer-deps --no-audit --no-fund
           
       - name: 📥 Install iOS Platform
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           echo "📥 Setting up iOS platform and SDKs..."
           
@@ -446,6 +477,7 @@ jobs:
           echo "✅ iOS platform setup complete"
           
       - name: 🍎 Setup iOS Development Environment
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           echo "� Validating iOS build environment..."
           
@@ -470,6 +502,7 @@ jobs:
           echo "✅ iOS development environment validated"
           
       - name: 🏗️ Generate iOS Project
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           cd mobile
           echo "🍎 Generating native iOS project..."
@@ -504,6 +537,7 @@ jobs:
           echo "✅ iOS project generated successfully"
           
       - name: 📦 Install iOS Dependencies
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           cd mobile/ios
           echo "📦 Installing iOS CocoaPods dependencies..."
@@ -511,6 +545,7 @@ jobs:
           echo "✅ iOS dependencies installed successfully"
           
       - name: � Setup iOS Code Signing (Development)
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         env:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
@@ -550,6 +585,7 @@ jobs:
           fi
           
       - name: 📋 Create Export Options Configuration
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           cd mobile
           
@@ -576,7 +612,7 @@ jobs:
           echo "✅ Export options configuration created"
           
       - name: 🔨 Build Debug Configuration
-        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "🔨 Building iOS Debug configuration..."
           cd mobile
@@ -609,8 +645,10 @@ jobs:
           echo "📋 Available build destinations:"
           xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null || echo "Could not query destinations"
           
-          # If no iOS destinations are available, try creating a simulator
-          if ! xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null | grep -q "platform:iOS"; then
+          # If no eligible iOS destinations are available, try creating a simulator
+          # Note: Some runners only print "Ineligible destinations" which still contains "platform:iOS".
+          # We specifically check for the presence of the "Available destinations" header to avoid false positives.
+          if ! xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null | grep -q "Available destinations"; then
             echo "🔧 No iOS destinations found, attempting to create iOS simulator..."
             
             # List available device types
@@ -704,7 +742,7 @@ jobs:
           fi
           
       - name: 🚀 Build Release Configuration
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "🚀 Building iOS Release configuration..."
           cd mobile
@@ -747,7 +785,7 @@ jobs:
           fi
           
       - name: 📦 Build Archive for Distribution
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "📦 Creating Xcode archive for distribution..."
           cd mobile
@@ -778,7 +816,7 @@ jobs:
           fi
           
       - name: 📲 Export IPA for Distribution
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "📲 Exporting IPA from archive..."
           cd mobile
@@ -800,6 +838,7 @@ jobs:
           fi
           
       - name: 🔍 Generate iOS Build Summary
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           echo "🍎 iOS BUILD SUMMARY" >> $GITHUB_STEP_SUMMARY
           echo "===================" >> $GITHUB_STEP_SUMMARY
@@ -849,7 +888,7 @@ jobs:
           echo "- **Note**: IPA and Archive files are automatically built with Release builds" >> $GITHUB_STEP_SUMMARY
           
       - name: 📤 Upload Debug App
-        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-debug-app
@@ -857,7 +896,7 @@ jobs:
           retention-days: 30
           
       - name: 📤 Upload Release App
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-release-app
@@ -865,7 +904,7 @@ jobs:
           retention-days: 90
           
       - name: 📤 Upload Xcode Archive
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-archive
@@ -873,7 +912,7 @@ jobs:
           retention-days: 90
           
       - name: 📤 Upload IPA Package
-        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
