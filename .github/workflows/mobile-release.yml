@@ -24,11 +24,6 @@ on:
           - debug
           - release
           - both
-      create_aab:
-        description: 'Build AAB for Play Store (Android only)'
-        required: true
-        default: true
-        type: boolean
       upload_artifacts:
         description: 'Upload artifacts as GitHub release'
         required: true
@@ -188,7 +183,7 @@ jobs:
           fi
           
       - name: 📦 Build Release AAB (Play Store)
-        if: ${{ github.event.inputs.create_aab == 'true' }}
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
         run: |
           echo "📦 Building Android App Bundle for Play Store..."
           cd mobile
@@ -210,8 +205,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "### 📋 Build Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform**: Android" >> $GITHUB_STEP_SUMMARY
           echo "- **Release Type**: ${{ github.event.inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **AAB Build**: ${{ github.event.inputs.create_aab }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Store Builds**: Automatically included with Release builds" >> $GITHUB_STEP_SUMMARY
           echo "- **Upload Artifacts**: ${{ github.event.inputs.upload_artifacts }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
@@ -242,6 +238,7 @@ jobs:
           echo "- **APK Testing**: Download APK artifacts to test on Android devices" >> $GITHUB_STEP_SUMMARY
           echo "- **Sideloading**: Use release APK for manual installation" >> $GITHUB_STEP_SUMMARY
           echo "- **Play Store**: Use AAB file for Google Play Console submission" >> $GITHUB_STEP_SUMMARY
+          echo "- **Note**: AAB files are automatically built with Release builds" >> $GITHUB_STEP_SUMMARY
           
       - name: 📤 Upload Debug APK
         if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
@@ -260,7 +257,7 @@ jobs:
           retention-days: 90
           
       - name: 📤 Upload Release AAB
-        if: ${{ github.event.inputs.create_aab == 'true' }}
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
         uses: actions/upload-artifact@v4
         with:
           name: play-store-aab
@@ -283,7 +280,7 @@ jobs:
           body: |
             ## 📱 Mobile Release v1.0.${{ github.run_number }}
             
-            This release contains mobile app artifacts for the Everything Is Awesome application.
+            This release contains mobile app artifacts for the Everything Is Awesome application, ready for distribution through app stores and direct installation.
             
             ### 📦 Artifacts Included:
             
@@ -292,7 +289,13 @@ jobs:
             - **app-release.aab** (~46MB) - For Google Play Store submission
             
             **iOS** (if built):
-            - **EverythingIsAwesome.ipa** (~43MB) - For TestFlight and App Store submission
+            - **[AppName].ipa** (~43MB) - For TestFlight and App Store submission
+            
+            ### 🏪 Store-Ready Builds:
+            
+            When **Release** build type is selected, both platforms automatically generate store-ready artifacts:
+            - **Android**: APK (sideloading) + AAB (Play Store)
+            - **iOS**: IPA (TestFlight/App Store) + Archive (distribution)
             
             ### 🔐 Signing Information:
             
@@ -317,7 +320,7 @@ jobs:
             3. Complete store listing and submit for review
             
             **iOS TestFlight/App Store:**
-            1. Download `EverythingIsAwesome.ipa`
+            1. Download the `.ipa` file
             2. Upload to App Store Connect via Xcode or Transporter
             3. Submit for TestFlight beta or App Store review
             
@@ -620,6 +623,7 @@ jobs:
           echo "### 📋 Build Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- **Platform**: iOS" >> $GITHUB_STEP_SUMMARY
           echo "- **Release Type**: ${{ github.event.inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **App Store Builds**: Automatically included with Release builds" >> $GITHUB_STEP_SUMMARY
           echo "- **Xcode Version**: $(xcodebuild -version | head -1)" >> $GITHUB_STEP_SUMMARY
           echo "- **Upload Artifacts**: ${{ github.event.inputs.upload_artifacts }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -657,6 +661,7 @@ jobs:
           echo "- **Device Testing**: Install IPA on physical devices via Xcode/iTunes" >> $GITHUB_STEP_SUMMARY
           echo "- **TestFlight**: Upload IPA to App Store Connect for beta testing" >> $GITHUB_STEP_SUMMARY
           echo "- **App Store**: Submit IPA through App Store Connect for review" >> $GITHUB_STEP_SUMMARY
+          echo "- **Note**: IPA and Archive files are automatically built with Release builds" >> $GITHUB_STEP_SUMMARY
           
       - name: 📤 Upload Debug App
         if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
