@@ -1022,7 +1022,8 @@ jobs:
       - name: 🚀 Start EAS iOS Build
         working-directory: mobile
         run: |
-          eas build --platform ios --non-interactive --profile "${{ github.event.inputs.eas_profile }}" --local=false --no-wait
+          # Use cloud build by omitting --local; --no-wait returns immediately
+          eas build --platform ios --non-interactive --profile "${{ github.event.inputs.eas_profile }}" --no-wait
 
       - name: 🔗 Fetch Latest Build URL
         id: eas_status
