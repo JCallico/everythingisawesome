@@ -570,6 +570,28 @@ jobs:
           echo "📦 Installing iOS CocoaPods dependencies..."
           pod install --verbose
           echo "✅ iOS dependencies installed successfully"
+
+      - name: 🔎 Check iOS Destinations
+        id: destcheck
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
+        run: |
+          cd mobile
+          echo "🔎 Checking Xcode destinations for workspace: $WORKSPACE_NAME"
+          DEST_OUTPUT=$(xcodebuild -workspace "ios/${WORKSPACE_NAME}.xcworkspace" -scheme "$WORKSPACE_NAME" -showdestinations 2>&1 || true)
+          echo "$DEST_OUTPUT"
+          if echo "$DEST_OUTPUT" | grep -q "Available destinations"; then
+            echo "ios_dests=true" >> $GITHUB_OUTPUT
+            echo "✅ Eligible iOS destinations detected"
+          else
+            echo "ios_dests=false" >> $GITHUB_OUTPUT
+            echo "❌ No eligible iOS destinations detected for the scheme/workspace"
+            echo "### 🍎 iOS build skipped" >> $GITHUB_STEP_SUMMARY
+            echo "- Reason: No eligible iOS destinations for the scheme/workspace on this runner" >> $GITHUB_STEP_SUMMARY
+            echo "- Observed: Only ineligible 'Any iOS Device' placeholder is listed" >> $GITHUB_STEP_SUMMARY
+            echo "- Next steps:" >> $GITHUB_STEP_SUMMARY
+            echo "  - Use a self-hosted macOS runner with iOS Platform installed" >> $GITHUB_STEP_SUMMARY
+            echo "  - Or use an iOS-capable CI (Codemagic, Bitrise)" >> $GITHUB_STEP_SUMMARY
+          fi
           
       - name: � Setup iOS Code Signing (Development)
         if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
@@ -639,7 +661,7 @@ jobs:
           echo "✅ Export options configuration created"
           
       - name: 🔨 Build Debug Configuration
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both') }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && steps.destcheck.outputs.ios_dests == 'true' && (github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "🔨 Building iOS Debug configuration..."
           cd mobile
@@ -769,7 +791,7 @@ jobs:
           fi
           
       - name: 🚀 Build Release Configuration
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && steps.destcheck.outputs.ios_dests == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "🚀 Building iOS Release configuration..."
           cd mobile
@@ -812,7 +834,7 @@ jobs:
           fi
           
       - name: 📦 Build Archive for Distribution
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && steps.destcheck.outputs.ios_dests == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "📦 Creating Xcode archive for distribution..."
           cd mobile
@@ -843,7 +865,7 @@ jobs:
           fi
           
       - name: 📲 Export IPA for Distribution
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
+        if: ${{ steps.preflight.outputs.ios_supported == 'true' && steps.destcheck.outputs.ios_dests == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
         run: |
           echo "📲 Exporting IPA from archive..."
           cd mobile
