@@ -554,6 +554,10 @@ jobs:
           # Try different destination approaches for iOS build
           echo "🔍 Testing iOS build destinations..."
           
+          # Show available destinations first
+          echo "📋 Available build destinations:"
+          xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null || echo "Could not query destinations"
+          
           # First try: Use SDK version explicitly in destination
           echo "Attempt 1: Using explicit SDK in destination"
           if xcodebuild -workspace "$WORKSPACE_PATH" \
@@ -588,7 +592,9 @@ jobs:
               else
                 echo "❌ All iOS build approaches failed"
                 echo "📋 This indicates iOS development is not fully supported on this runner"
-                return 1
+                echo "🔍 Let's check what iOS destinations are actually available:"
+                xcodebuild -workspace "$WORKSPACE_PATH" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null || echo "Could not query available destinations"
+                exit 1
               fi
             fi
           fi
@@ -612,8 +618,6 @@ jobs:
           
           if [[ "$IOS_BUILD_FOUND" == "false" ]]; then
             echo "❌ iOS Debug build verification failed"
-            return 1
-          fi
             exit 1
           fi
           
