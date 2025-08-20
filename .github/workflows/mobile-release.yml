@@ -404,11 +404,12 @@ jobs:
           fi
           
           # Check for workspace file
-          if [[ -f "ios/EverythingIsAwesome.xcworkspace/contents.xcworkspacedata" ]]; then
-            echo "✅ Xcode workspace found: EverythingIsAwesome.xcworkspace"
-          elif [[ -f "ios/mobile.xcworkspace/contents.xcworkspacedata" ]]; then
+          if [[ -f "ios/mobile.xcworkspace/contents.xcworkspacedata" ]]; then
             echo "✅ Xcode workspace found: mobile.xcworkspace"
             echo "WORKSPACE_NAME=mobile" >> $GITHUB_ENV
+          elif [[ -f "ios/EverythingIsAwesome.xcworkspace/contents.xcworkspacedata" ]]; then
+            echo "✅ Xcode workspace found: EverythingIsAwesome.xcworkspace"
+            echo "WORKSPACE_NAME=EverythingIsAwesome" >> $GITHUB_ENV
           else
             echo "🔍 Searching for any .xcworkspace files..."
             find ios/ -name "*.xcworkspace" -type d || echo "No workspace files found"
@@ -416,10 +417,7 @@ jobs:
             exit 1
           fi
           
-          # Set default workspace name if not already set
-          if [[ -z "$WORKSPACE_NAME" ]]; then
-            echo "WORKSPACE_NAME=EverythingIsAwesome" >> $GITHUB_ENV
-          fi
+          echo "🔧 Workspace name set to: $WORKSPACE_NAME"
           
           echo "✅ iOS project generated successfully"
           
