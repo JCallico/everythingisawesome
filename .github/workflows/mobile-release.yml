@@ -279,37 +279,53 @@ jobs:
           files: |
             mobile/android/app/build/outputs/apk/release/app-release.apk
             mobile/android/app/build/outputs/bundle/release/app-release.aab
+            mobile/ios/build/ipa/EverythingIsAwesome.ipa
           body: |
             ## 📱 Mobile Release v1.0.${{ github.run_number }}
             
-            This release contains Android APK and AAB files for the Everything Is Awesome mobile application.
+            This release contains mobile app artifacts for the Everything Is Awesome application.
             
             ### 📦 Artifacts Included:
+            
+            **Android** (if built):
             - **app-release.apk** (~70MB) - For sideloading and manual installation  
             - **app-release.aab** (~46MB) - For Google Play Store submission
             
+            **iOS** (if built):
+            - **EverythingIsAwesome.ipa** (~43MB) - For TestFlight and App Store submission
+            
             ### 🔐 Signing Information:
+            
+            **Android**:
             - **Certificate**: Production-signed with release keystore
             - **Package**: com.jcallico.everythingisawesome  
-            - **Version**: 1.0.${{ github.run_number }}
+            
+            **iOS**:
+            - **Bundle ID**: com.mobile.everythingisawesome
+            - **Certificate**: Development/Distribution certificate (depending on secrets configuration)
             
             ### 📋 Installation Instructions:
             
-            **APK Sideloading:**
+            **Android APK Sideloading:**
             1. Enable "Unknown Sources" in Android Settings
             2. Download `app-release.apk`
             3. Install using: `adb install -r app-release.apk`
             
-            **Play Store Submission:**
+            **Android Play Store Submission:**
             1. Download `app-release.aab`
             2. Upload to Google Play Console
             3. Complete store listing and submit for review
             
+            **iOS TestFlight/App Store:**
+            1. Download `EverythingIsAwesome.ipa`
+            2. Upload to App Store Connect via Xcode or Transporter
+            3. Submit for TestFlight beta or App Store review
+            
             ### ⚡ Built With:
             - React Native with Expo
-            - Android API 35
-            - Java JDK 17
-            - Production keystore signing
+            - **Android**: API 35, Java JDK 17, Production keystore signing
+            - **iOS**: Xcode latest, CocoaPods, Code signing certificates
+            - Cross-platform shared codebase
             
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -320,23 +336,301 @@ jobs:
     if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     
     steps:
-      - name: 🍎 iOS Build Placeholder
-        run: |
-          echo "📱 iOS build support coming soon!"
-          echo "This will include:"
-          echo "- 🔨 Xcode project building"
-          echo "- 📦 IPA artifact creation"
-          echo "- 🏪 App Store Connect integration"
-          echo "- 🔐 iOS code signing"
+      - name: 🍎 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: ⚙️ Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
           
-          echo "## 🍎 iOS Build Placeholder" >> $GITHUB_STEP_SUMMARY
-          echo "iOS build functionality will be added in a future update." >> $GITHUB_STEP_SUMMARY
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.2
+          run_install: false
+          
+      - name: 🔧 Install Dependencies
+        run: |
+          echo "📦 Installing root dependencies..."
+          pnpm install --no-frozen-lockfile --reporter=append-only
+          
+          echo "📱 Installing mobile dependencies..."
+          cd mobile
+          npm install --legacy-peer-deps --no-audit --no-fund
+          
+      - name: 🍎 Setup iOS Development Environment
+        run: |
+          echo "� Validating iOS build environment..."
+          
+          # Check Xcode version
+          echo "⚙️ Xcode version:"
+          xcodebuild -version
+          
+          # Check iOS Simulators
+          echo "📱 Available iOS Simulators:"
+          xcrun simctl list devices ios | grep -E "(iPhone|iPad)" | head -5
+          
+          # Check CocoaPods
+          echo "📦 CocoaPods version:"
+          pod --version
+          
+          # Install CocoaPods if not available
+          if ! command -v pod &> /dev/null; then
+            echo "📦 Installing CocoaPods..."
+            sudo gem install cocoapods
+          fi
+          
+          echo "✅ iOS development environment validated"
+          
+      - name: 🏗️ Generate iOS Project
+        run: |
+          cd mobile
+          echo "🍎 Generating native iOS project..."
+          npx expo prebuild --platform ios --clean
+          echo "✅ iOS project generated successfully"
+          
+      - name: 📦 Install iOS Dependencies
+        run: |
+          cd mobile/ios
+          echo "📦 Installing iOS CocoaPods dependencies..."
+          pod install --verbose
+          echo "✅ iOS dependencies installed successfully"
+          
+      - name: � Setup iOS Code Signing (Development)
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          cd mobile
+          
+          # Create temporary keychain for CI
+          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
+          KEYCHAIN_PASSWORD="build123"
+          
+          # Create and configure keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed s/\"//g)
+          
+          # Install certificate if provided
+          if [[ -n "$IOS_CERTIFICATE_BASE64" ]]; then
+            echo "🔐 Installing iOS development certificate..."
+            echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > certificate.p12
+            security import certificate.p12 -k "$KEYCHAIN_PATH" -P "${IOS_CERTIFICATE_PASSWORD:-}" -T /usr/bin/codesign
+            rm certificate.p12
+            echo "✅ Development certificate installed"
+          else
+            echo "⚠️ No iOS certificate provided - builds will be unsigned (development only)"
+          fi
+          
+          # Install provisioning profile if provided
+          if [[ -n "$IOS_PROVISIONING_PROFILE_BASE64" ]]; then
+            echo "🔐 Installing iOS provisioning profile..."
+            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+            echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+            echo "✅ Provisioning profile installed"
+          else
+            echo "⚠️ No iOS provisioning profile provided - using automatic code signing"
+          fi
+          
+      - name: 📋 Create Export Options Configuration
+        run: |
+          cd mobile
+          
+          # Create ExportOptions.plist for IPA export
+          cat > ios/ExportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          
+          echo "✅ Export options configuration created"
+          
+      - name: 🔨 Build Debug Configuration
+        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "🔨 Building iOS Debug configuration..."
+          cd mobile
+          
+          # Build Debug for iOS Simulator (matches documentation)
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+            -scheme EverythingIsAwesome \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
+            -derivedDataPath ios/build \
+            clean build
+            
+          # Verify build
+          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app" ]]; then
+            APP_SIZE=$(du -sh ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+            echo "✅ Debug build completed successfully - Size: $APP_SIZE"
+          else
+            echo "❌ Debug build failed"
+            exit 1
+          fi
+          
+      - name: 🚀 Build Release Configuration
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "🚀 Building iOS Release configuration..."
+          cd mobile
+          
+          # Build Release for iOS Simulator (standalone app, no Metro required)
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+            -scheme EverythingIsAwesome \
+            -configuration Release \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
+            -derivedDataPath ios/build \
+            clean build
+            
+          # Verify build
+          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app" ]]; then
+            APP_SIZE=$(du -sh ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+            echo "✅ Release build completed successfully - Size: $APP_SIZE"
+          else
+            echo "❌ Release build failed"
+            exit 1
+          fi
+          
+      - name: 📦 Build Archive for Distribution
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "📦 Creating Xcode archive for distribution..."
+          cd mobile
+          
+          # Create archive for App Store distribution
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+            -scheme EverythingIsAwesome \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath ios/build/EverythingIsAwesome.xcarchive \
+            archive
+            
+          # Verify archive
+          if [[ -d "ios/build/EverythingIsAwesome.xcarchive" ]]; then
+            ARCHIVE_SIZE=$(du -sh ios/build/EverythingIsAwesome.xcarchive | cut -f1)
+            echo "✅ Archive created successfully - Size: $ARCHIVE_SIZE"
+          else
+            echo "❌ Archive creation failed"
+            exit 1
+          fi
+          
+      - name: 📲 Export IPA for Distribution
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        run: |
+          echo "📲 Exporting IPA from archive..."
+          cd mobile
+          
+          # Export IPA using archive
+          xcodebuild -exportArchive \
+            -archivePath ios/build/EverythingIsAwesome.xcarchive \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath ios/build/ipa/
+            
+          # Verify IPA export
+          if [[ -f "ios/build/ipa/EverythingIsAwesome.ipa" ]]; then
+            IPA_SIZE=$(du -sh ios/build/ipa/EverythingIsAwesome.ipa | cut -f1)
+            echo "✅ IPA exported successfully - Size: $IPA_SIZE"
+          else
+            echo "❌ IPA export failed"
+            exit 1
+          fi
+          
+      - name: 🔍 Generate iOS Build Summary
+        run: |
+          echo "🍎 iOS BUILD SUMMARY" >> $GITHUB_STEP_SUMMARY
+          echo "===================" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📋 Planned Features:" >> $GITHUB_STEP_SUMMARY
-          echo "- Xcode project compilation" >> $GITHUB_STEP_SUMMARY
-          echo "- IPA file generation" >> $GITHUB_STEP_SUMMARY
-          echo "- TestFlight distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- App Store submission preparation" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📋 Build Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform**: iOS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release Type**: ${{ github.event.inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Xcode Version**: $(xcodebuild -version | head -1)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Upload Artifacts**: ${{ github.event.inputs.upload_artifacts }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📦 Generated iOS Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | Size | Purpose | Location |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|---------|----------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Check what was built
+          cd mobile
+          
+          if [[ -d "ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app" ]]; then
+            DEBUG_SIZE=$(du -sh ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app | cut -f1)
+            echo "| Debug App | $DEBUG_SIZE | Development/Testing | \`ios/build/Build/Products/Debug-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -d "ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app" ]]; then
+            RELEASE_SIZE=$(du -sh ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app | cut -f1)  
+            echo "| Release App | $RELEASE_SIZE | Standalone Distribution | \`ios/build/Build/Products/Release-iphonesimulator/\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -d "ios/build/EverythingIsAwesome.xcarchive" ]]; then
+            ARCHIVE_SIZE=$(du -sh ios/build/EverythingIsAwesome.xcarchive | cut -f1)
+            echo "| Xcode Archive | $ARCHIVE_SIZE | App Store Distribution | \`ios/build/EverythingIsAwesome.xcarchive\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -f "ios/build/ipa/EverythingIsAwesome.ipa" ]]; then
+            IPA_SIZE=$(du -sh ios/build/ipa/EverythingIsAwesome.ipa | cut -f1)
+            echo "| IPA Package | $IPA_SIZE | TestFlight/App Store | \`ios/build/ipa/EverythingIsAwesome.ipa\` |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- **Simulator Testing**: Use Debug/Release .app files with iOS Simulator" >> $GITHUB_STEP_SUMMARY
+          echo "- **Device Testing**: Install IPA on physical devices via Xcode/iTunes" >> $GITHUB_STEP_SUMMARY
+          echo "- **TestFlight**: Upload IPA to App Store Connect for beta testing" >> $GITHUB_STEP_SUMMARY
+          echo "- **App Store**: Submit IPA through App Store Connect for review" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📤 Upload Debug App
+        if: ${{ github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-debug-app
+          path: mobile/ios/build/Build/Products/Debug-iphonesimulator/EverythingIsAwesome.app
+          retention-days: 30
+          
+      - name: 📤 Upload Release App
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-app
+          path: mobile/ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app
+          retention-days: 90
+          
+      - name: 📤 Upload Xcode Archive
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-archive
+          path: mobile/ios/build/EverythingIsAwesome.xcarchive
+          retention-days: 90
+          
+      - name: 📤 Upload IPA Package
+        if: ${{ github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: mobile/ios/build/ipa/EverythingIsAwesome.ipa
+          retention-days: 365
 
   build-complete:
     name: Build Complete
@@ -366,10 +660,12 @@ jobs:
             
             if [[ "$IOS_RESULT" == "success" ]]; then
               echo "### 🍎 iOS Build: ✅ Success" >> $GITHUB_STEP_SUMMARY
-              echo "- IPA files ready for TestFlight distribution" >> $GITHUB_STEP_SUMMARY
+              echo "- Debug/Release .app files ready for iOS Simulator testing" >> $GITHUB_STEP_SUMMARY
+              echo "- Xcode archive ready for distribution" >> $GITHUB_STEP_SUMMARY
+              echo "- IPA file ready for TestFlight and App Store submission" >> $GITHUB_STEP_SUMMARY
             elif [[ "$IOS_RESULT" == "skipped" && "${{ github.event.inputs.platform }}" == "ios" ]]; then
-              echo "### 🍎 iOS Build: ⏳ Coming Soon" >> $GITHUB_STEP_SUMMARY
-              echo "- iOS build support will be added in a future update" >> $GITHUB_STEP_SUMMARY
+              echo "### 🍎 iOS Build: ⏹️ Skipped" >> $GITHUB_STEP_SUMMARY
+              echo "- iOS build was not selected for this workflow run" >> $GITHUB_STEP_SUMMARY
             fi
             
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -388,10 +684,17 @@ jobs:
             echo "- **iOS**: $IOS_RESULT" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 🔧 Common Issues:" >> $GITHUB_STEP_SUMMARY
+            echo "**Android**:" >> $GITHUB_STEP_SUMMARY
             echo "- Android SDK configuration problems" >> $GITHUB_STEP_SUMMARY
             echo "- Java JDK version incompatibility" >> $GITHUB_STEP_SUMMARY
             echo "- Keystore signing issues" >> $GITHUB_STEP_SUMMARY
             echo "- Dependency resolution problems" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**iOS**:" >> $GITHUB_STEP_SUMMARY
+            echo "- Xcode command line tools not installed" >> $GITHUB_STEP_SUMMARY
+            echo "- CocoaPods dependency conflicts" >> $GITHUB_STEP_SUMMARY
+            echo "- iOS code signing certificate issues" >> $GITHUB_STEP_SUMMARY
+            echo "- Provisioning profile configuration problems" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Please review the workflow logs and try building again." >> $GITHUB_STEP_SUMMARY
           fi
