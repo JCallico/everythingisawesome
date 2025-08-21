@@ -1,0 +1,41 @@
+name: Mobile Build Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: cd mobile && yarn install
+      - name: Build Android Release
+        run: cd mobile/android && ./gradlew assembleRelease
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-app
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: cd mobile && yarn install
+      - name: Install CocoaPods
+        run: cd mobile/ios && pod install
+      - name: Build iOS App
+        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator build
+      - name: Upload iOS Artifact (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: mobile/build/Release-iphonesimulator/EverythingIsAwesome.app # Adjust path as needed
