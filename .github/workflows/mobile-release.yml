@@ -29,11 +29,6 @@ on:
         required: true
         default: false
         type: boolean
-      force_ios_setup:
-        description: 'Force iOS platform/runtime installation (may download >8GB)'
-        required: true
-        default: false
-        type: boolean
 
 jobs:
   android-build:
@@ -398,110 +393,6 @@ jobs:
           cd mobile
           npm install --legacy-peer-deps --no-audit --no-fund
           
-      - name: 📥 Install iOS Platform
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
-        timeout-minutes: 8
-        env:
-          FORCE_IOS_SETUP: ${{ github.event.inputs.force_ios_setup }}
-        run: |
-          echo "📥 Setting up iOS platform and SDKs..."
-          
-          # Check current available platforms
-          echo "📱 Current available platforms:"
-          xcodebuild -showsdks
-          
-          # Quick exit: if both iphoneos and iphonesimulator SDKs are present and iOS runtimes are listed, skip heavy installs
-          HAS_IPHONEOS=$(xcodebuild -showsdks 2>/dev/null | grep -c "iphoneos" || true)
-          HAS_SIMSDK=$(xcodebuild -showsdks 2>/dev/null | grep -c "iphonesimulator" || true)
-          HAS_IOS_RUNTIME=$(xcrun simctl list runtimes 2>/dev/null | grep -c "^iOS" || true)
-          if [[ "${FORCE_IOS_SETUP}" != "true" && "${HAS_IPHONEOS}" -gt 0 && "${HAS_SIMSDK}" -gt 0 && "${HAS_IOS_RUNTIME}" -gt 0 ]]; then
-            echo "✅ iOS SDKs and runtimes already available, skipping platform download"
-            # Export the latest iOS SDK version
-            AVAILABLE_IOS_SDK=$(xcodebuild -showsdks | grep "iphoneos" | tail -1 | sed 's/.*iphoneos/iphoneos/')
-            echo "IOS_SDK_VERSION=$AVAILABLE_IOS_SDK" >> $GITHUB_ENV
-            echo "✅ iOS platform setup complete"
-            exit 0
-          else
-            if [[ "${FORCE_IOS_SETUP}" == "true" ]]; then
-              echo "⚠️ Forcing iOS setup as requested (this may download several GB)"
-            else
-              echo "ℹ️ Proceeding with setup because required SDKs/runtimes were not fully detected"
-            fi
-          fi
-          
-          # Try to install iOS platform with enhanced methods
-          echo "📥 Attempting to install iOS platform..."
-          
-          # Method 1: Standard platform download
-          if xcodebuild -downloadPlatform iOS -verbose 2>&1; then
-            echo "✅ Standard iOS platform download succeeded"
-          else
-            echo "❌ Standard platform download failed, trying alternatives..."
-            
-            # Method 2: Try specific iOS version  
-            if xcodebuild -downloadPlatform iOS -version 18.0 2>&1; then
-              echo "✅ iOS 18.0 platform download succeeded"
-            else
-              echo "❌ iOS 18.0 download failed, trying simulator runtime..."
-              
-              # Method 3: Install iOS Simulator Runtime
-              if xcrun simctl runtime list available 2>&1 | grep "iOS 18.0"; then
-                echo "📥 Installing iOS 18.0 simulator runtime..."
-                xcrun simctl runtime download "iOS 18.0" || echo "Runtime download attempted"
-              fi
-              
-              # Method 4: Try alternative installation approaches
-              echo "🔧 Trying alternative installation methods..."
-              
-              # Accept licenses that might be blocking installation
-              sudo xcodebuild -license accept 2>/dev/null || echo "License acceptance attempted"
-              
-              # Try forcing platform installation
-              xcodebuild -downloadPlatform iOS -force || echo "Force download attempted"
-            fi
-          fi
-          
-          # Verify simulator availability after installation attempts
-          echo "🔍 Checking iOS Simulator availability:"
-          xcrun simctl list devices available | grep iPhone || echo "No iPhone simulators found"
-          xcrun simctl list runtimes | grep iOS || echo "No iOS runtimes found"
-          
-          # Check platforms after installation attempts
-          echo "📱 Available platforms after installation:"
-          xcodebuild -showsdks
-          
-          # Extract available iOS SDK version and set environment variable
-          AVAILABLE_IOS_SDK=$(xcodebuild -showsdks | grep "iphoneos" | tail -1 | sed 's/.*iphoneos/iphoneos/')
-          if [[ -n "$AVAILABLE_IOS_SDK" ]]; then
-            echo "📱 Found iOS SDK: $AVAILABLE_IOS_SDK"
-            echo "IOS_SDK_VERSION=$AVAILABLE_IOS_SDK" >> $GITHUB_ENV
-          else
-            echo "⚠️ No iOS SDK found after installation attempts"
-            echo "IOS_SDK_VERSION=" >> $GITHUB_ENV
-          fi
-          
-          # Critical check: Verify if iOS builds are actually possible
-          echo "🔍 Final verification of iOS build capability..."
-          cd mobile
-          WORKSPACE_NAME=$(find ios -name "*.xcworkspace" -exec basename {} .xcworkspace \; | head -1)
-          if [[ -n "$WORKSPACE_NAME" ]]; then
-            echo "WORKSPACE_NAME=$WORKSPACE_NAME" >> $GITHUB_ENV
-            
-            # Test if we can query destinations without errors
-            if xcodebuild -workspace "ios/${WORKSPACE_NAME}.xcworkspace" -scheme "$WORKSPACE_NAME" -showdestinations 2>&1 | grep -q "platform:iOS.*Available"; then
-              echo "✅ iOS destinations are available - builds should succeed"
-            else
-              echo "❌ No available iOS destinations found"
-              echo "📋 iOS builds will likely fail on this runner"
-              echo "🔧 This is a known limitation of GitHub Actions macOS runners"
-              
-              # Show what destinations are available
-              echo "📋 Available destinations:"
-              xcodebuild -workspace "ios/${WORKSPACE_NAME}.xcworkspace" -scheme "$WORKSPACE_NAME" -showdestinations 2>/dev/null || echo "Could not query destinations"
-            fi
-          fi
-          
-          echo "✅ iOS platform setup complete"
           
       - name: 🍎 Setup iOS Development Environment
         if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
@@ -593,47 +484,8 @@ jobs:
             echo "  - Or use an iOS-capable CI (Codemagic, Bitrise)" >> $GITHUB_STEP_SUMMARY
           fi
           
-      - name: � Setup iOS Code Signing (Development)
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
-        env:
-          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
-          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
-          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
-        run: |
-          cd mobile
           
-          # Create temporary keychain for CI
-          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain"
-          KEYCHAIN_PASSWORD="build123"
-          
-          # Create and configure keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed s/\"//g)
-          
-          # Install certificate if provided
-          if [[ -n "$IOS_CERTIFICATE_BASE64" ]]; then
-            echo "🔐 Installing iOS development certificate..."
-            echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > certificate.p12
-            security import certificate.p12 -k "$KEYCHAIN_PATH" -P "${IOS_CERTIFICATE_PASSWORD:-}" -T /usr/bin/codesign
-            rm certificate.p12
-            echo "✅ Development certificate installed"
-          else
-            echo "⚠️ No iOS certificate provided - builds will be unsigned (development only)"
-          fi
-          
-          # Install provisioning profile if provided
-          if [[ -n "$IOS_PROVISIONING_PROFILE_BASE64" ]]; then
-            echo "🔐 Installing iOS provisioning profile..."
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-            echo "✅ Provisioning profile installed"
-          else
-            echo "⚠️ No iOS provisioning profile provided - using automatic code signing"
-          fi
-          
-      - name: 📋 Create Export Options Configuration
+      - name:  Create Export Options Configuration
         if: ${{ steps.preflight.outputs.ios_supported == 'true' }}
         run: |
           cd mobile
@@ -936,37 +788,6 @@ jobs:
           echo "- **App Store**: Submit IPA through App Store Connect for review" >> $GITHUB_STEP_SUMMARY
           echo "- **Note**: IPA and Archive files are automatically built with Release builds" >> $GITHUB_STEP_SUMMARY
           
-      - name: 📤 Upload Debug App
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'debug' || github.event.inputs.release_type == 'both') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-debug-app
-          path: mobile/ios/build/Build/Products/Debug-iphoneos/${{ env.WORKSPACE_NAME }}.app
-          retention-days: 30
-          
-      - name: 📤 Upload Release App
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-release-app
-          path: mobile/ios/build/Build/Products/Release-iphoneos/${{ env.WORKSPACE_NAME }}.app
-          retention-days: 90
-          
-      - name: 📤 Upload Xcode Archive
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-archive
-          path: mobile/ios/build/${{ env.WORKSPACE_NAME }}.xcarchive
-          retention-days: 90
-          
-      - name: 📤 Upload IPA Package
-        if: ${{ steps.preflight.outputs.ios_supported == 'true' && (github.event.inputs.release_type == 'release' || github.event.inputs.release_type == 'both') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-ipa
-          path: mobile/ios/build/ipa/${{ env.WORKSPACE_NAME }}.ipa
-          retention-days: 365
 
   ios-eas-build:
     name: Build iOS with EAS
@@ -974,7 +795,6 @@ jobs:
     if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -1021,24 +841,16 @@ jobs:
           echo "profile=$PROFILE" >> $GITHUB_OUTPUT
           echo "Using EAS profile derived from release_type ($RT): $PROFILE"
 
-      - name: 🔗 Link EAS Project (non-interactive if EXPO_PROJECT_ID provided)
+      - name: 🔗 Verify EAS Project Link
         working-directory: mobile
         run: |
           set -e
           echo "Checking EAS project configuration..."
-          if ! eas project:info >/dev/null 2>&1; then
-            if [[ -n "${EXPO_PROJECT_ID}" ]]; then
-              echo "EAS project not linked. Initializing with provided EXPO_PROJECT_ID..."
-              eas init --id "${EXPO_PROJECT_ID}" --non-interactive
-            else
-              echo "EAS project not linked and EXPO_PROJECT_ID not provided."
-              echo "Please either:"
-              echo "  1) Add 'EXPO_PROJECT_ID' as a repo secret (Expo project UUID), or"
-              echo "  2) Add 'owner' to expo.app.json and 'extra.eas.projectId' to link the project."
-              exit 1
-            fi
+          if eas project:info >/dev/null 2>&1; then
+            echo "EAS project is configured."
           else
-            echo "EAS project is already configured."
+            echo "❌ EAS project not configured. Ensure app.json contains 'owner' and 'extra.eas.projectId'."
+            exit 1
           fi
 
       - name: 🚀 Start EAS iOS Build
