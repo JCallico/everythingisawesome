@@ -2,58 +2,94 @@ name: Mobile Build Release
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mobile/**'
+      - 'packages/**'
+      - '.github/workflows/mobile_build_release.yml'
 
 jobs:
   build-android:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Install root dependencies
-        run: pnpm install --no-frozen-lockfile
+          node-version: '22'
+
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install --no-frozen-lockfile
+
       - name: Install mobile dependencies
         run: cd mobile && pnpm install --no-frozen-lockfile
-      - name: Explicitly install Babel core for Android build
-        run: cd mobile && pnpm add @babel/core --save-dev
+
       - name: Generate native Android project
         run: cd mobile && npx expo prebuild --clean --platform android
-      - name: Build Android Release
-        run: cd mobile/android && ./gradlew assembleRelease
-      - name: Upload Android Artifact
+
+      - name: Build Android Release APK
+        run: cd mobile && ./android/gradlew -p android assembleRelease
+
+      - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-app
+          name: android-apk
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
 
   build-ios:
     runs-on: macos-latest
     timeout-minutes: 45
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Install root dependencies
-        run: pnpm install --no-frozen-lockfile
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install --no-frozen-lockfile
+
       - name: Install mobile dependencies
         run: cd mobile && pnpm install --no-frozen-lockfile
+
       - name: Generate native iOS project
         run: cd mobile && npx expo prebuild --clean --platform ios
+
       - name: Install CocoaPods
         run: cd mobile/ios && pod install
+
       - name: List available schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
+
       - name: Build iOS Release
-        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' build
-      - name: Upload iOS Artifact (optional)
+        run: |
+          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+            -scheme EverythingIsAwesome \
+            -configuration Release \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' \
+            -derivedDataPath ios/build \
+            clean build
+
+      - name: Upload iOS App
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
-          path: mobile/ios/build/mobile.xcarchive
+          path: mobile/ios/build/Build/Products/Release-iphonesimulator/EverythingIsAwesome.app
