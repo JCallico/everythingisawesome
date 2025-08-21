@@ -35,7 +35,10 @@
       "apiBaseUrlDev": "http://192.168.101.120:3001/api",
       "apiBaseUrlProd": "https://everythingisawesome.news/api",
       "imageBaseUrlDev": "http://192.168.101.120:3001",
-      "imageBaseUrlProd": "https://everythingisawesome.news"
+      "imageBaseUrlProd": "https://everythingisawesome.news",
+      "eas": {
+        "projectId": "${EXPO_PROJECT_ID}"
+      }
     }
   }
 }

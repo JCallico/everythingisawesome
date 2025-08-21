@@ -986,8 +986,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both') && github.event.inputs.use_eas == 'true' }}
     env:
-      EAS_NO_VCS: 1
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
@@ -1018,6 +1018,26 @@ jobs:
       - name: 🔐 Configure EAS Profile
         run: |
           echo "Using EAS profile: ${{ github.event.inputs.eas_profile }}"
+
+      - name: 🔗 Link EAS Project (non-interactive if EXPO_PROJECT_ID provided)
+        working-directory: mobile
+        run: |
+          set -e
+          echo "Checking EAS project configuration..."
+          if ! eas project:info >/dev/null 2>&1; then
+            if [[ -n "${EXPO_PROJECT_ID}" ]]; then
+              echo "EAS project not linked. Initializing with provided EXPO_PROJECT_ID..."
+              eas init --id "${EXPO_PROJECT_ID}" --non-interactive
+            else
+              echo "EAS project not linked and EXPO_PROJECT_ID not provided."
+              echo "Please either:"
+              echo "  1) Add 'EXPO_PROJECT_ID' as a repo secret (Expo project UUID), or"
+              echo "  2) Add 'owner' to expo.app.json and 'extra.eas.projectId' to link the project."
+              exit 1
+            fi
+          else
+            echo "EAS project is already configured."
+          fi
 
       - name: 🚀 Start EAS iOS Build
         working-directory: mobile
