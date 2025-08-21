@@ -29,11 +29,6 @@ on:
         required: true
         default: false
         type: boolean
-      use_eas:
-        description: 'Use Expo EAS Cloud Build for iOS (recommended)'
-        required: true
-        default: true
-        type: boolean
       force_ios_setup:
         description: 'Force iOS platform/runtime installation (may download >8GB)'
         required: true
@@ -346,7 +341,8 @@ jobs:
   ios-build:
     name: Build iOS Artifacts
     runs-on: macos-latest
-    if: ${{ (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both') && github.event.inputs.use_eas != 'true' }}
+  # Disabled by default since EAS is now the default path for iOS builds
+  if: ${{ false }}
     steps:
       - name: 🍎 Checkout Repository
         uses: actions/checkout@v4
@@ -975,7 +971,7 @@ jobs:
   ios-eas-build:
     name: Build iOS with EAS
     runs-on: ubuntu-latest
-    if: ${{ (github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both') && github.event.inputs.use_eas == 'true' }}
+  if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
