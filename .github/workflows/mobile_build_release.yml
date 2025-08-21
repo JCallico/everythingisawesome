@@ -18,6 +18,8 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Install mobile dependencies
         run: cd mobile && pnpm install --no-frozen-lockfile
+      - name: Explicitly install Babel core for Android build
+        run: cd mobile && pnpm add @babel/core --save-dev
       - name: Generate native Android project
         run: cd mobile && npx expo prebuild --clean --platform android
       - name: Build Android Release
@@ -49,7 +51,7 @@ jobs:
       - name: List available schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
       - name: Build iOS Release
-        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator build
+        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' build
       - name: Upload iOS Artifact (optional)
         uses: actions/upload-artifact@v4
         with:
