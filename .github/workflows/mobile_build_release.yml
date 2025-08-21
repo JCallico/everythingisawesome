@@ -17,6 +17,10 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Install mobile dependencies
         run: cd mobile && pnpm install
+      - name: Install Expo CLI
+        run: npm install -g @expo/cli
+      - name: Generate native Android project
+        run: cd mobile && expo prebuild --clean --platform android
       - name: Build Android Release
         run: cd mobile/android && ./gradlew assembleRelease
       - name: Upload Android Artifact
@@ -38,6 +42,10 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Install mobile dependencies
         run: cd mobile && pnpm install
+      - name: Install Expo CLI
+        run: npm install -g @expo/cli
+      - name: Generate native iOS project
+        run: cd mobile && expo prebuild --clean --platform ios
       - name: Install CocoaPods
         run: cd mobile/ios && pod install
       - name: Build iOS App
