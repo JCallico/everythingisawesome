@@ -11,8 +11,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install dependencies
-        run: cd mobile && yarn install
+        run: cd mobile && pnpm install
       - name: Build Android Release
         run: cd mobile/android && ./gradlew assembleRelease
       - name: Upload Android Artifact
@@ -28,8 +30,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install dependencies
-        run: cd mobile && yarn install
+        run: cd mobile && pnpm install
       - name: Install CocoaPods
         run: cd mobile/ios && pod install
       - name: Build iOS App
