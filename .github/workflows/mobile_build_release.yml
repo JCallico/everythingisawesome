@@ -47,9 +47,9 @@ jobs:
       - name: Install CocoaPods
         run: cd mobile/ios && pod install
       - name: List available schemes
-        run: cd mobile && xcodebuild -workspace ios/everythingisawesome.xcworkspace -list
+        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
       - name: Build iOS Release
-        run: cd mobile && xcodebuild -workspace ios/everythingisawesome.xcworkspace -scheme everythingisawesome -configuration Release -sdk iphonesimulator build
+        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator build
       - name: Upload iOS Artifact (optional)
         uses: actions/upload-artifact@v4
         with:
