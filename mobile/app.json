@@ -2,6 +2,7 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
+    "owner": "jcallico",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -37,7 +38,7 @@
       "imageBaseUrlDev": "http://192.168.101.120:3001",
       "imageBaseUrlProd": "https://everythingisawesome.news",
       "eas": {
-        "projectId": "${EXPO_PROJECT_ID}"
+        "projectId": "0faa9ba5-f2d0-4015-9660-421e49c551a8"
       }
     }
   }
