@@ -971,7 +971,7 @@ jobs:
   ios-eas-build:
     name: Build iOS with EAS
     runs-on: ubuntu-latest
-  if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
+    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
