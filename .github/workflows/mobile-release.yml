@@ -34,15 +34,6 @@ on:
         required: true
         default: true
         type: boolean
-      eas_profile:
-        description: 'EAS build profile (defined in eas.json)'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - development
-          - preview
-          - production
       force_ios_setup:
         description: 'Force iOS platform/runtime installation (may download >8GB)'
         required: true
@@ -1015,9 +1006,24 @@ jobs:
           cd mobile
           npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: 🔐 Configure EAS Profile
+      - name: 🧭 Determine EAS Profile from release_type
+        id: eas_profile
         run: |
-          echo "Using EAS profile: ${{ github.event.inputs.eas_profile }}"
+          RT="${{ github.event.inputs.release_type }}"
+          case "$RT" in
+            debug)
+              PROFILE="development" ;;
+            release)
+              PROFILE="production" ;;
+            both)
+              # For combined runs, prefer production for store-ready output
+              PROFILE="production" ;;
+            *)
+              PROFILE="production" ;;
+          esac
+          echo "EAS_PROFILE=$PROFILE" >> $GITHUB_ENV
+          echo "profile=$PROFILE" >> $GITHUB_OUTPUT
+          echo "Using EAS profile derived from release_type ($RT): $PROFILE"
 
       - name: 🔗 Link EAS Project (non-interactive if EXPO_PROJECT_ID provided)
         working-directory: mobile
@@ -1043,7 +1049,7 @@ jobs:
         working-directory: mobile
         run: |
           # Use cloud build by omitting --local; --no-wait returns immediately
-          eas build --platform ios --non-interactive --profile "${{ github.event.inputs.eas_profile }}" --no-wait
+          eas build --platform ios --non-interactive --profile "$EAS_PROFILE" --no-wait
 
       - name: 🔗 Fetch Latest Build URL
         id: eas_status
@@ -1060,7 +1066,7 @@ jobs:
       - name: 📣 EAS Build Info
         run: |
           echo "### 🍎 EAS iOS Build Triggered" >> $GITHUB_STEP_SUMMARY
-          echo "- Profile: ${{ github.event.inputs.eas_profile }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Profile: $EAS_PROFILE" >> $GITHUB_STEP_SUMMARY
           echo "- Dashboard: https://expo.dev/accounts (check your project/builds)" >> $GITHUB_STEP_SUMMARY
           if [[ -n "${{ steps.eas_status.outputs.build_url }}" ]]; then
             echo "- Latest Build: ${{ steps.eas_status.outputs.build_url }}" >> $GITHUB_STEP_SUMMARY
