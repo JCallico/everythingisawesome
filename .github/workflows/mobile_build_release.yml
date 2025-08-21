@@ -44,10 +44,11 @@ jobs:
         run: cd mobile && npx expo prebuild --clean --platform ios
       - name: Install CocoaPods
         run: cd mobile/ios && pod install
-      - name: Build iOS App
-        run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -scheme EverythingIsAwesome -configuration Release -sdk iphonesimulator build
+      - name: Build iOS Release
+        run: |
+          cd mobile && xcodebuild -workspace ios/mobile.xcworkspace -scheme mobile -configuration Release -sdk iphonesimulator build
       - name: Upload iOS Artifact (optional)
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
-          path: mobile/build/Release-iphonesimulator/EverythingIsAwesome.app # Adjust path as needed
+          path: mobile/ios/build/mobile.xcarchive
