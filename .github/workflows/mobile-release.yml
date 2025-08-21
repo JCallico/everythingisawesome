@@ -342,7 +342,7 @@ jobs:
     name: Build iOS Artifacts
     runs-on: macos-latest
   # Disabled by default since EAS is now the default path for iOS builds
-  if: ${{ false }}
+    if: ${{ false }}
     steps:
       - name: 🍎 Checkout Repository
         uses: actions/checkout@v4
