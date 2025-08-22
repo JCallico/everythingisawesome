@@ -85,7 +85,7 @@ jobs:
       - name: List available iOS schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
 
-      - name: Check available iOS SDKs and devices
+      - name: Check iOS SDK versions and build for available SDK
         run: |
           echo "=== Available iOS SDKs ==="
           xcodebuild -showsdks | grep iphoneos
@@ -93,10 +93,10 @@ jobs:
           echo "=== Available iOS Simulators ==="
           xcrun simctl list devices available | grep "iPhone" | head -5
           
-          echo "=== Trying to build without specifying deployment target ==="
+          # Get the highest available iOS SDK
+          LATEST_SDK=$(xcodebuild -showsdks | grep iphoneos | tail -1 | awk '{print $2}')
+          echo "Latest iOS SDK: $LATEST_SDK"
           
-      - name: Build iOS app using available simulator
-        run: |          
           # Boot the first iPhone simulator
           SIMULATOR_ID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" | head -1 | grep -E -o "\([A-Z0-9-]{36}\)" | tr -d "()")
           echo "Booting simulator: $SIMULATOR_ID"
@@ -105,11 +105,14 @@ jobs:
           # Wait for simulator to boot
           sleep 30
           
+          # Build using the latest available SDK
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
+            -sdk $LATEST_SDK \
             -destination "id=$SIMULATOR_ID" \
             -derivedDataPath ios/build \
+            IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             clean build
 
       - name: Upload iOS App
