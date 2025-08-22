@@ -99,19 +99,17 @@ jobs:
           echo "=== Available Schemes ==="
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
-          # Build using GitHub agent recommendation: iPhone 16 Pro with iOS 17.4
-          echo "Building with iPhone 16 Pro and iOS 17.4 as recommended by GitHub agent..."
-          
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
-            -configuration Release \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=17.4' \
-            -derivedDataPath ios/build \
-            IPHONEOS_DEPLOYMENT_TARGET=15.1 \
-            clean build
-            
-      - name: Upload iOS App
+        # Build using lowest available iOS runtime: iPhone 16 Pro with iOS 18.4
+        echo "Building with iPhone 16 Pro and iOS 18.4 (lowest available runtime)..."
+        
+        xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+          -scheme EverythingIsAwesome \
+          -configuration Release \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+          -derivedDataPath ios/build \
+          IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+          clean build      - name: Upload iOS App
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
