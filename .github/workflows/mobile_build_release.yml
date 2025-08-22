@@ -90,15 +90,22 @@ jobs:
 
       - name: Build iOS app using available simulator
         run: |
-          # List all available devices for debugging
+          # List available simulators
           echo "Available iOS simulators:"
-          xcrun simctl list devices available | head -10
+          xcrun simctl list devices available | grep "iPhone" | head -5
           
-          # Use a specific iOS version that's available (iOS 18.4 based on logs)
+          # Boot the first iPhone simulator
+          SIMULATOR_ID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" | head -1 | grep -E -o "\([A-Z0-9-]{36}\)" | tr -d "()")
+          echo "Booting simulator: $SIMULATOR_ID"
+          xcrun simctl boot $SIMULATOR_ID
+          
+          # Wait for simulator to boot
+          sleep 30
+          
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+            -destination "id=$SIMULATOR_ID" \
             -derivedDataPath ios/build \
             clean build
 
