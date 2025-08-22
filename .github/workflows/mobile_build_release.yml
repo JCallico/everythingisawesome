@@ -92,24 +92,26 @@ jobs:
           
           echo "=== Available iOS Runtimes ==="
           xcrun simctl list runtimes available | grep iOS
+          
           echo "=== Available iPhone Simulators ==="
           xcrun simctl list devices available | grep "iPhone" | head -5
           
           echo "=== Available Schemes ==="
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
-          # Build using exact simulator UUID for iOS 18.4
-          echo "Building with iPhone 16 Pro UUID C707DF3C-D29E-4CA9-B02F-06CBF9E434B2..."
+          # Build using GitHub agent recommendation: iPhone 16 Pro with iOS 17.4
+          echo "Building with iPhone 16 Pro and iOS 17.4 as recommended by GitHub agent..."
           
-          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
             -sdk iphonesimulator \
-            -destination 'id=C707DF3C-D29E-4CA9-B02F-06CBF9E434B2' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=17.4' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+            -verbose \
             clean build
-
+            
       - name: Upload iOS App
         uses: actions/upload-artifact@v4
         with:
