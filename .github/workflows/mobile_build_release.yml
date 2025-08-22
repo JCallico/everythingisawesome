@@ -99,10 +99,10 @@ jobs:
           echo "=== Available Schemes ==="
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
-          # Use iOS 18.4 since that runtime is available (not 18.0)
-          echo "Building with iOS 18.4 runtime compatibility..."
+          # Use iOS 18.6 since that runtime is available (confirmed from previous logs)
+          echo "Building with iOS 18.6 runtime that we know exists..."
           
-          # Build using available simulator - use specific iOS 18.6 which we know exists
+          # Build using available simulator - use specific iOS 18.6 which we confirmed exists
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
