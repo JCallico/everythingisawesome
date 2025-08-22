@@ -79,8 +79,19 @@ jobs:
       - name: Generate native iOS project
         run: cd mobile && npx expo prebuild --clean --platform ios
 
-      - name: Install CocoaPods dependencies
-        run: cd mobile/ios && pod install
+      - name: Clean CocoaPods cache and install dependencies
+        run: |
+          # Clean any potential null byte issues in environment
+          unset $(env | grep -o '^[^=]*' | grep $'\000' | tr '\n' ' ' 2>/dev/null || true)
+          
+          cd mobile/ios
+          
+          # Clean CocoaPods cache to avoid null byte issues
+          pod cache clean --all
+          rm -rf Pods Podfile.lock
+          
+          # Install with clean environment
+          pod install --repo-update
         
       - name: List available iOS simulators
         run: xcrun simctl list devices available
