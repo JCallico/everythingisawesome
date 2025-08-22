@@ -98,14 +98,14 @@ jobs:
           echo "=== Available Schemes ==="
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
-          # Build using lowest available iOS runtime: iPhone 16 Pro with iOS 18.4
-          echo "Building with iPhone 16 Pro and iOS 18.4 (lowest available runtime)..."
+          # Build using exact simulator UUID for iOS 18.4
+          echo "Building with iPhone 16 Pro UUID C707DF3C-D29E-4CA9-B02F-06CBF9E434B2..."
           
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+            -destination 'id=C707DF3C-D29E-4CA9-B02F-06CBF9E434B2' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             clean build
