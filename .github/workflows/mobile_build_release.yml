@@ -102,7 +102,7 @@ jobs:
           echo "Building with iPhone 16 Pro and iOS 18.4..."
           cd mobile
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme mevcutIsAwesome \
+            -scheme EverythingIsAwesome \
             -configuration Release \
             -sdk iphonesimulator18.0 \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
