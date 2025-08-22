@@ -87,32 +87,44 @@ jobs:
 
       - name: Check iOS SDK versions and build for available SDK
         run: |
-          echo "=== Available iOS SDKs ==="
+          echo "=== Available iOS Simulator SDKs ==="
           xcodebuild -showsdks | grep iphonesimulator
           
-          echo "=== Available iOS Simulators ==="
-          xcrun simctl list devices available | grep "iPhone" | head -5
+          echo "=== Available iOS Simulators with Runtime Info ==="
+          xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | select(.key | contains("iOS")) | "\(.key): \(.value | length) devices"'
           
-          # Get the iOS Simulator SDK identifier (like "iphonesimulator18.0")
+          echo "=== Available iPhone Simulators ==="
+          xcrun simctl list devices available | grep "iPhone" | head -10
+          
+          # Get the iOS Simulator SDK identifier and check for available runtimes
           LATEST_SIMULATOR_SDK=$(xcodebuild -showsdks | grep iphonesimulator | tail -1 | awk '{print $6}')
           echo "Latest iOS Simulator SDK: $LATEST_SIMULATOR_SDK"
           
-          # Boot the first iPhone simulator
-          SIMULATOR_ID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" | head -1 | grep -E -o "\([A-Z0-9-]{36}\)" | tr -d "()")
-          echo "Booting simulator: $SIMULATOR_ID"
-          xcrun simctl boot $SIMULATOR_ID
+          # Find an iPhone simulator that's actually available (try multiple versions)
+          SIMULATOR_NAME=""
+          for IPHONE in "iPhone 15 Pro" "iPhone 15" "iPhone 14 Pro" "iPhone 14" "iPhone 13 Pro" "iPhone 13"; do
+            if xcrun simctl list devices available | grep -q "$IPHONE"; then
+              SIMULATOR_NAME="$IPHONE"
+              echo "Found available simulator: $SIMULATOR_NAME"
+              break
+            fi
+          done
           
-          # Wait for simulator to boot
-          sleep 30
+          if [ -z "$SIMULATOR_NAME" ]; then
+            echo "No suitable iPhone simulator found, using first available iPhone"
+            SIMULATOR_NAME=$(xcrun simctl list devices available | grep "iPhone" | head -1 | sed 's/^[[:space:]]*//' | cut -d'(' -f1 | xargs)
+          fi
           
-          # Build using the latest available iOS Simulator SDK
-          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
-            -configuration Release \
-            -sdk $LATEST_SIMULATOR_SDK \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro" \
-            -derivedDataPath ios/build \
-            IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+          echo "Using simulator: $SIMULATOR_NAME"
+          
+          # Build using available simulator and SDK
+          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace 
+            -scheme EverythingIsAwesome 
+            -configuration Release 
+            -sdk $LATEST_SIMULATOR_SDK 
+            -destination "platform=iOS Simulator,name=$SIMULATOR_NAME" 
+            -derivedDataPath ios/build 
+            IPHONEOS_DEPLOYMENT_TARGET=15.1 
             clean build
 
       - name: Upload iOS App
