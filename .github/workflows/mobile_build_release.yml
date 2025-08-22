@@ -110,7 +110,7 @@ jobs:
             -scheme EverythingIsAwesome \
             -configuration Release \
             -sdk $LATEST_SIMULATOR_SDK \
-            -destination "id=$SIMULATOR_ID" \
+            -destination "platform=iOS Simulator,name=iPhone 16 Pro" \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             clean build
