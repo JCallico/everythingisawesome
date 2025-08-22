@@ -79,6 +79,9 @@ jobs:
       - name: Generate native iOS project
         run: cd mobile && npx expo prebuild --clean --platform ios
 
+      - name: Setup CocoaPods
+        run: sudo gem install cocoapods
+
       - name: Clean CocoaPods cache and install dependencies
         run: |
           # Clean any potential null byte issues in environment
