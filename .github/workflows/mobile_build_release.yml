@@ -94,7 +94,7 @@ jobs:
           xcrun simctl list devices available | grep "iPhone" | head -5
           
           # Get the iOS Simulator SDK identifier (like "iphonesimulator18.0")
-          LATEST_SIMULATOR_SDK=$(xcodebuild -showsdks | grep iphonesimulator | tail -1 | awk '{print $5}')
+          LATEST_SIMULATOR_SDK=$(xcodebuild -showsdks | grep iphonesimulator | tail -1 | awk '{print $6}')
           echo "Latest iOS Simulator SDK: $LATEST_SIMULATOR_SDK"
           
           # Boot the first iPhone simulator
