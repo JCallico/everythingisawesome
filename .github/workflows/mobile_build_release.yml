@@ -86,6 +86,7 @@ jobs:
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
 
       - name: Check iOS SDK versions and build for available SDK
+        working-directory: mobile
         run: |
           echo "=== Available iOS Simulator SDKs ==="
           xcodebuild -showsdks | grep iphonesimulator
@@ -97,10 +98,9 @@ jobs:
           xcrun simctl list devices available | grep "iPhone" | head -5
           
           echo "=== Available Schemes ==="
-          cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
           echo "Building with iPhone 16 Pro and iOS 18.4..."
-          cd mobile
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
