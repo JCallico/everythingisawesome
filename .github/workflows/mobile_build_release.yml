@@ -55,7 +55,7 @@ jobs:
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
 
   build-ios:
-    runs-on: macos-15-arm64
+    runs-on: macos-latest
     timeout-minutes: 45
     if: ${{ inputs.build_target == 'iOS' || inputs.build_target == 'Both' }}
 
