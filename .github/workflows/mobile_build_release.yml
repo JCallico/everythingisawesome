@@ -93,8 +93,8 @@ jobs:
           echo "=== Available iOS Simulators ==="
           xcrun simctl list devices available | grep "iPhone" | head -5
           
-          # Get the highest available iOS SDK
-          LATEST_SDK=$(xcodebuild -showsdks | grep iphoneos | tail -1 | awk '{print $2}')
+          # Get the iOS SDK identifier (like "iphoneos18.0")
+          LATEST_SDK=$(xcodebuild -showsdks | grep iphoneos | tail -1 | awk '{print $4}')
           echo "Latest iOS SDK: $LATEST_SDK"
           
           # Boot the first iPhone simulator
