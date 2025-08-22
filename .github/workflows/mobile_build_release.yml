@@ -102,12 +102,12 @@ jobs:
           # Use iOS 18.4 since that runtime is available (not 18.0)
           echo "Building with iOS 18.4 runtime compatibility..."
           
-          # Build using available simulator - use generic iOS Simulator destination
+          # Build using available simulator - use specific iOS 18.6 which we know exists
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
             -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=latest" \
+            -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.6" \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             clean build
