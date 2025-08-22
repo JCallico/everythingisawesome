@@ -90,14 +90,28 @@ jobs:
 
       - name: Build iOS app using available simulator
         run: |
-          # Get the first available iOS simulator
-          SIMULATOR=$(xcrun simctl list devices available | grep -E "iPhone [0-9]" | head -1 | sed 's/.*(\([^)]*\)).*/\1/')
-          echo "Using simulator: $SIMULATOR"
+          # List all available devices for debugging
+          echo "Available iOS simulators:"
+          xcrun simctl list devices available
+          
+          # Get the first available iPhone simulator UUID
+          SIMULATOR_UUID=$(xcrun simctl list devices available | grep -E "iPhone.*\(" | head -1 | sed -n 's/.*(\([A-Z0-9-]*\)).*/\1/p')
+          echo "Using simulator UUID: $SIMULATOR_UUID"
+          
+          if [ -z "$SIMULATOR_UUID" ]; then
+            echo "No iPhone simulator found, trying any iOS simulator"
+            SIMULATOR_UUID=$(xcrun simctl list devices available | grep -E "iOS.*\(" | head -1 | sed -n 's/.*(\([A-Z0-9-]*\)).*/\1/p')
+          fi
+          
+          if [ -z "$SIMULATOR_UUID" ]; then
+            echo "ERROR: No iOS simulator available"
+            exit 1
+          fi
           
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
-            -destination "platform=iOS Simulator,id=$SIMULATOR" \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
             -derivedDataPath ios/build \
             clean build
 
