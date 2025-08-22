@@ -92,13 +92,13 @@ jobs:
         run: |
           # List all available devices for debugging
           echo "Available iOS simulators:"
-          xcrun simctl list devices available | head -20
+          xcrun simctl list devices available | head -10
           
-          # Start with the simplest approach - let Xcode choose any available iOS simulator
+          # Use a specific iOS version that's available (iOS 18.4 based on logs)
           cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
             -derivedDataPath ios/build \
             clean build
 
