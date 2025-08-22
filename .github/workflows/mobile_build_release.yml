@@ -88,12 +88,18 @@ jobs:
       - name: List available iOS schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
 
-      - name: Build iOS app using available simulator
+      - name: Check available iOS SDKs and devices
         run: |
-          # List available simulators
-          echo "Available iOS simulators:"
+          echo "=== Available iOS SDKs ==="
+          xcodebuild -showsdks | grep iphoneos
+          
+          echo "=== Available iOS Simulators ==="
           xcrun simctl list devices available | grep "iPhone" | head -5
           
+          echo "=== Trying to build without specifying deployment target ==="
+          
+      - name: Build iOS app using available simulator
+        run: |          
           # Boot the first iPhone simulator
           SIMULATOR_ID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" | head -1 | grep -E -o "\([A-Z0-9-]{36}\)" | tr -d "()")
           echo "Booting simulator: $SIMULATOR_ID"
