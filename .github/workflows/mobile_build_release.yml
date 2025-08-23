@@ -125,7 +125,6 @@ jobs:
             -destination 'platform=iOS Simulator,OS=18.5,arch=arm64,name=iPhone 16 Pro' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
-            -verbose \
             clean build
         continue-on-error: true
 
@@ -140,7 +139,6 @@ jobs:
             -destination 'platform=iOS Simulator,OS=18.4,arch=arm64,name=iPhone 16 Pro' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
-            -verbose \
             clean build
         continue-on-error: true
 
