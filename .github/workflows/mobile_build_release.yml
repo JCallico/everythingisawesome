@@ -83,9 +83,6 @@ jobs:
       - name: Generate native iOS project
         run: cd mobile && npx expo prebuild --clean --platform ios
 
-      - name: Clear Xcode derived data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData
-
       - name: Select Xcode 16.4
         run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
@@ -126,6 +123,7 @@ jobs:
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             -quiet \
+            -parallelizeTargets \
             clean build
 
       - name: Upload iOS App
