@@ -85,48 +85,61 @@ jobs:
       - name: Select Xcode 16.4
         run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
-      - name: List available iOS simulators
-        run: xcrun simctl list devices available
+      - name: Verify Xcode version and SDKs
+        run: |
+          echo "Xcode Version:"
+          xcodebuild -version
+          echo "Available SDKs:"
+          xcodebuild -showsdks
+          echo "Available Runtimes:"
+          xcrun simctl list runtimes available
+          echo "Available Simulators:"
+          xcrun simctl list devices available
 
-      - name: Boot iPhone 16 Pro simulator
+      - name: Boot iPhone 16 Pro simulator for iOS 18.5
         run: xcrun simctl boot "iPhone 16 Pro" || true
         continue-on-error: true
 
       - name: List available iOS schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
 
-      - name: Check iOS SDK versions and build for available SDK
+      - name: Build with iOS 18.5 simulator
         working-directory: mobile
         run: |
-          echo "=== Available iOS Simulator SDKs ==="
-          xcodebuild -showsdks | grep iphonesimulator
-          
-          echo "=== Available iOS Runtimes ==="
-          xcrun simctl list runtimes available | grep iOS
-          
-          echo "=== Available iPhone Simulators ==="
-          xcrun simctl list devices available | grep "iPhone" | head -5
-          
-          echo "=== Available Schemes ==="
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
-          
-          echo "Building with iOS 18.4 simulator..."
+          echo "Building with iOS 18.5 simulator..."
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
-            -sdk iphonesimulator18.4 \
+            -sdk iphonesimulator18.5 \
+            -destination 'platform=iOS Simulator,OS=18.5' \
+            -derivedDataPath ios/build \
+            IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+            -verbose \
+            clean build
+        shell: /bin/bash -e {0}
+        continue-on-error: true
+
+      - name: Build with iOS 18.4 simulator (fallback)
+        if: failure()
+        working-directory: mobile
+        run: |
+          echo "Falling back to iOS 18.4 simulator without SDK specification..."
+          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
+            -scheme EverythingIsAwesome \
+            -configuration Release \
             -destination 'platform=iOS Simulator,OS=18.4' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             -verbose \
             clean build
         shell: /bin/bash -e {0}
+        continue-on-error: true
 
-      - name: Fallback build with Expo
+      - name: Build with Expo (final fallback)
         if: failure()
         working-directory: mobile
         run: |
-          echo "Falling back to npx expo run:ios due to xcodebuild failure..."
+          echo "Falling back to npx expo run:ios due to xcodebuild failures..."
           npx expo run:ios --configuration Release
         shell: /bin/bash -e {0}
         continue-on-error: true
