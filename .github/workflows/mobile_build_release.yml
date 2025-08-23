@@ -55,7 +55,7 @@ jobs:
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
 
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 45
     if: ${{ inputs.build_target == 'iOS' || inputs.build_target == 'Both' }}
 
@@ -79,8 +79,18 @@ jobs:
       - name: Generate native iOS project
         run: cd mobile && npx expo prebuild --clean --platform ios
 
+      - name: Clear Xcode derived data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
+      - name: Select Xcode 16.4
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
       - name: List available iOS simulators
         run: xcrun simctl list devices available
+
+      - name: Boot iPhone 16 Pro simulator
+        run: xcrun simctl boot "iPhone 16 Pro" || true
+        continue-on-error: true
 
       - name: List available iOS schemes
         run: cd mobile && xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
@@ -100,17 +110,26 @@ jobs:
           echo "=== Available Schemes ==="
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace -list
           
-          echo "Building with iPhone 16 Pro and iOS 18.4..."
+          echo "Building with iOS 18.4 simulator..."
           xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
             -scheme EverythingIsAwesome \
             -configuration Release \
-            -sdk iphonesimulator18.0 \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+            -sdk iphonesimulator18.4 \
+            -destination 'platform=iOS Simulator,OS=18.4' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
             -verbose \
             clean build
         shell: /bin/bash -e {0}
+
+      - name: Fallback build with Expo
+        if: failure()
+        working-directory: mobile
+        run: |
+          echo "Falling back to npx expo run:ios due to xcodebuild failure..."
+          npx expo run:ios --configuration Release
+        shell: /bin/bash -e {0}
+        continue-on-error: true
 
       - name: Upload iOS App
         uses: actions/upload-artifact@v4
