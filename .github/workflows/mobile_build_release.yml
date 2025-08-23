@@ -125,30 +125,8 @@ jobs:
             -destination 'platform=iOS Simulator,OS=18.5,arch=arm64,name=iPhone 16 Pro' \
             -derivedDataPath ios/build \
             IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+            -quiet \
             clean build
-        continue-on-error: true
-
-      - name: Build with iOS 18.4 simulator (fallback)
-        if: failure()
-        working-directory: mobile
-        run: |
-          echo "Falling back to iOS 18.4 simulator..."
-          xcodebuild -workspace ios/EverythingIsAwesome.xcworkspace \
-            -scheme EverythingIsAwesome \
-            -configuration Release \
-            -destination 'platform=iOS Simulator,OS=18.4,arch=arm64,name=iPhone 16 Pro' \
-            -derivedDataPath ios/build \
-            IPHONEOS_DEPLOYMENT_TARGET=15.1 \
-            clean build
-        continue-on-error: true
-
-      - name: Build with Expo (final fallback)
-        if: failure()
-        working-directory: mobile
-        run: |
-          echo "Falling back to npx expo run:ios due to xcodebuild failures..."
-          npx expo run:ios --configuration Release --device "iPhone 16 Pro"
-        continue-on-error: true
 
       - name: Upload iOS App
         uses: actions/upload-artifact@v4
