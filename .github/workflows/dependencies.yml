@@ -35,7 +35,7 @@ jobs:
           run_install: false
 
       - name: Install dependencies
-        run: pnpm install --reporter=append-only
+        run: pnpm install --no-frozen-lockfile --reporter=append-only
 
       - name: Run security audit
         run: |
