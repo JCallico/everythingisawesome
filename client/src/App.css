@@ -400,7 +400,6 @@ body.theme-default {
   font-weight: 600;
   color: #1a1a1a;
   line-height: 1.4;
-  flex: 1;
   text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
 }
 
@@ -519,8 +518,9 @@ body.theme-default {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   min-height: 500px;
   max-height: none;
 }
@@ -533,21 +533,29 @@ body.theme-default {
 /* Story image */
 .story-image-container {
   position: relative;
-  height: 45%;
-  min-height: 200px;
-  max-height: 450px; /* Increased from 300px to allow more image visibility on desktop */
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-right: 2rem;
+  box-sizing: border-box;
   flex-shrink: 0;
-  border-radius: 0;
+  border-radius: 10px;
   transition: all 0.3s ease;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .story-image {
-  width: 120%; /* Reasonable size for precise panning */
-  height: 120%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.story-image-container.paused .story-image {
+  animation-play-state: paused;
 }
 
 .image-overlay {
@@ -568,6 +576,9 @@ body.theme-default {
   flex-direction: column;
   position: relative;
   overflow-y: auto;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  justify-content: flex-start;
 }
 
 .awesome-badge {
@@ -611,6 +622,7 @@ body.theme-default {
   color: #1a1a1a;
   text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
   animation: slideInUp 0.8s ease;
+  flex-shrink: 0;
 }
 
 @keyframes slideInUp {
@@ -624,12 +636,29 @@ body.theme-default {
   }
 }
 
+@keyframes gentleZoom {
+  0% {
+    transform: scale(1.02) translateX(-3%) translateY(-3%);
+  }
+  25% {
+    transform: scale(1.02) translateX(3%) translateY(-3%);
+  }
+  50% {
+    transform: scale(1.02) translateX(3%) translateY(3%);
+  }
+  75% {
+    transform: scale(1.02) translateX(-3%) translateY(3%);
+  }
+  100% {
+    transform: scale(1.02) translateX(-3%) translateY(-3%);
+  }
+}
+
 .story-summary {
   font-size: 1.1rem;
   line-height: 1.6;
   color: #2c2c2c;
   margin-bottom: 1.5rem;
-  flex: 1;
   animation: slideInUp 0.8s 0.2s both;
   overflow-y: auto;
   text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
@@ -1105,8 +1134,9 @@ body.theme-default {
   }
   
   .story-image-container {
-    height: 40%;
-    max-height: 350px;
+    max-height: 60vh;
+    min-height: 220px;
+    padding: 10px;
   }
 
   .news-container {
@@ -1191,7 +1221,7 @@ body.theme-default {
   .news-date h2 {
     font-size: 1.5rem;
   }
-  
+ 
   .header-logo {
     width: 200px;
     height: 100px;
@@ -1204,11 +1234,7 @@ body.theme-default {
     max-width: 100%;
     box-sizing: border-box;
   }
-  
-  .news-date h2 {
-    font-size: 1.4rem;
-  }
-  
+   
   .stories-grid {
     gap: 1rem;
     margin-top: 1rem;
@@ -1299,9 +1325,24 @@ body.theme-default {
   }
   
   .story-image-container {
-    height: 35%;
-    max-height: 250px;
+    max-height: 50vh;
     min-height: 180px;
+    padding: 8px;
+    grid-row: 1;
+    grid-column-start: 1;
+    margin: 1em;    
+  }
+
+  .story-image {
+    object-fit: none;
+  }  
+
+  .story-content {
+    grid-row: 2;
+  }
+
+  .story-container {
+    grid-template-columns: 1fr;
   }
     
   .content-page-container {
