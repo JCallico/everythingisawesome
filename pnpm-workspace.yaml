@@ -7,11 +7,11 @@ packages:
 catalog:
   '@eslint/js': ^9.32.0
   react: ^19.1.0
-  axios: ^1.10.0
+  axios: ^1.12.0
   moment: ^2.30.1
   eslint: ^9.30.1
 
 overrides:
   postcss@<8.4.31: '>=8.4.31'
   nth-check@<2.0.1: '>=2.0.1'
-  webpack-dev-server@<=5.2.0: '>=5.2.1'
+  eslint-webpack-plugin: ^4.2.0
