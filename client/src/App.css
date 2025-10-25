@@ -423,6 +423,76 @@ body.theme-default {
   text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
+.story-opinion-section {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  border-left: 4px solid #667eea;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.opinion-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.opinion-toggle-btn:hover {
+  opacity: 0.8;
+}
+
+.opinion-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1rem;
+  transition: transform 0.3s ease;
+  font-size: 0.75rem;
+  color: #667eea;
+}
+
+.opinion-subtitle {
+  color: #667eea;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.story-opinion {
+  color: #2c2c2c;
+  line-height: 1.6;
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    overflow: visible;
+  }
+}
+
 .story-link {
   color: #667eea;
   text-decoration: none;

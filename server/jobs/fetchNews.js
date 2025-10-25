@@ -274,6 +274,58 @@ const calculateAwesomeIndex = (sentimentScore, positiveKeywordCount) => {
   return Math.round(awesomeIndex);
 };
 
+// Function to generate opinion using Grok API
+const generateOpinionWithGrok = async (articleUrl, articleTitle, retries = 3) => {
+  try {
+    const apiKey = process.env.GROK_API_KEY;
+    if (!apiKey) {
+      throw new Error('GROK_API_KEY not found');
+    }
+
+    const prompt = `Retrieve this article "${articleUrl}" and analyze it.
+
+Write your own summary on the same subject discussed on the article, but with your own opinion based not only on the content of the article but also your own knowledge of the subject. Don't be afraid of being opinionated or disagreeable if needed, it is your own opinion after all.
+
+Output only a paragraph with your own take, nothing else.`;
+
+    const response = await axios.post(GROK_API_URL, {
+      model: process.env.GROK_MODEL || 'grok-3-latest',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.8,
+      max_tokens: parseInt(process.env.GROK_OPINION_MAX_TOKENS) || 300
+    }, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
+    });
+
+    const opinion = response.data.choices[0].message.content.trim();
+    
+    if (!opinion || opinion.length === 0) {
+      throw new Error('Empty opinion received from Grok API');
+    }
+
+    return opinion;
+  } catch (error) {
+    console.error('Error generating opinion:', error.message);
+    if (error.response) {
+      console.error('Grok API Error Response:', error.response.status, error.response.data);
+    }
+    
+    if (retries > 0) {
+      console.log(`Retrying opinion generation... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return await generateOpinionWithGrok(articleUrl, articleTitle, retries - 1);
+    }
+    
+    // Return empty string as fallback - opinion will be optional
+    console.log(`Skipping opinion for article: ${articleTitle.substring(0, 50)}...`);
+    return '';
+  }
+};
+
 // Function to count positive keywords in text
 const countPositiveKeywords = (text) => {
   const lowercaseText = text.toLowerCase();
@@ -710,19 +762,41 @@ const fetchDailyNews = async (targetDate = null) => {
       const imageUrl = await generateStoryImage(story, i);
       topArticles[i].image = imageUrl;
       
-      // Remove processing metadata from final output
-      delete topArticles[i].sentimentScore;
-      delete topArticles[i].keywordCount;
-      delete topArticles[i].source;
-      delete topArticles[i].publishedAt;
-      
       // Add a delay between requests to respect Grok API rate limits
       if (i < topArticles.length - 1) {
         await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds between image generations
       }
     }
+
+    // Step 6: Generate opinions for each story using Grok
+    console.log('Step 6: Generating opinions for each story...');
+    for (let i = 0; i < topArticles.length; i++) {
+      const story = topArticles[i];
+      console.log(`Generating opinion for story ${i + 1}/${topArticles.length}: ${story.title.substring(0, 50)}...`);
+      
+      const opinion = await generateOpinionWithGrok(story.link, story.title);
+      if (opinion) {
+        topArticles[i].opinion = opinion;
+        console.log(`  ✓ Opinion generated (${opinion.length} characters)`);
+      } else {
+        console.log(`  ⚠ Skipped opinion for this story`);
+      }
+      
+      // Add a delay between requests to avoid rate limiting
+      if (i < topArticles.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second between opinion generations
+      }
+    }
     
-    // Step 6: Format final output
+    // Step 7: Format final output
+    for (let i = 0; i < topArticles.length; i++) {
+      // Remove processing metadata from final output
+      delete topArticles[i].sentimentScore;
+      delete topArticles[i].keywordCount;
+      delete topArticles[i].source;
+      delete topArticles[i].publishedAt;
+    }
+
     const newsData = {
       date: dateToFetch,
       title: `Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories from ${formattedDate}`,

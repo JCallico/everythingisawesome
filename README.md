@@ -62,7 +62,7 @@ This monorepo contains four main components:
 - **dotenv** - Environment variable management
 
 ### AI & APIs
-- **Grok-3-latest** - X.AI's most advanced model for enhanced sentiment analysis with anti-commercial filtering
+- **Grok-3-latest** - X.AI's most advanced model for enhanced sentiment analysis with anti-commercial filtering, opinion generation, and summarization
 - **Grok-2-image** - AI-powered custom image generation based on story themes
 - **NewsAPI** - Real-time news data from 100+ diverse sources
 - **Advanced Prompting** - Specialized AI prompt engineering to distinguish genuine content from promotional material
@@ -95,7 +95,7 @@ This monorepo contains four main components:
 
 ### 🌐 Web Application
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
-- **Advanced AI Curation**: Uses Grok-3-latest with specialized prompts to distinguish genuine inspiring content from commercial promotions
+- **Advanced AI Curation**: Uses Grok-3-latest with specialized prompts to distinguish genuine inspiring content from commercial promotions, includes AI-generated opinionated commentary
 - **AI-Generated Images**: Custom images generated using Grok-2-image based on story themes with fallback category images
 - **Proprietary Awesome Index**: Advanced 6-step algorithm (50-100 scale) with anti-commercial filtering and duplicate detection
 - **Generic Duplicate Detection**: Advanced fuzzy string matching using 12 similarity algorithms with 100% accuracy on test data
@@ -148,6 +148,7 @@ npm run install-all
 # - GROK_SENTIMENT_MAX_TOKENS=10 (optional - has default, use 200 for grok-4)
 # - GROK_SUMMARY_MAX_TOKENS=100 (optional - has default, use 250 for grok-4)
 # - GROK_IMAGE_PROMPT_MAX_TOKENS=150 (optional - has default, use 300 for grok-4)
+# - GROK_OPINION_MAX_TOKENS=300 (optional - has default for opinion generation)
 #
 # For Azure Blob Storage (optional - local file system used by default):
 # - AZURE_STORAGE_ENABLED=true (set to enable Azure Blob Storage)
@@ -553,6 +554,7 @@ Advanced duplicate story detection using cutting-edge fuzzy string matching:
 - Removes duplicate stories using generic fuzzy matching algorithm
 - Selects top 10 most inspiring unique stories (or all if fewer than 10 qualify)
 - **Custom Image Generation**: AI-created visuals using Grok-2-image based on story themes
+- **Grok's Opinion Analysis**: AI-generated opinionated commentary providing critical perspective on each story
 - **Themed Fallbacks**: Pre-generated category images when AI generation fails
 - Preserves authentic source URLs for credibility
 

@@ -54,6 +54,7 @@ Advanced duplicate story detection ensures unique content using cutting-edge fuz
 The top 10 highest-scoring unique articles are enhanced with AI-generated content:
 
 - **Smart Summarization:** Concise, uplifting summaries highlighting inspiring aspects
+- **Grok's Opinion Analysis:** AI-generated opinionated commentary providing critical perspective
 - **Custom Image Generation:** AI-created visuals using Grok-2-image based on story themes
 - **Themed Fallbacks:** Pre-generated category images when AI generation fails
 
@@ -62,6 +63,19 @@ The top 10 highest-scoring unique articles are enhanced with AI-generated conten
 ### Grok-3-Latest Enhanced Sentiment Analysis
 
 Our AI analysis uses X.AI's most advanced Grok-3-latest model with specialized prompts designed to distinguish between genuine inspiring content and commercial promotional material. This ensures only authentic positive stories make it through our filters.
+
+### Grok's Opinion Generation
+
+Beyond sentiment analysis, we generate thoughtful, opinionated commentary for each top story:
+
+- **Critical Perspective:** AI analyzes articles with both enthusiasm and healthy skepticism
+- **Contextual Knowledge:** Combines article content with broader knowledge about the subject
+- **Balanced Analysis:** Acknowledges both opportunities and potential concerns
+- **Authentic Voice:** Provides nuanced, sometimes disagreeable perspectives rather than pure celebration
+- **Deep Understanding:** Goes beyond surface-level positivity to explore implications and limitations
+- **Reader Engagement:** Offers additional value by prompting deeper thinking about the news
+
+This creates a more sophisticated reading experience where users get both an inspiring news story and thoughtful analysis of its significance and context.
 
 ### Multi-Criteria Evaluation System
 
@@ -119,6 +133,18 @@ Each selected article receives a custom AI-generated summary designed to:
 - **Maintain Accuracy:** Preserve factual content while emphasizing positivity
 - **Improve Readability:** Create concise, engaging descriptions
 - **Reduce Bias:** Present information objectively while maintaining optimistic tone
+
+### AI-Generated Opinion Commentary
+
+Each story includes thoughtful, opinionated analysis ("Grok's Take") that:
+
+- **Provides Critical Analysis:** Offers perspective beyond the headline
+- **Balances Optimism with Realism:** Acknowledges both potential and limitations
+- **Engages Intellectually:** Encourages deeper thinking about the news story
+- **Maintains Authenticity:** Delivers honest assessment including when skepticism is warranted
+- **Contextualizes Importance:** Explores broader implications and significance
+
+This dual-layer approach gives readers both inspiring headlines and substantive analysis to form their own informed opinions.
 
 ### Custom Visual Content
 

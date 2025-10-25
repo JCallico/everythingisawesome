@@ -6,6 +6,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isUserActive, setIsUserActive] = useState(false);
+  const [expandedOpinion, setExpandedOpinion] = useState(false);
   const containerRef = useRef(null);
   const userActivityTimeoutRef = useRef(null);
 
@@ -201,17 +202,27 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
         <div className="story-content">
           <h2 className="story-title">{currentStory.title}</h2>
           <p className="story-summary">{currentStory.summary}</p>
-
+          {currentStory.opinion && (
+            <div className="story-opinion-section">
+              <button
+                className="opinion-toggle-btn"
+                onClick={() => setExpandedOpinion(!expandedOpinion)}
+              >
+                <span className="opinion-toggle-icon">{expandedOpinion ? '▼' : '▶'}</span>
+                <h3 className="opinion-subtitle">Grok's Take</h3>
+              </button>
+              {expandedOpinion && (
+                <p className="story-opinion">{currentStory.opinion}</p>
+              )}
+            </div>
+          )}
           <div className="story-actions">
             <a
               href={currentStory.link}
               target="_blank"
               rel="noopener noreferrer"
               className="read-more-btn"
-            >
-              Read Full Story
-              <span className="btn-icon">✨</span>
-            </a>
+            >Read Full Story<span className="btn-icon">✨</span></a>
           </div>
         </div>
       </div>
