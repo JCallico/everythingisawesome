@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Image,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
@@ -14,6 +15,7 @@ import { BlurView } from 'expo-blur';
 const { width, height } = Dimensions.get('window');
 
 const StoryCard = ({ story, getStoryImage, _onLinkPress, _onSharePress }) => {
+  const [expandedOpinion, setExpandedOpinion] = useState(false);
   return (
     <ScrollView 
       style={styles.storyCard}
@@ -50,6 +52,26 @@ const StoryCard = ({ story, getStoryImage, _onLinkPress, _onSharePress }) => {
             <Text style={styles.storySummary}>
               {story.summary}
             </Text>
+
+            {/* Opinion Section - Collapsible */}
+            {story.opinion && (
+              <View style={styles.opinionSection}>
+                <TouchableOpacity
+                  style={styles.opinionToggle}
+                  onPress={() => setExpandedOpinion(!expandedOpinion)}
+                >
+                  <Text style={styles.opinionToggleIcon}>
+                    {expandedOpinion ? '▼' : '▶'}
+                  </Text>
+                  <Text style={styles.opinionSubtitle}>Grok's Take</Text>
+                </TouchableOpacity>
+                {expandedOpinion && (
+                  <Text style={styles.storyOpinion}>
+                    {story.opinion}
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
         </View>
       </BlurView>
@@ -164,6 +186,43 @@ const styles = StyleSheet.create({
     textShadowColor: Colors.textShadowLight,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3
+  },
+  opinionSection: {
+    backgroundColor: 'rgba(102, 126, 234, 0.08)',
+    borderLeftColor: Colors.accent,
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    marginTop: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12
+  },
+  opinionToggle: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8
+  },
+  opinionToggleIcon: {
+    color: Colors.accent,
+    fontSize: 10,
+    fontWeight: '600'
+  },
+  opinionSubtitle: {
+    color: Colors.accent,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase'
+  },
+  storyOpinion: {
+    color: Colors.textTertiary,
+    fontSize: 14,
+    fontStyle: 'italic',
+    lineHeight: 22,
+    marginTop: 8,
+    paddingLeft: 12,
+    textShadowColor: Colors.textShadowLight,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2
   }
 });
 

@@ -4,7 +4,7 @@ export const Colors = {
   primary: '#FFD700',      // Gold
   primaryDark: '#333',     // Dark gray
   primaryLight: '#fff',    // White
-  accent: '#ff6b6b',       // Red accent
+  accent: '#f97316',       // Orange accent
 
   // Text colors
   textPrimary: '#121212',  // Very dark gray
@@ -30,7 +30,7 @@ export const Colors = {
   // Shadow colors
   shadowPrimary: '#000',
   shadowSecondary: 'rgba(0, 0, 0, 0.2)',
-  shadowAccent: 'rgba(255, 107, 107, 0.3)',
+  shadowAccent: 'rgba(249, 115, 22, 0.3)',
 
   // Text shadow colors
   textShadowLight: 'rgba(255, 255, 255, 0.8)',

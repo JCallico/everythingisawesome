@@ -37,9 +37,9 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiBaseUrlDev": "http://192.168.101.120:3001/api",
+      "apiBaseUrlDev": "http://192.168.2.97:3001/api",
       "apiBaseUrlProd": "https://everythingisawesome.news/api",
-      "imageBaseUrlDev": "http://192.168.101.120:3001",
+      "imageBaseUrlDev": "http://192.168.2.97:3001",
       "imageBaseUrlProd": "https://everythingisawesome.news",
       "eas": {
         "projectId": "0faa9ba5-f2d0-4015-9660-421e49c551a8"

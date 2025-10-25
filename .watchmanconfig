@@ -1,0 +1,17 @@
+{
+  "ignore_dirs": [
+    ".git",
+    ".next",
+    "build",
+    "dist",
+    "node_modules",
+    ".cache",
+    ".expo",
+    "coverage",
+    ".turbo",
+    ".pnpm-store"
+  ],
+  "performance": {
+    "enable_content_hash_metadata": true
+  }
+}
