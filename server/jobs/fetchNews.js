@@ -779,7 +779,7 @@ const fetchDailyNews = async (targetDate = null) => {
         topArticles[i].opinion = opinion;
         console.log(`  ✓ Opinion generated (${opinion.length} characters)`);
       } else {
-        console.log(`  ⚠ Skipped opinion for this story`);
+        console.log('  ⚠ Skipped opinion for this story');
       }
       
       // Add a delay between requests to avoid rate limiting
