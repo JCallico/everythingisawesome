@@ -283,9 +283,10 @@ const generateOpinionWithGrok = async (articleUrl, articleTitle, retries = 3) =>
     }
 
     const prompt = `Retrieve this article "${articleUrl}" and analyze it.
-
-Write your own summary on the same subject discussed on the article, but with your own opinion based not only on the content of the article but also your own knowledge of the subject. Don't be afraid of being opinionated or disagreeable if needed, it is your own opinion after all.
-
+Write your own summary on the same subject discussed on the article, but with your own opinion based not only on the content of the article but also your own knowledge of the subject.
+Focus on providing unique insights or perspectives that go beyond the article itself.
+When forming your opinion, consider the broader context and implications of the article's content.
+Don't be afraid of being opinionated or disagreeable if needed, but attempt to remain positive and hopeful unless contradicted by strong evidence.
 Output only a paragraph with your own take, nothing else.`;
 
     const response = await axios.post(GROK_API_URL, {
