@@ -21,6 +21,7 @@
     "build": "cd client && npm run build",
     "build:mobile": "cd mobile && npm run prebuild",
     "start": "node app.js",
+    "start:prod": "concurrently \"node app.js\" \"npx serve -s client/build\"",
     "install-all": "npm run install-deps && npm run install:shared && cd client && npm install && cd ../mobile && npm install",
     "install:shared": "cd packages/shared-api && npm install",
     "install:client": "npm run install:shared && cd client && npm install",
