@@ -390,244 +390,33 @@ jobs:
           echo "- Or make additional changes and push to trigger a new build" >> $GITHUB_STEP_SUMMARY
 
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: [build, deploy-approval]
     if: ${{ needs.deploy-approval.result == 'success' }}
-    
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
     steps:
-      - name: 'Deployment Approved'
-        run: |
-          echo "✅ Deployment approved - proceeding with production deployment"
-          echo "🚀 Starting deployment process..."
-        
-      - name: Download artifact from build job
-        run: |
-          echo "📥 Downloading build artifacts..."
-        
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
-      - name: Verify downloaded artifacts
-        shell: bash
-        run: |
-          echo "🔍 Verifying downloaded artifacts..."
-          ls -la
-          echo "✅ Artifacts downloaded successfully"
-      
-      - name: Login to Azure
-        uses: azure/login@v2
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2D34B457FC84DBD932B2B893BCAB313 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6037D42E5BA0405EA75FC80408338126 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F976DF1D680446ECA0330678241B7509 }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Verify Azure login
-        shell: bash
+      - name: Deploy via SSH
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
-          echo "✅ Azure login successful"
-          echo "Current Azure account:"
-          az account show --query "{subscriptionId:id, subscriptionName:name, tenantId:tenantId}" -o table
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'everythingisawesome'
-          slot-name: 'Production'
-          package: .
-          clean: false
-
-      - name: 'Verify Deployment Success'
-        shell: bash
-        run: |
-          echo "🔍 Verifying deployment status..."
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          
-          # Check if the web app is running
-          STATUS=$(az webapp show --name everythingisawesome --resource-group "$RESOURCE_GROUP" --query "state" -o tsv)
-          echo "Web app status: $STATUS"
-          
-          if [ "$STATUS" = "Running" ]; then
-            echo "✅ Web app is running successfully"
-          else
-            echo "❌ Web app is not in running state: $STATUS"
-            exit 1
-          fi
-          
-          # Verify deployment package structure (without modifying anything)
-          echo "📦 Verifying deployment package structure..."
-          if [ -f "app.js" ]; then
-            echo "✅ app.js found"
-          else
-            echo "❌ app.js not found - deployment may be incomplete"
-            exit 1
-          fi
-          
-          # With SCM_DO_BUILD_DURING_DEPLOYMENT=true, Azure will install dependencies automatically
-          echo "📦 Dependencies will be installed by Azure SCM during deployment"
-          echo "✅ Deployment verification completed - Azure will handle dependency installation"
-
-      - name: 'Configure Node.js Runtime'
-        shell: bash
-        run: |
-          echo "⚙️ Configuring Node.js runtime..."
-          # Find the resource group
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          echo "Found resource group: $RESOURCE_GROUP"
-          
-          # Configure for Windows Node.js with explicit startup file
-          echo "Setting startup file to app.js..."
-          az webapp config set \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --startup-file "app.js"
-            
-          # Set Node.js specific configurations
-          echo "Configuring Node.js settings..."
-          az webapp config appsettings set \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --settings \
-              WEBSITE_NODE_DEFAULT_VERSION=~22 \
-              WEBSITE_RUN_FROM_PACKAGE=0 \
-              NODE_ENV=production \
-              WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
-            
-          echo "✅ Node.js runtime configured successfully"
-
-      - name: 'Configure Azure Web App Settings'
-        shell: bash
-        run: |
-          echo "⚙️ Configuring application settings..."
-          # Find the resource group by listing all web apps and filtering by name
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          
-          if [ -z "$RESOURCE_GROUP" ]; then
-            echo "❌ Error: Could not find resource group for web app 'everythingisawesome'"
-            echo "Available web apps:"
-            az webapp list --query "[].{name:name, resourceGroup:resourceGroup}" -o table
-            exit 1
-          fi
-          
-          echo "Found resource group: $RESOURCE_GROUP"
-          
-          # Set application settings including SCM build configuration and Azure Storage
-          echo "Setting environment variables and build configuration..."
-          
-          # Check if Azure Storage secrets are configured
-          if [[ -n "${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" && -n "${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" && -n "${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" ]]; then
-            echo "✅ Azure Storage secrets detected - enabling Azure Blob Storage"
-            AZURE_STORAGE_ENABLED="true"
-          else
-            echo "⚠️ Azure Storage secrets not configured - using local file system"
-            AZURE_STORAGE_ENABLED="false"
-          fi
-          
-          az webapp config appsettings set \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --settings \
-              NODE_ENV=production \
-              GROK_API_KEY="${{ secrets.GROK_API_KEY }}" \
-              GROK_MODEL=grok-3-latest \
-              GROK_IMAGE_MODEL=grok-2-image \
-              GROK_SENTIMENT_MAX_TOKENS=10 \
-              GROK_SUMMARY_MAX_TOKENS=100 \
-              GROK_IMAGE_PROMPT_MAX_TOKENS=150 \
-              NEWS_API_KEY="${{ secrets.NEWS_API_KEY }}" \
-              AZURE_STORAGE_ENABLED="$AZURE_STORAGE_ENABLED" \
-              AZURE_STORAGE_ACCOUNT_NAME="${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}" \
-              AZURE_STORAGE_ACCOUNT_KEY="${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}" \
-              AZURE_STORAGE_CONTAINER_NAME="${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}" \
-              SCM_DO_BUILD_DURING_DEPLOYMENT=true
-              
-          echo "✅ SCM_DO_BUILD_DURING_DEPLOYMENT=true - Azure will automatically run npm install during deployment"
-              
-          # Force restart to apply all changes
-          echo "Restarting web app to apply changes..."
-          az webapp restart \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP"
-            
-          echo "✅ App settings configured and app restarted successfully"
-
-      - name: 'Verify Application Type in Azure'
-        shell: bash
-        run: |
-          echo "🔍 Verifying Azure configuration..."
-          # Find the resource group
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='everythingisawesome'].resourceGroup" -o tsv)
-          
-          # Check current app settings including Azure Storage
-          echo "Current app settings:"
-          az webapp config appsettings list \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --query "[?name=='WEBSITE_NODE_DEFAULT_VERSION' || name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE' || name=='AZURE_STORAGE_ENABLED' || name=='AZURE_STORAGE_ACCOUNT_NAME' || name=='AZURE_STORAGE_CONTAINER_NAME']" \
-            -o table
-            
-          # Check startup command
-          echo "Current startup command:"
-          az webapp config show \
-            --name everythingisawesome \
-            --resource-group "$RESOURCE_GROUP" \
-            --query "appCommandLine" \
-            -o tsv
-            
-          echo "✅ Azure configuration verification completed"
-
-      - name: 'Final Deployment Status'
-        shell: bash
-        run: |
-          echo "🎉 Deployment completed successfully!"
-          echo "🌐 Your application should be available at: https://everythingisawesome.azurewebsites.net"
-          echo "📊 Deployment Summary:"
-          echo "   ✅ Build: Successful"
-          echo "   ✅ Linting: Passed"
-          echo "   ✅ Tests: Passed"
-          echo "   ✅ Deploy: Successful"
-          echo "   ✅ Configuration: Applied"
-          echo "   ✅ Status: Running"
-
-      - name: 'Deployment Summary'
-        if: always()
-        shell: bash
-        run: |
-          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Azure Login | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
-          echo "| Artifact Download | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
-          echo "| Web App Deployment | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
-          echo "| Runtime Configuration | ✅ Applied |" >> $GITHUB_STEP_SUMMARY
-          echo "| App Settings | ✅ Configured |" >> $GITHUB_STEP_SUMMARY
-          echo "| Application Status | ✅ Running |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🌐 **Application URL**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 **Deployment completed successfully!**" >> $GITHUB_STEP_SUMMARY
-
-      - name: 'Deployment Failure Notification'
-        if: failure()
-        shell: bash
-        run: |
-          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The deployment process encountered an error. Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Common Issues:" >> $GITHUB_STEP_SUMMARY
-          echo "- Azure authentication failure" >> $GITHUB_STEP_SUMMARY
-          echo "- Resource group or web app not found" >> $GITHUB_STEP_SUMMARY
-          echo "- Configuration settings error" >> $GITHUB_STEP_SUMMARY
-          echo "- Network connectivity issues" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please review the workflow logs and try deploying again." >> $GITHUB_STEP_SUMMARY
+          echo "Deploying to $SSH_USER@$SSH_HOST (default home directory)"
+          ssh -o StrictHostKeyChecking=no -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" '
+            set -e
+            cd ~
+            sudo -i -u everythingisawesome bash -c "git pull && npm install && cd client && npm install && cd .. && npm run build && pm2 restart everythingisawesome"
+          '
+          echo "✅ SSH deployment complete"
 
   completed:
     runs-on: ubuntu-latest
