@@ -369,7 +369,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" '
             set -e
             cd ~
-            sudo -i -u everythingisawesome bash -c "git pull && npm install && cd client && npm install && cd .. && npm run build && pm2 restart everythingisawesome"
+            sudo -i -u everythingisawesome bash -c "git pull && pnpm install --recursive && pnpm run build && pm2 restart everythingisawesome"
           '
           echo "✅ SSH deployment complete"
 
