@@ -170,38 +170,6 @@ jobs:
           
           echo "✅ Test step completed"
       
-      - name: Prepare deployment package
-        shell: bash
-        run: |
-          echo "📦 Preparing deployment package with build files..."
-          
-          # Verify build files exist
-          if [ -d "client/build" ]; then
-            echo "✅ Client build directory found"
-            echo "Build files: $(ls -la client/build/ | wc -l) items"
-          else
-            echo "❌ Client build directory not found!"
-            exit 1
-          fi
-          
-          # List contents for verification
-          echo "Contents of client/build:"
-          ls -la client/build/
-          
-          echo "✅ Deployment package ready"
-      
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: |
-            .
-            !node_modules
-            !client/node_modules
-            !mobile/node_modules
-            !packages/*/node_modules
-          # Ensure build files are included even if in .gitignore
-          retention-days: 1
 
       - name: 'Build Summary'
         if: always()
@@ -216,7 +184,6 @@ jobs:
           echo "| Client | Build | ✅ Successful |" >> $GITHUB_STEP_SUMMARY
           echo "| Mobile | Validation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           echo "| All | Tests | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | Artifacts | ✅ Uploaded |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎉 **Multi-platform build completed successfully!**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -230,11 +197,6 @@ jobs:
           echo "- ✅ **Path length optimized** - No Azure deployment path issues" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Nesting reduced** - From 14 to 10 levels maximum" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ⚡ Azure SCM Deployment:" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔧 **SCM_DO_BUILD_DURING_DEPLOYMENT=true** - Azure handles npm install automatically" >> $GITHUB_STEP_SUMMARY
-          echo "- 📦 **postinstall script** - Installs client & mobile dependencies" >> $GITHUB_STEP_SUMMARY
-          echo "- 🚀 **Optimized workflow** - No duplicate dependency installation" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "## ⏳ Deployment Approval Required" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build has completed successfully and is now waiting for manual approval." >> $GITHUB_STEP_SUMMARY
@@ -244,9 +206,6 @@ jobs:
           echo "- ✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Linting passed" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Tests completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Artifacts ready for deployment" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "� **Ready to deploy to**: https://everythingisawesome.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Next Step**: Navigate to the Actions tab and click 'Approve and deploy' to proceed with production deployment." >> $GITHUB_STEP_SUMMARY
 
@@ -394,10 +353,6 @@ jobs:
     needs: [build, deploy-approval]
     if: ${{ needs.deploy-approval.result == 'success' }}
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
 
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.9.0
