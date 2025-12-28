@@ -152,7 +152,7 @@ class DataDownloadFromAzure {
           }
         }
       } else {
-        console.log(`   ℹ️  Local images directory does not exist yet (will be created)`);
+        console.log('   ℹ️  Local images directory does not exist yet (will be created)');
       }
 
       console.log(`📋 Found ${localFiles.jsonFiles.size} local JSON files`);
@@ -181,7 +181,7 @@ class DataDownloadFromAzure {
       const localMap = fileType === 'json' ? localFiles.jsonFiles : localFiles.imageFiles;
       const existingLocal = localMap.get(fileName);
       let action = 'Downloading';
-      let targetDir = fileType === 'json' ? LOCAL_DATA_DIR : LOCAL_IMAGES_DIR;
+      const targetDir = fileType === 'json' ? LOCAL_DATA_DIR : LOCAL_IMAGES_DIR;
 
       if (existingLocal) {
         if (existingLocal.size === remoteFile.size) {
