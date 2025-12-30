@@ -15,7 +15,7 @@ permissions:
 
 env:
   # Default app URL - can be overridden by setting APP_URL repository variable in GitHub
-  DEFAULT_APP_URL: 'https://everythingisawesome.news'
+  DEFAULT_APP_URL: 'http://everythingisawesome.news'
 
 jobs:
   # Job 1: Health Check
