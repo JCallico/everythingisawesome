@@ -20,7 +20,7 @@ describe('Footer Component', () => {
   test('displays news source attribution', () => {
     render(<Footer />);
     expect(screen.getByText(/News content sourced from NewsAPI/)).toBeInTheDocument();
-    expect(screen.getByText(/AI processing by Grok/)).toBeInTheDocument();
+    expect(screen.getByText(/AI processing by Grok & Gemini/)).toBeInTheDocument();
   });
 
   test('renders navigation links', () => {

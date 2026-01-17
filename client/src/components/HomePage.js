@@ -138,6 +138,8 @@ const HomePage = () => {
         stories={news.stories} 
         initialStoryIndex={currentStoryIndex}
         date={date || news.date}
+        aiProvider={news.aiProvider}
+        aiModel={news.aiModel}
       />
 
       <div className="navigation">

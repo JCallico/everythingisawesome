@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { resolveImageUrl } from '../services/api';
 
-const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
+const NewsDisplay = ({ stories, initialStoryIndex = 0, date, aiProvider, aiModel }) => {
   const [currentIndex, setCurrentIndex] = useState(initialStoryIndex);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -209,7 +209,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date }) => {
                 onClick={() => setExpandedOpinion(!expandedOpinion)}
               >
                 <span className="opinion-toggle-icon">{expandedOpinion ? '▼' : '▶'}</span>
-                <h3 className="opinion-subtitle">Grok's Take</h3>
+                <h3 className="opinion-subtitle">{aiProvider || 'Grok'}'s Take {aiModel && <span style={{fontSize: '0.8em', opacity: 0.7}}>({aiModel})</span>}</h3>
               </button>
               {expandedOpinion && (
                 <p className="story-opinion">{currentStory.opinion}</p>

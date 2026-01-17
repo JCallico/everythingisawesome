@@ -21,7 +21,7 @@ Articles undergo rigorous pre-filtering to eliminate low-quality content:
 
 ### Step 3: Enhanced AI Analysis
 
-Each article is analyzed by **Grok-3-latest** using specialized prompts designed to focus on genuine human interest content:
+Each article is analyzed by advanced AI models (**Grok-3** or **Google Gemini**) using specialized prompts designed to focus on genuine human interest content:
 
 - **Anti-Commercial Filtering:** Product sales and promotional content automatically scored 0-20
 - **Main Event Focus:** Algorithm evaluates the primary news event, not just positive entities mentioned
@@ -54,17 +54,17 @@ Advanced duplicate story detection ensures unique content using cutting-edge fuz
 The top 10 highest-scoring unique articles are enhanced with AI-generated content:
 
 - **Smart Summarization:** Concise, uplifting summaries highlighting inspiring aspects
-- **Grok's Opinion Analysis:** AI-generated opinionated commentary providing critical perspective
-- **Custom Image Generation:** AI-created visuals using Grok-2-image based on story themes
+- **AI Opinion Analysis:** AI-generated opinionated commentary providing critical perspective
+- **Custom Image Generation:** AI-created visuals using specialized image models (Grok-2/Imagen 3) based on story themes
 - **Themed Fallbacks:** Pre-generated category images when AI generation fails
 
 ## Advanced AI Analysis Technology
 
-### Grok-3-Latest Enhanced Sentiment Analysis
+### Advanced AI Sentiment Analysis
 
-Our AI analysis uses X.AI's most advanced Grok-3-latest model with specialized prompts designed to distinguish between genuine inspiring content and commercial promotional material. This ensures only authentic positive stories make it through our filters.
+Our AI analysis uses state-of-the-art models (like **Grok-3** or **Google Gemini**) with specialized prompts designed to distinguish between genuine inspiring content and commercial promotional material. This ensures only authentic positive stories make it through our filters.
 
-### Grok's Opinion Generation
+### AI Opinion Generation
 
 Beyond sentiment analysis, we generate thoughtful, opinionated commentary for each top story:
 
@@ -136,7 +136,7 @@ Each selected article receives a custom AI-generated summary designed to:
 
 ### AI-Generated Opinion Commentary
 
-Each story includes thoughtful, opinionated analysis ("Grok's Take") that:
+Each story includes thoughtful, opinionated analysis ("AI's Take") that:
 
 - **Provides Critical Analysis:** Offers perspective beyond the headline
 - **Balances Optimism with Realism:** Acknowledges both potential and limitations
@@ -150,7 +150,7 @@ This dual-layer approach gives readers both inspiring headlines and substantive 
 
 Every story is enhanced with AI-generated imagery:
 
-- **Theme-Based Generation:** Images created using Grok-2-image based on story content
+- **Theme-Based Generation:** Images created using advanced image models (Grok-2/Imagen 3) based on story content
 - **Fallback System:** Pre-designed category images when generation fails
 - **Visual Consistency:** Maintains cohesive aesthetic across all content
 - **Accessibility:** Alt text and descriptions for screen readers

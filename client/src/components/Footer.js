@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="app-footer">
       <div className="footer-content">
         <p>
-          News content sourced from NewsAPI • AI processing by Grok • 
+          News content sourced from NewsAPI • AI processing by Grok & Gemini • 
           <Link to="/how-it-works" className="footer-link"> How It Works</Link> • 
           <Link to="/disclaimer" className="footer-link"> Legal Disclaimer</Link>
         </p>

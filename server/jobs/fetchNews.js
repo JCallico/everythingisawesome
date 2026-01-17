@@ -22,12 +22,18 @@ if (!isAzureProduction && process.env.NODE_ENV !== 'production') {
 }
 
 // Check if critical environment variables are available
+const aiProvider = (process.env.AI_PROVIDER || 'grok').toLowerCase();
 console.log('🔑 Environment Variables Check:');
+console.log(`   AI_PROVIDER: ${aiProvider}`);
 console.log(`   GROK_API_KEY: ${process.env.GROK_API_KEY ? 'SET' : 'MISSING'}`);
+console.log(`   GEMINI_API_KEY: ${process.env.GEMINI_API_KEY ? 'SET' : 'MISSING'}`);
 console.log(`   NEWS_API_KEY: ${process.env.NEWS_API_KEY ? 'SET' : 'MISSING'}`);
 
 // Exit early if critical variables are missing
-if (!process.env.GROK_API_KEY || !process.env.NEWS_API_KEY) {
+const isAiKeyMissing = (aiProvider === 'grok' && !process.env.GROK_API_KEY) || 
+                       (aiProvider === 'gemini' && !process.env.GEMINI_API_KEY);
+
+if (isAiKeyMissing || !process.env.NEWS_API_KEY) {
   console.error('❌ Critical environment variables missing. Cannot proceed.');
   console.error('💡 In Azure: Configure these in Application Settings');
   console.error('💡 Locally: Add these to your .env file');
@@ -48,6 +54,9 @@ console.log('📦 Loaded newsUtils');
 import { createFileSystem } from '../filesystem/FileSystemFactory.js';
 console.log('📦 Loaded FileSystemFactory');
 
+import { createAIService } from '../ai/AIServiceFactory.js';
+console.log('📦 Loaded AIServiceFactory');
+
 import * as fuzzball from 'fuzzball';
 console.log('📦 Loaded fuzzball');
 
@@ -55,7 +64,10 @@ console.log('📦 Loaded fuzzball');
 const fileSystem = createFileSystem();
 console.log('📦 Initialized file system');
 
-const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
+// Initialize AI Service
+const aiService = createAIService();
+console.log('📦 Initialized AI Service');
+
 const NEWSAPI_URL = 'https://newsapi.org/v2/everything';
 
 // Positive keywords to filter uplifting stories
@@ -136,129 +148,9 @@ const fetchNewsArticles = async (targetDate) => {
   }
 };
 
-// Function to analyze sentiment using Grok API with retry logic
-const analyzeSentimentWithGrok = async (articleText, retries = 3) => {
-  try {
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      throw new Error('GROK_API_KEY not found');
-    }
 
-    const prompt = `Analyze this news article and provide a positivity score from 0-100 based on genuine human interest and inspiring content.
 
-SCORING GUIDELINES:
-- 80-100: Genuine positive outcomes - scientific breakthroughs, successful rescues, medical cures, achievements, environmental victories, community successes, heroic acts, charitable accomplishments
-- 40-79: General positive news without major impact  
-- 20-39: Neutral or mixed content
-- 0-19: Negative events, crimes, disasters, failures, product sales, commercial content
 
-CRITICAL: Focus on the MAIN EVENT, not just positive entities mentioned:
-- If the primary news is negative (scams, crimes, disasters, deaths, failures) → Score 0-19 even if good organizations are mentioned
-- If the primary news is positive (successes, breakthroughs, rescues, achievements) → Score based on impact
-
-NEGATIVE INDICATORS (Score 0-19):
-- Crimes, scams, fraud, theft, corruption
-- Disasters, accidents, emergencies, crises
-- Deaths, injuries, illnesses, setbacks
-- Product sales, deals, discounts, shopping content
-- Commercial promotions, advertisements
-- Failures, controversies, conflicts
-
-POSITIVE INDICATORS (Score 80-100):
-- Scientific discoveries, medical breakthroughs
-- Successful rescues, heroic acts, lives saved
-- Community achievements, charitable successes
-- Environmental victories, conservation wins
-- Educational breakthroughs, accessibility improvements
-- Inspirational human stories with positive outcomes
-
-EXCEPTION: Charity fundraising events and donation drives should score highly even if they mention prices.
-
-Article text: "${articleText.substring(0, 1000)}"
-
-Respond with only a number between 0-100 representing the positivity score.`;
-
-    const response = await axios.post(GROK_API_URL, {
-      model: process.env.GROK_MODEL || 'grok-3-latest',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
-      max_tokens: parseInt(process.env.GROK_SENTIMENT_MAX_TOKENS) || 10
-    }, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const content = response.data.choices[0].message.content.trim();
-    const score = parseInt(content);
-    
-    // Validate score is a number between 0-100
-    if (isNaN(score) || score < 0 || score > 100) {
-      throw new Error('Invalid sentiment score received');
-    }
-    
-    return score;
-  } catch (error) {
-    console.error('Error analyzing sentiment:', error.message);
-    if (error.response) {
-      console.error('Grok API Error Response:', error.response.status, error.response.data);
-    }
-    
-    if (retries > 0) {
-      console.log(`Retrying sentiment analysis... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return await analyzeSentimentWithGrok(articleText, retries - 1);
-    }
-    
-    // Return fallback score of 50
-    return 50;
-  }
-};
-
-// Function to generate summary using Grok API
-const generateSummaryWithGrok = async (articleText, retries = 3) => {
-  try {
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      throw new Error('GROK_API_KEY not found');
-    }
-
-    const prompt = `Create a concise, positive summary (2-3 sentences) for this news article, highlighting its most inspiring and uplifting aspects:
-
-Article: "${articleText.substring(0, 1000)}"
-
-Focus on the positive impact, hope, and inspiring elements. Keep it under 200 characters.`;
-
-    const response = await axios.post(GROK_API_URL, {
-      model: process.env.GROK_MODEL || 'grok-3-latest',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: parseInt(process.env.GROK_SUMMARY_MAX_TOKENS) || 100
-    }, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    return response.data.choices[0].message.content.trim();
-  } catch (error) {
-    console.error('Error generating summary:', error.message);
-    if (error.response) {
-      console.error('Grok API Error Response:', error.response.status, error.response.data);
-    }
-    
-    if (retries > 0) {
-      console.log(`Retrying summary generation... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return await generateSummaryWithGrok(articleText, retries - 1);
-    }
-    
-    // Return fallback summary
-    return 'An inspiring story about positive change and human achievement.';
-  }
-};
 
 // Function to calculate awesome index
 const calculateAwesomeIndex = (sentimentScore, positiveKeywordCount) => {
@@ -274,58 +166,7 @@ const calculateAwesomeIndex = (sentimentScore, positiveKeywordCount) => {
   return Math.round(awesomeIndex);
 };
 
-// Function to generate opinion using Grok API
-const generateOpinionWithGrok = async (articleUrl, articleTitle, retries = 3) => {
-  try {
-    const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-      throw new Error('GROK_API_KEY not found');
-    }
 
-    const prompt = `Retrieve this article "${articleUrl}" and analyze it.
-Write your own summary on the same subject discussed on the article, but with your own opinion based not only on the content of the article but also your own knowledge of the subject.
-Focus on providing unique insights or perspectives that go beyond the article itself.
-When forming your opinion, consider the broader context and implications of the article's content.
-Don't be afraid of being opinionated or disagreeable if needed, but attempt to remain positive and hopeful unless contradicted by strong evidence.
-Output only a paragraph with your own take, nothing else.`;
-
-    const response = await axios.post(GROK_API_URL, {
-      model: process.env.GROK_MODEL || 'grok-3-latest',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.8,
-      max_tokens: parseInt(process.env.GROK_OPINION_MAX_TOKENS) || 300
-    }, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    });
-
-    const opinion = response.data.choices[0].message.content.trim();
-    
-    if (!opinion || opinion.length === 0) {
-      throw new Error('Empty opinion received from Grok API');
-    }
-
-    return opinion;
-  } catch (error) {
-    console.error('Error generating opinion:', error.message);
-    if (error.response) {
-      console.error('Grok API Error Response:', error.response.status, error.response.data);
-    }
-    
-    if (retries > 0) {
-      console.log(`Retrying opinion generation... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return await generateOpinionWithGrok(articleUrl, articleTitle, retries - 1);
-    }
-    
-    // Return empty string as fallback - opinion will be optional
-    console.log(`Skipping opinion for article: ${articleTitle.substring(0, 50)}...`);
-    return '';
-  }
-};
 
 // Function to count positive keywords in text
 const countPositiveKeywords = (text) => {
@@ -334,48 +175,39 @@ const countPositiveKeywords = (text) => {
     lowercaseText.includes(keyword.toLowerCase())
   ).length;
 };
-// Function to generate image using Grok API
+// Function to generate image using AI Service
 const generateStoryImage = async (story, storyIndex) => {
   try {
-    const grokApiKey = process.env.GROK_API_KEY;
-    if (!grokApiKey) {
-      console.log('GROK_API_KEY not found, using themed fallback image');
-      return getFallbackImage(story);
-    }
-
     // Create a detailed prompt for image generation based on the story
-    const imagePrompt = await createImagePrompt(story);
-    console.log(`  Generated prompt: "${imagePrompt}"`);
-    
-    // Try Grok image generation with grok-2-image
+    let imagePrompt;
     try {
-      const response = await axios.post('https://api.x.ai/v1/images/generations', {
-        model: process.env.GROK_IMAGE_MODEL || 'grok-2-image',
-        prompt: imagePrompt,
-        n: 1,
-        response_format: 'b64_json'
-      }, {
-        headers: {
-          'Authorization': `Bearer ${grokApiKey}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.data.data && response.data.data.length > 0) {
-        const base64Image = response.data.data[0].b64_json;
-        
+      imagePrompt = await aiService.generateImagePrompt(story);
+      console.log(`  Generated prompt: "${imagePrompt}"`);
+    } catch (e) {
+      console.log('  Error generating prompt with AI, using basic prompt');
+      imagePrompt = createBasicImagePrompt(story);
+    }
+    
+    // Try AI image generation
+    try {
+      const base64Image = await aiService.generateImage(imagePrompt);
+      
+      if (base64Image) {
         // Save the base64 image locally
         const savedImagePath = await saveBase64Image(base64Image, storyIndex);
         
         if (savedImagePath) {
-          console.log(`  ✓ Image generated with Grok and saved: ${savedImagePath}`);
+          console.log(`  ✓ Image generated with AI and saved: ${savedImagePath}`);
           return savedImagePath;
         }
       }
-    } catch (grokError) {
-      console.log('  Grok image generation failed, using themed fallback...');
-      if (grokError.response && grokError.response.data) {
-        console.log('  Grok Error:', grokError.response.data);
+    } catch (aiError) {
+      if (aiError.message && aiError.message.includes('not supported')) {
+        console.log(`  ⚠ ${aiError.message} Using themed fallback...`);
+      } else {
+        console.log('  AI image generation failed, using themed fallback...');
+        // Only log full error for debugging if it's not a known "not supported" error
+        // console.error(aiError);
       }
     }
 
@@ -388,57 +220,7 @@ const generateStoryImage = async (story, storyIndex) => {
   }
 };
 
-// Create a detailed image generation prompt based on the story content
-const createImagePrompt = async (story) => {
-  try {
-    const grokApiKey = process.env.GROK_API_KEY;
-    if (!grokApiKey) {
-      // Fallback to a basic prompt if Grok is not available
-      return createBasicImagePrompt(story);
-    }
 
-    const prompt = `Based on this uplifting news story, create a detailed, visual description for an AI image generator. The description should be positive, inspiring, and capture the essence of the story. Focus on creating a professional, high-quality image that represents the story's theme.
-
-Story Title: "${story.title}"
-Story Summary: "${story.summary}"
-
-Create a visual description that includes:
-- The main theme or subject matter
-- Positive, uplifting atmosphere
-- Professional, clean aesthetic
-- Inspiring visual elements
-- No text or words visible in the image
-- Photorealistic or artistic style as appropriate
-
-Respond with only the image generation prompt (max 300 characters).`;
-
-    const response = await axios.post(GROK_API_URL, {
-      model: process.env.GROK_MODEL || 'grok-3-latest',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: parseInt(process.env.GROK_IMAGE_PROMPT_MAX_TOKENS) || 150
-    }, {
-      headers: {
-        'Authorization': `Bearer ${grokApiKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const generatedPrompt = response.data.choices[0].message.content.trim();
-    
-    // Clean up the prompt and ensure it's suitable for image generation
-    const cleanPrompt = generatedPrompt
-      .replace(/['"]/g, '') // Remove quotes
-      .replace(/\n/g, ' ') // Replace newlines with spaces
-      .substring(0, 500); // Reasonable length limit
-    
-    return cleanPrompt || createBasicImagePrompt(story);
-    
-  } catch (error) {
-    console.error('Error creating image prompt with Grok:', error.message);
-    return createBasicImagePrompt(story);
-  }
-};
 
 // Create a basic image prompt without using Grok
 const createBasicImagePrompt = (story) => {
@@ -681,8 +463,8 @@ const fetchDailyNews = async (targetDate = null) => {
     
     console.log(`Found ${articles.length} articles from NewsAPI`);
     
-    // Step 2: Process articles with Grok API for sentiment and summarization
-    console.log('Step 2: Processing articles with Grok API...');
+    // Step 2: Process articles with AI for sentiment and summarization
+    console.log('Step 2: Processing articles with AI...');
     const processedArticles = [];
     
     for (let i = 0; i < Math.min(articles.length, 100); i++) { // Process up to 100 articles for better selection pool
@@ -701,7 +483,12 @@ const fetchDailyNews = async (targetDate = null) => {
       }
       
       // Get sentiment score
-      const sentimentScore = await analyzeSentimentWithGrok(articleText);
+      let sentimentScore = 50;
+      try {
+        sentimentScore = await aiService.analyzeSentiment(articleText);
+      } catch (e) {
+        // console.log('Sentiment analysis failed, using default 50');
+      }
       
       // Skip articles with very low sentiment scores
       if (sentimentScore < 40) {
@@ -709,7 +496,12 @@ const fetchDailyNews = async (targetDate = null) => {
       }
       
       // Generate summary
-      const summary = await generateSummaryWithGrok(articleText);
+      let summary = article.description || articleText.substring(0, 200);
+      try {
+        summary = await aiService.generateSummary(articleText);
+      } catch (e) {
+        // console.log('Summary generation failed, using fallback');
+      }
       // Calculate awesome index
       const awesomeIndex = calculateAwesomeIndex(sentimentScore, keywordCount);
       
@@ -754,8 +546,8 @@ const fetchDailyNews = async (targetDate = null) => {
     
     console.log(`Selected top ${topArticles.length} unique articles with awesome_index ranging from ${topArticles[topArticles.length-1].awesome_index} to ${topArticles[0].awesome_index}`);
     
-    // Step 5: Generate custom images for each story using Grok
-    console.log('Step 5: Generating custom AI images for each story using Grok...');
+    // Step 5: Generate custom images for each story using AI
+    console.log('Step 5: Generating custom AI images for each story using AI...');
     for (let i = 0; i < topArticles.length; i++) {
       const story = topArticles[i];
       console.log(`Generating image for story ${i + 1}: ${story.title.substring(0, 50)}...`);
@@ -763,19 +555,25 @@ const fetchDailyNews = async (targetDate = null) => {
       const imageUrl = await generateStoryImage(story, i);
       topArticles[i].image = imageUrl;
       
-      // Add a delay between requests to respect Grok API rate limits
+      // Add a delay between requests to respect API rate limits
       if (i < topArticles.length - 1) {
         await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds between image generations
       }
     }
 
-    // Step 6: Generate opinions for each story using Grok
+    // Step 6: Generate opinions for each story using AI
     console.log('Step 6: Generating opinions for each story...');
     for (let i = 0; i < topArticles.length; i++) {
       const story = topArticles[i];
       console.log(`Generating opinion for story ${i + 1}/${topArticles.length}: ${story.title.substring(0, 50)}...`);
       
-      const opinion = await generateOpinionWithGrok(story.link, story.title);
+      let opinion = '';
+      try {
+        opinion = await aiService.generateOpinion(story.link, story.title);
+      } catch (e) {
+        // console.log('Opinion generation failed');
+      }
+
       if (opinion) {
         topArticles[i].opinion = opinion;
         console.log(`  ✓ Opinion generated (${opinion.length} characters)`);
@@ -801,6 +599,8 @@ const fetchDailyNews = async (targetDate = null) => {
     const newsData = {
       date: dateToFetch,
       title: `Top 10 Optimistic, Feel-Good, Awe-Inspiring News Stories from ${formattedDate}`,
+      aiProvider: aiService.getProviderName(),
+      aiModel: aiService.getModelName(),
       stories: topArticles
     };
     

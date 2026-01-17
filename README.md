@@ -62,11 +62,13 @@ This monorepo contains four main components:
 - **dotenv** - Environment variable management
 
 ### AI & APIs
-- **Grok-3-latest** - X.AI's most advanced model for enhanced sentiment analysis with anti-commercial filtering, opinion generation, and summarization
-- **Grok-2-image** - AI-powered custom image generation based on story themes
-- **NewsAPI** - Real-time news data from 100+ diverse sources
-- **Advanced Prompting** - Specialized AI prompt engineering to distinguish genuine content from promotional material
-- **Generic Duplicate Detection** - Fuzzy string matching algorithms with scientifically optimized thresholds
+- **Multi-Model AI Support** - Configurable to use either **xAI (Grok)** or **Google (Gemini)** for intelligent content analysis.
+- **Advanced Sentiment Analysis** - Uses Grok-3 or Gemini Flash to filter for positivity, hope, and genuine inspiration.
+- **AI Opinion Generation** - Generates "AI's Take" analysis for every top story.
+- **NewsAPI** - Real-time news data from 100+ diverse sources.
+- **AI Image Generation** - Integration with **Grok-2** (xAI) or **Gemini 2.0 Flash / Imagen 3** (Google) for custom story illustrations.
+- **Advanced Prompting** - Specialized prompt engineering to distinguish genuine content from promotional material.
+- **Generic Duplicate Detection** - Fuzzy string matching algorithms with scientifically optimized thresholds.
 
 ### Cloud & DevOps
 - **Azure Web App** - Production hosting (Windows App Service Plan)
@@ -95,8 +97,8 @@ This monorepo contains four main components:
 
 ### 🌐 Web Application
 - **Real News Sources**: Fetches authentic articles from 100+ news providers via NewsAPI
-- **Advanced AI Curation**: Uses Grok-3-latest with specialized prompts to distinguish genuine inspiring content from commercial promotions, includes AI-generated opinionated commentary
-- **AI-Generated Images**: Custom images generated using Grok-2-image based on story themes with fallback category images
+- **Advanced AI Curation**: Uses advanced AI (Grok/Gemini) with specialized prompts to distinguish genuine inspiring content from commercial promotions, includes AI-generated opinionated commentary
+- **AI-Generated Images**: Custom images generated using AI based on story themes with fallback category images
 - **Proprietary Awesome Index**: Advanced 6-step algorithm (50-100 scale) with anti-commercial filtering and duplicate detection
 - **Generic Duplicate Detection**: Advanced fuzzy string matching using 12 similarity algorithms with 100% accuracy on test data
 - **Content Quality Assurance**: Multi-stage filtering eliminates promotional content, maintains 40+ positivity threshold
