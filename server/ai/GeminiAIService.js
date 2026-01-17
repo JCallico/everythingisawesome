@@ -186,7 +186,7 @@ export class GeminiAIService extends AIService {
     } catch (error) {
       console.error(`Error generating image with Gemini (${this.imageModel}):`, error.message);
       if (error.response) {
-         console.error('Gemini Image API Error details:', JSON.stringify(error.response.data, null, 2));
+        console.error('Gemini Image API Error details:', JSON.stringify(error.response.data, null, 2));
       }
       throw error;
     }

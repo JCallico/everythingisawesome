@@ -24,20 +24,20 @@ export function createAIService() {
 
   if (provider === 'gemini') {
     if (!process.env.GEMINI_API_KEY) {
-        console.error('❌ Gemini configuration incomplete: Missing GEMINI_API_KEY');
-        console.error('   Falling back to Grok (if available) or failing.');
-        // Fallback logic could be complex. For now, let's try to proceed or just throw if strictly requested gemini.
-        // But if Grok is the default fallback, let's try that.
-        if (process.env.GROK_API_KEY) {
-            console.log('   Falling back to Grok AI Service');
-            aiServiceInstance = new GrokAIService();
-        } else {
-            // Neither is configured? The services check internally for keys usually, but factory can pre-check.
-            // Let's instantiate Gemini anyway so it throws proper error when used, or throw here.
-            aiServiceInstance = new GeminiAIService();
-        }
-    } else {
+      console.error('❌ Gemini configuration incomplete: Missing GEMINI_API_KEY');
+      console.error('   Falling back to Grok (if available) or failing.');
+      // Fallback logic could be complex. For now, let's try to proceed or just throw if strictly requested gemini.
+      // But if Grok is the default fallback, let's try that.
+      if (process.env.GROK_API_KEY) {
+        console.log('   Falling back to Grok AI Service');
+        aiServiceInstance = new GrokAIService();
+      } else {
+        // Neither is configured? The services check internally for keys usually, but factory can pre-check.
+        // Let's instantiate Gemini anyway so it throws proper error when used, or throw here.
         aiServiceInstance = new GeminiAIService();
+      }
+    } else {
+      aiServiceInstance = new GeminiAIService();
     }
   } else if (provider === 'grok') {
     // Default to Grok

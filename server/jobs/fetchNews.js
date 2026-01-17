@@ -183,7 +183,7 @@ const generateStoryImage = async (story, storyIndex) => {
     try {
       imagePrompt = await aiService.generateImagePrompt(story);
       console.log(`  Generated prompt: "${imagePrompt}"`);
-    } catch (e) {
+    } catch {
       console.log('  Error generating prompt with AI, using basic prompt');
       imagePrompt = createBasicImagePrompt(story);
     }
@@ -486,7 +486,7 @@ const fetchDailyNews = async (targetDate = null) => {
       let sentimentScore = 50;
       try {
         sentimentScore = await aiService.analyzeSentiment(articleText);
-      } catch (e) {
+      } catch {
         // console.log('Sentiment analysis failed, using default 50');
       }
       
@@ -499,7 +499,7 @@ const fetchDailyNews = async (targetDate = null) => {
       let summary = article.description || articleText.substring(0, 200);
       try {
         summary = await aiService.generateSummary(articleText);
-      } catch (e) {
+      } catch {
         // console.log('Summary generation failed, using fallback');
       }
       // Calculate awesome index
@@ -570,7 +570,7 @@ const fetchDailyNews = async (targetDate = null) => {
       let opinion = '';
       try {
         opinion = await aiService.generateOpinion(story.link, story.title);
-      } catch (e) {
+      } catch {
         // console.log('Opinion generation failed');
       }
 
