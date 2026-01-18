@@ -230,7 +230,7 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date, aiProvider, aiModel
                 onClick={() => setExpandedOpinion(!expandedOpinion)}
               >
                 <span className="opinion-toggle-icon">{expandedOpinion ? '▼' : '▶'}</span>
-                <h3 className="opinion-subtitle">{aiProvider || 'Grok'}'s Take {aiModel && <span style={{fontSize: '0.8em', opacity: 0.7}}>({aiModel})</span>}</h3>
+                <h3 className="opinion-subtitle">{aiProvider || 'Grok'}'s Take</h3>
               </button>
               {expandedOpinion && (
                 <p className="story-opinion">{currentStory.opinion}</p>
