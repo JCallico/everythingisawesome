@@ -10,6 +10,27 @@ const NewsDisplay = ({ stories, initialStoryIndex = 0, date, aiProvider, aiModel
   const containerRef = useRef(null);
   const userActivityTimeoutRef = useRef(null);
 
+  // Handle responsive expansion of opinion section
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    
+    // Set initial state based on current screen size
+    if (mediaQuery.matches) {
+      setExpandedOpinion(true);
+    }
+
+    // Update state when crossing the breakpoint
+    const handleResize = (e) => {
+      setExpandedOpinion(e.matches);
+    };
+
+    // Add listener for breakpoint changes
+    mediaQuery.addEventListener('change', handleResize);
+    
+    // Cleanup
+    return () => mediaQuery.removeEventListener('change', handleResize);
+  }, []);
+
   // Handle user activity detection to pause animation
   const handleUserActivity = useCallback(() => {
     setIsUserActive(true);
