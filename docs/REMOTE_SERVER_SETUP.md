@@ -62,8 +62,21 @@ This document describes the steps to set up and deploy the Everything Is Awesome
 ## 8. Environment Variables
 - Create a `.env` file in the project root and set required variables:
   ```env
-  GROK_API_KEY=your_grok_api_key
   NEWS_API_KEY=your_news_api_key
+  
+  # Choose one provider:
+  AI_PROVIDER=gemini # or grok
+  
+  # Gemini Config
+  GEMINI_API_KEY=your_gemini_key
+  GEMINI_MODEL=gemini-2.5-flash
+  GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+  GEMINI_OPINION_MAX_TOKENS=2000
+
+  # Grok Config
+  GROK_API_KEY=your_grok_key
+  GROK_MODEL=grok-3-latest
+
   NODE_ENV=production
   PORT=3001
   # ...other variables as needed

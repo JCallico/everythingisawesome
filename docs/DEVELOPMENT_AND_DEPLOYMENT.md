@@ -264,6 +264,22 @@ az storage account keys list --account-name mystorageaccount --resource-group my
 **3. Configure Environment Variables:**
 ```env
 # In .env for local development
+
+# Required for AI Features (Choose One Provider)
+AI_PROVIDER=gemini # or grok
+
+# Gemini Configuration (Recommended)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+GEMINI_OPINION_MAX_TOKENS=2000
+
+# Grok Configuration
+GROK_API_KEY=your_grok_api_key_here
+GROK_MODEL=grok-3-latest
+GROK_IMAGE_MODEL=grok-2-image
+
+# Azure Storage (Optional)
 AZURE_STORAGE_ACCOUNT_NAME=mystorageaccount
 AZURE_STORAGE_ACCOUNT_KEY=your_account_key_here
 AZURE_STORAGE_CONTAINER_NAME=data

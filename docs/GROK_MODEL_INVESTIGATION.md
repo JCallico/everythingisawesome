@@ -36,7 +36,7 @@ We investigated why the fetch-news script fails when using `grok-4-latest` inste
 - ✅ Reliable, fast, cost-effective
 - ✅ Proven in production
 
-### Option B: Make grok-4-latest Work Now
+### Option B: Make grok-4-latest (or Gemini) Work Now
 Update the environment variables in `.env`:
 
 ```bash
@@ -52,6 +52,9 @@ GROK_MODEL=grok-4-latest
 GROK_SENTIMENT_MAX_TOKENS=200       # grok-4 minimum
 GROK_SUMMARY_MAX_TOKENS=250         # grok-4 recommended
 GROK_IMAGE_PROMPT_MAX_TOKENS=300    # grok-4 recommended
+
+# For Gemini (uses thinking/reasoning models):
+GEMINI_OPINION_MAX_TOKENS=2000      # Increased for "Hot Take" depth
 ```
 
 ### Option C: Adaptive/Hybrid Approach
@@ -59,8 +62,8 @@ Create conditional logic that adapts based on the model:
 
 ```javascript
 const getOptimalMaxTokens = (model, baseTokens) => {
-  if (model.includes('grok-4')) {
-    return Math.max(baseTokens * 20, 200); // Much higher for grok-4
+  if (model.includes('grok-4') || model.includes('gemini-2.0-flash')) {
+    return Math.max(baseTokens * 20, 200); // Much higher for reasoning models
   }
   return baseTokens; // Standard for grok-3
 };

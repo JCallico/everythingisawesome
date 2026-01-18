@@ -143,11 +143,20 @@ npm run install-all
 
 # Set up environment variables
 # Copy .env.example to .env and add your API keys:
-# - GROK_API_KEY=your_grok_api_key
 # - NEWS_API_KEY=your_news_api_key
-# - GROK_MODEL=grok-3-latest (optional - has default)
-# - GROK_IMAGE_MODEL=grok-2-image (optional - has default)
-# - GROK_SENTIMENT_MAX_TOKENS=10 (optional - has default, use 200 for grok-4)
+# - AI_PROVIDER=gemini (or grok)
+#  
+# For Gemini (Default/Recommended):
+# - GEMINI_API_KEY=your_gemini_api_key
+# - GEMINI_MODEL=gemini-2.5-flash
+# - GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+# - GEMINI_OPINION_MAX_TOKENS=2000
+#
+# For Grok:
+# - GROK_API_KEY=your_grok_api_key
+# - GROK_MODEL=grok-3-latest 
+# - GROK_IMAGE_MODEL=grok-2-image
+# - GROK_SENTIMENT_MAX_TOKENS=10 (use 200 for grok-4)
 # - GROK_SUMMARY_MAX_TOKENS=100 (optional - has default, use 250 for grok-4)
 # - GROK_IMAGE_PROMPT_MAX_TOKENS=150 (optional - has default, use 300 for grok-4)
 # - GROK_OPINION_MAX_TOKENS=300 (optional - has default for opinion generation)
