@@ -2,7 +2,7 @@
 
 A beautiful cross-platform application displaying optimistic, feel-good news stories that restore hope in humanity. This project fetches real news articles, analyzes them with AI for sentiment and positivity, then presents the most uplifting stories with an engaging user interface.
 
-**🚀 Live Demo**: [http://everythingisawesome.iqapps.space/](http://everythingisawesome.iqapps.space/)
+**🚀 Live Demo**: [https://everythingisawesome.iqapps.space/](https://everythingisawesome.iqapps.space/)
 
 ## 📱 Cross-Platform Architecture
 
@@ -206,7 +206,7 @@ The project uses **dual GitHub Actions workflows** for automated deployments:
 - **Triggers**: Push to `main` branch or manual dispatch
 - **Purpose**: Builds and deploys web app to Azure Web Apps
 - **Features**: Multi-stage approval, Azure integration, production secrets
-- **Output**: Live web application at http://everythingisawesome.iqapps.space
+- **Output**: Live web application at https://everythingisawesome.iqapps.space
 
 ### 📱 Mobile Application Pipeline (`mobile-release.yml`) 
 - **Triggers**: Manual workflow dispatch with configuration options
